@@ -97,7 +97,7 @@ export function generateUserSummaryCard(data, theme = 'dark') {
 </svg>`.trim();
 }
 
-export function generateTopProjectsCard(data, theme = 'dark') {
+export function generateProjectsCard(data, theme = 'dark') {
   const { user, stats } = data;
   const isDark = theme === 'dark';
 
@@ -106,7 +106,7 @@ export function generateTopProjectsCard(data, theme = 'dark') {
   const accentColor = isDark ? '#1bd96a' : '#1bd96a';
   const secondaryTextColor = isDark ? '#8b949e' : '#4c4f69';
   const borderColor = '#E4E2E2';
-  const barBgColor = isDark ? '#21262d' : '#e6e9ef';
+  const barBgColor = 'transparent';
 
   const username = escapeXml(user.username);
   const topProjects = stats.topProjects.slice(0, 5);
@@ -118,7 +118,7 @@ export function generateTopProjectsCard(data, theme = 'dark') {
 
   let projectsHtml = '';
   topProjects.forEach((project, index) => {
-    const barWidth = (project.downloads / maxDownloads) * 320;
+    const barWidth = Math.max((project.downloads / maxDownloads) * 320, 8);
     const yPos = 100 + (index * 45);
     const projectName = escapeXml(project.title.length > 30 ? project.title.substring(0, 27) + '...' : project.title);
     const downloads = formatNumber(project.downloads);
@@ -126,8 +126,8 @@ export function generateTopProjectsCard(data, theme = 'dark') {
     projectsHtml += `
   <!-- Project ${index + 1} -->
   <g transform="translate(0, ${yPos})">
-    <rect x="20" y="0" width="320" height="8" fill="${barBgColor}" rx="4"/>
-    <rect x="20" y="0" width="${barWidth}" height="8" fill="${accentColor}" rx="4"/>
+    <rect x="20" y="0" width="320" height="8" fill="${barBgColor}" stroke="${borderColor}" stroke-width="1" rx="4"/>
+    <rect x="20.5" y="0.5" width="${barWidth - 1}" height="7" fill="${accentColor}" rx="3.5"/>
     <text x="20" y="25" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="13" fill="${textColor}">
       ${projectName}
     </text>
@@ -149,7 +149,7 @@ export function generateTopProjectsCard(data, theme = 'dark') {
 
   <!-- Title -->
   <text x="20" y="35" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="20" font-weight="bold" fill="${textColor}">
-    ${username}'s Top Projects
+    ${username}'s Projects
   </text>
 
   ${projectsHtml}

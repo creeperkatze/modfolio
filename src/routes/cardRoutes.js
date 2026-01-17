@@ -4,6 +4,6 @@ import * as cardController from '../controllers/cardController.js';
 const router = express.Router();
 
 router.get('/summary/:username', cardController.getSummary);
-router.get('/top-projects/:username', cardController.getTopProjects);
+router.get('/projects/:username', cardController.getProjects);
 
 export default router;

@@ -1,6 +1,6 @@
 import modrinthClient from '../services/modrinthClient.js';
 import cache from '../utils/cache.js';
-import { generateUserSummaryCard, generateTopProjectsCard } from '../utils/svgGenerator.js';
+import { generateUserSummaryCard, generateProjectsCard as generateProjectsCard } from '../utils/svgGenerator.js';
 
 export const getSummary = async (req, res, next) => {
   try {
@@ -34,13 +34,13 @@ export const getSummary = async (req, res, next) => {
   }
 };
 
-export const getTopProjects = async (req, res, next) => {
+export const getProjects = async (req, res, next) => {
   try {
     const { username } = req.params;
     const theme = req.query.theme || 'dark';
 
     // Check cache first
-    const cacheKey = `top-projects:${username}:${theme}`;
+    const cacheKey = `projects:${username}:${theme}`;
     const cached = cache.get(cacheKey);
 
     if (cached) {
@@ -53,7 +53,7 @@ export const getTopProjects = async (req, res, next) => {
     const data = await modrinthClient.getUserStats(username);
 
     // Generate SVG
-    const svg = generateTopProjectsCard(data, theme);
+    const svg = generateProjectsCard(data, theme);
 
     // Cache the result
     cache.set(cacheKey, svg);
