@@ -1,12 +1,28 @@
-import express from 'express'
+import express from 'express';
+import dotenv from 'dotenv';
+import logger from "./src/utils/logger.js";
+import cardRoutes from './routes/cardRoutes.js';
+import badgeRoutes from './routes/badgeRoutes.js';
+import { errorHandler } from './src/middleware/errorHandler.js';
 
-const app = express()
-const port = 3000
+dotenv.config({ quiet: true });
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+const app = express();
+const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-})
+app.use('/card', cardRoutes);
+app.use('/badge', badgeRoutes);
+
+app.get('/', (req, res) =>
+{
+    res.json({
+        message: 'Welcome to the Modrinth Readme Stats API',
+    });
+});
+
+app.use(errorHandler);
+
+app.listen(port, () =>
+{
+    logger.info(`Listening on port ${port}`);
+});
