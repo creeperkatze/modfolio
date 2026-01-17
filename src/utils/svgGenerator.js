@@ -241,7 +241,7 @@ export function generateUserCard(data, theme = 'dark')
     let projectsHtml = '';
     topProjects.forEach((project, index) => {
         const yPos = 160 + (index * 50);
-        const projectName = escapeXml(project.title.length > 20 ? project.title.substring(0, 17) + '...' : project.title);
+        const projectName = escapeXml(project.title);
         const downloads = formatNumber(project.downloads);
         const followers = formatNumber(project.followers || 0);
 
@@ -350,23 +350,23 @@ export function generateUserCard(data, theme = 'dark')
     </text>
   </g>
 
-  <!-- Projects -->
-  <g transform="translate(155, 70)">
-    <text font-family="'Segoe UI', Ubuntu, sans-serif" font-size="26" font-weight="bold" fill="${accentColor}">
-      ${projectCount}
-    </text>
-    <text y="20" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="12" fill="${secondaryTextColor}">
-      Projects
-    </text>
-  </g>
-
   <!-- Followers -->
-  <g transform="translate(240, 70)">
+  <g transform="translate(155, 70)">
     <text font-family="'Segoe UI', Ubuntu, sans-serif" font-size="26" font-weight="bold" fill="${accentColor}">
       ${totalFollowers}
     </text>
     <text y="20" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="12" fill="${secondaryTextColor}">
       Followers
+    </text>
+  </g>
+
+  <!-- Projects -->
+  <g transform="translate(270, 70)">
+    <text font-family="'Segoe UI', Ubuntu, sans-serif" font-size="26" font-weight="bold" fill="${accentColor}">
+      ${projectCount}
+    </text>
+    <text y="20" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="12" fill="${secondaryTextColor}">
+      Projects
     </text>
   </g>
 
