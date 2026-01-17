@@ -1,6 +1,6 @@
 import modrinthClient from '../services/modrinthClient.js';
 import cache from '../utils/cache.js';
-import { generateUserSummaryCard, generateProjectsCard } from '../utils/svgGenerator.js';
+import { generateUserSummaryCard as generateUserCard, generateProjectsCard } from '../utils/svgGenerator.js';
 
 const MAX_AGE = Math.floor(cache.ttl / 1000);
 
@@ -30,8 +30,5 @@ const handleCardRequest = async (req, res, next, cardType, generator) => {
   }
 };
 
-export const getSummary = (req, res, next) =>
-  handleCardRequest(req, res, next, 'summary', generateUserSummaryCard);
-
-export const getProjects = (req, res, next) =>
-  handleCardRequest(req, res, next, 'projects', generateProjectsCard);
+export const getUser = (req, res, next) =>
+  handleCardRequest(req, res, next, 'user', generateUserCard);

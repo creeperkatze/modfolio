@@ -53,6 +53,60 @@ export class ModrinthClient {
       .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
       .slice(0, 5);
 
+    // Calculate new metrics
+    const avgDownloads = projectCount > 0 ? Math.floor(totalDownloads / projectCount) : 0;
+    const engagementRatio = totalDownloads > 0 ? (totalFollowers / totalDownloads * 1000).toFixed(1) : 0;
+
+    // Project type breakdown
+    const projectTypes = projects.reduce((acc, project) => {
+      const type = project.project_type || 'unknown';
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Game versions (get most common versions)
+    const gameVersions = {};
+    projects.forEach(project => {
+      if (project.game_versions && Array.isArray(project.game_versions)) {
+        project.game_versions.forEach(version => {
+          gameVersions[version] = (gameVersions[version] || 0) + 1;
+        });
+      }
+    });
+    const topGameVersions = Object.entries(gameVersions)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([version]) => version);
+
+    // Loaders breakdown
+    const loaders = {};
+    projects.forEach(project => {
+      if (project.loaders && Array.isArray(project.loaders)) {
+        project.loaders.forEach(loader => {
+          loaders[loader] = (loaders[loader] || 0) + 1;
+        });
+      }
+    });
+
+    // Categories (most common)
+    const categories = {};
+    projects.forEach(project => {
+      if (project.categories && Array.isArray(project.categories)) {
+        project.categories.forEach(category => {
+          categories[category] = (categories[category] || 0) + 1;
+        });
+      }
+    });
+    const topCategories = Object.entries(categories)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([category]) => category);
+
+    // Recent activity
+    const recentProject = projects
+      .filter(p => p.published)
+      .sort((a, b) => new Date(b.published) - new Date(a.published))[0];
+
     return {
       user,
       projects,
@@ -61,7 +115,14 @@ export class ModrinthClient {
         totalFollowers,
         projectCount,
         mostPopular,
-        topProjects
+        topProjects,
+        avgDownloads,
+        engagementRatio,
+        projectTypes,
+        topGameVersions,
+        loaders,
+        topCategories,
+        recentProject
       }
     };
   }

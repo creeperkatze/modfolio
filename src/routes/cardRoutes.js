@@ -3,8 +3,7 @@ import * as cardController from '../controllers/cardController.js';
 
 const router = express.Router();
 
-router.get('/summary/:username', cardController.getSummary);
-router.get('/user/:username', cardController.getSummary);
-router.get('/projects/:username', cardController.getProjects);
+router.get('/summary/:username', cardController.getUser); // Deprecated
+router.get('/user/:username', cardController.getUser);
 
 export default router;
