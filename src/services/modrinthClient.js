@@ -34,11 +34,41 @@ export class ModrinthClient {
     return this.fetch(`${MODRINTH_API}/user/${username}/projects`);
   }
 
+  async fetchImageAsBase64(url) {
+    if (!url) return null;
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': USER_AGENT
+        }
+      });
+      if (!response.ok) return null;
+
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const base64 = buffer.toString('base64');
+      const contentType = response.headers.get('content-type') || 'image/png';
+      return `data:${contentType};base64,${base64}`;
+    } catch (error) {
+      logger.warn(`Failed to fetch image ${url}: ${error.message}`);
+      return null;
+    }
+  }
+
   async getUserStats(username) {
     const [user, projects] = await Promise.all([
       this.getUser(username),
       this.getUserProjects(username)
     ]);
+
+    // Fetch project icons as base64
+    await Promise.all(
+      projects.map(async (project) => {
+        if (project.icon_url) {
+          project.icon_url_base64 = await this.fetchImageAsBase64(project.icon_url);
+        }
+      })
+    );
 
     // Calculate aggregate statistics
     const totalDownloads = projects.reduce((sum, project) => sum + (project.downloads || 0), 0);

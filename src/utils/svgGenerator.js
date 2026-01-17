@@ -267,7 +267,7 @@ export function generateUserCard(data, theme = 'dark')
             }
         });
 
-        const projectIconUrl = project.icon_url || '';
+        const projectIconUrl = project.icon_url_base64 || project.icon_url || '';
 
         projectsHtml += `
   <!-- Project ${index + 1} -->
@@ -286,7 +286,7 @@ export function generateUserCard(data, theme = 'dark')
     <rect x="15" y="${yPos - 18}" width="${barWidth}" height="3" fill="${accentColor}" clip-path="url(#project-clip-${index})"/>
 
     <!-- Project image -->
-    ${projectIconUrl ? `<image x="20" y="${yPos - 12}" width="28" height="28" href="${escapeXml(projectIconUrl)}" clip-path="url(#project-icon-clip-${index})"/>` : `<rect x="20" y="${yPos - 12}" width="28" height="28" fill="${borderColor}" rx="4"/>`}
+    ${projectIconUrl ? `<image x="20" y="${yPos - 12}" width="28" height="28" href="${projectIconUrl}" clip-path="url(#project-icon-clip-${index})"/>` : `<rect x="20" y="${yPos - 12}" width="28" height="28" fill="${borderColor}" rx="4"/>`}
 
     <text x="54" y="${yPos - 2}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="13" font-weight="600" fill="${textColor}">
       ${projectName}
