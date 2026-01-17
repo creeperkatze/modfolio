@@ -15,9 +15,7 @@ app.use('/badge', badgeRoutes);
 
 app.get('/', (req, res) =>
 {
-    res.json({
-        message: 'Welcome to the Modrinth Readme Stats API',
-    });
+    res.redirect(301, 'https://github.com/creeperkatze/modrinth-readme-stats');
 });
 
 app.use(errorHandler);

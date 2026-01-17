@@ -379,6 +379,11 @@ export function generateUserCard(data, theme = 'dark')
   </text>
 
   ${projectsHtml}` : ''}
+
+  <!-- Bottom right attribution -->
+  <text x="445" y="${height - 5}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="8" fill="${secondaryTextColor}" text-anchor="end" opacity="0.6">
+    modrinth-readme-stats.creeperkatze.de
+  </text>
   </g>
 </svg>`.trim();
 }
