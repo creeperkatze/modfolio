@@ -190,8 +190,8 @@
             <div class="card-content">
                 <div class="left-panel">
                     <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-                        <img src="/favicon.svg" alt="Modrinth Logo" style="width: 2rem; height: 2rem;" />
-                        <h1>Modrinth Embeds</h1>
+                        <img src="/favicon.svg" alt="Modrinth Logo" style="width: 2rem; height: 2rem; margin-top: 0.125rem;" />
+                        <h1 style="margin-bottom: 0;">Modrinth Embeds</h1>
                     </div>
                     <p class="subtitle">Generate embeddable cards and badges for Modrinth projects, users, organizations, and collections</p>
 
@@ -272,6 +272,41 @@
             const markdownPlaceholder = document.getElementById("markdownPlaceholder");
             const copyBtn = document.getElementById("copyBtn");
 
+            // URL state management functions
+            function getUrlParams() {
+                const params = new URLSearchParams(window.location.search);
+                return {
+                    type: params.get('type') || 'card',
+                    target: params.get('target') || 'user',
+                    metric: params.get('metric') || 'downloads',
+                    value: params.get('value') || ''
+                };
+            }
+
+            function updateUrl() {
+                const params = new URLSearchParams();
+                const type = embedType.value;
+                const target = targetType.value;
+                const metric = badgeMetric.value;
+                const value = identifier.value.trim();
+
+                if (type !== 'card') params.set('type', type);
+                if (target !== 'user') params.set('target', target);
+                if (metric !== 'downloads') params.set('metric', metric);
+                if (value) params.set('value', value);
+
+                const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+                window.history.replaceState(null, '', newUrl);
+            }
+
+            function loadFromUrl() {
+                const params = getUrlParams();
+                embedType.value = params.type;
+                targetType.value = params.target;
+                badgeMetric.value = params.metric;
+                identifier.value = params.value;
+            }
+
             function parseModrinthUrl(url) {
                 try {
                     const urlObj = new URL(url);
@@ -311,6 +346,7 @@
                 if (parsed) {
                     targetType.value = parsed.type;
                     identifier.value = parsed.id;
+                    updateUrl();
                     updateUI();
                 }
             });
@@ -377,10 +413,10 @@
                 };
             }
 
-            embedType.addEventListener("change", updateUI);
-            targetType.addEventListener("change", updateUI);
-            badgeMetric.addEventListener("change", generate);
-            identifier.addEventListener("input", generate);
+            embedType.addEventListener("change", () => { updateUI(); updateUrl(); });
+            targetType.addEventListener("change", () => { updateUI(); updateUrl(); });
+            badgeMetric.addEventListener("change", () => { generate(); updateUrl(); });
+            identifier.addEventListener("input", () => { generate(); updateUrl(); });
 
             function copyUrl() {
                 const text = markdownOutput.textContent.trim();
@@ -395,6 +431,7 @@
                 });
             }
 
+            loadFromUrl();
             updateUI();
         </script>
 
