@@ -57,7 +57,7 @@ export class ModrinthClient
 
     async getProjectVersions(slug)
     {
-        return this.fetch(`${MODRINTH_API_URL}/project/${slug}/version`);
+        return this.fetch(`${MODRINTH_API_URL}/project/${slug}/version?include_changelog=false`);
     }
 
     async getOrganization(id)
