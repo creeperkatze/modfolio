@@ -1,4 +1,4 @@
-import { formatNumber, escapeXml } from '../utils/formatters.js';
+import { formatNumber, escapeXml, truncateText } from '../utils/formatters.js';
 import { ICONS } from '../constants/icons.js';
 import { getLoaderColor, getProjectTypeIcon } from '../constants/loaderConfig.js';
 
@@ -13,7 +13,7 @@ export function generateOrganizationCard(data, theme = 'dark')
     const secondaryTextColor = isDark ? '#8b949e' : '#4c4f69';
     const borderColor = '#E4E2E2';
 
-    const name = escapeXml(organization.name);
+    const name = escapeXml(truncateText(organization.name, 22));
     const totalDownloads = formatNumber(stats.totalDownloads);
     const projectCount = stats.projectCount;
     const totalFollowers = formatNumber(stats.totalFollowers);
@@ -29,7 +29,7 @@ export function generateOrganizationCard(data, theme = 'dark')
     let projectsHtml = '';
     topProjects.forEach((project, index) => {
         const yPos = 160 + (index * 50);
-        const projectName = escapeXml(project.title);
+        const projectName = escapeXml(truncateText(project.title, 18));
         const downloads = formatNumber(project.downloads);
         const followers = formatNumber(project.followers || 0);
 

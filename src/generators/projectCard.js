@@ -1,4 +1,4 @@
-import { formatNumber, escapeXml } from '../utils/formatters.js';
+import { formatNumber, escapeXml, truncateText } from '../utils/formatters.js';
 import { ICONS } from '../constants/icons.js';
 import { getLoaderColor, getProjectTypeIcon } from '../constants/loaderConfig.js';
 
@@ -13,7 +13,7 @@ export function generateProjectCard(data, theme = 'dark')
     const secondaryTextColor = isDark ? '#8b949e' : '#4c4f69';
     const borderColor = '#E4E2E2';
 
-    const projectName = escapeXml(project.title);
+    const projectName = escapeXml(truncateText(project.title, 22));
     const downloads = formatNumber(stats.downloads);
     const followers = formatNumber(stats.followers);
     const versionCount = stats.versionCount;
@@ -31,7 +31,7 @@ export function generateProjectCard(data, theme = 'dark')
     latestVersions.forEach((version, index) => {
         const yPos = 160 + (index * 50);
         const versionName = escapeXml(version.name);
-        const versionNumber = escapeXml(version.version_number);
+        const versionNumber = escapeXml(truncateText(version.version_number, 18));
 
         // Format date
         const publishedDate = new Date(version.date_published);

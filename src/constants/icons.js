@@ -193,5 +193,17 @@ export const ICONS = {
         <path d="M12 6v14" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         <path d="M8 8v12" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         <path d="M4 4v16" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    `,
+    canvas: (color = 'currentColor') => `
+        <path d="M12 1.305 1.305 12 12 22.695 22.695 12 12 1.305Z" stroke="${color}" stroke-width="2" fill="none"/>
+        <path d="M12 5.547 5.547 12 12 18.453 18.453 12 12 5.547Z" stroke="${color}" stroke-width="2" fill="none"/>
+        <path d="M12 9.79 9.79 12 12 14.21 14.21 12 12 9.79Z" stroke="${color}" stroke-width="2" fill="none"/>
+    `,
+    iris: (color = 'currentColor') => `
+        <path d="m22.59 12.013-3.01 3.126v4.405l.005.019-4.251-.005-2.994 3.115h-.003l-3.003-3.132H5.1l-.018.005.005-4.424-2.994-3.116-.003-.023L5.1 8.858V4.452l-.005-.019 4.252.005 2.993-3.115h.003l3.003 3.132h4.234l.018-.005-.005 4.425 2.994 3.115" stroke="${color}" stroke-width="2" fill="none" transform="translate(-.344)"/>
+        <path d="m17.229 12.005-1.436 1.491v2.101l.003.009-2.028-.002-1.428 1.486h-.001l-1.433-1.494H8.887l-.008.002.002-2.11-1.428-1.486-.001-.011L8.887 10.5V8.399l-.002-.009 2.027.002 1.428-1.485h.002l1.432 1.494h2.019l.009-.003-.003 2.11 1.428 1.486" stroke="${color}" stroke-width="2" fill="none" transform="translate(-.344)"/>
+    `,
+    optifine: (color = 'currentColor') => `
+        <path d="M10.985 9.205c0-1.38-1.121-2.5-2.5-2.5H7.156a2.5 2.5 0 0 0-2.5 2.5v5.59a2.5 2.5 0 0 0 2.5 2.5h1.329c1.379 0 2.5-1.12 2.5-2.5v-5.59ZM14.793 17.295v-9.34a1.252 1.252 0 0 1 1.25-1.25h3.301M18.007 10.997h-3.214" stroke="${color}" stroke-width="2" fill="none"/>
     `
 };
