@@ -75,7 +75,7 @@
                 display: block;
                 margin-bottom: 12px;
             }
-            .url-output {
+            .markdown-output {
                 padding: 12px;
                 background: #2a2a3a;
                 border: 1px solid #e4e2e2;
@@ -148,8 +148,8 @@
 
             <div id="preview" class="preview">
                 <img id="previewImg" src="" alt="Preview" />
-                <div class="url-output" id="urlOutput"></div>
-                <button class="copy-btn" onclick="copyUrl()">Copy URL</button>
+                <div class="markdown-output" id="markdownOutput"></div>
+                <button class="copy-btn" onclick="copyUrl()">Copy</button>
             </div>
         </div>
 
@@ -162,7 +162,7 @@
             const inputLabel = document.getElementById("inputLabel");
             const preview = document.getElementById("preview");
             const previewImg = document.getElementById("previewImg");
-            const urlOutput = document.getElementById("urlOutput");
+            const markdownOutput = document.getElementById("markdownOutput");
 
             function updateBadgeOptions() {
                 const target = targetType.value;
@@ -221,7 +221,8 @@
                 }
 
                 previewImg.src = url + "?t=" + Date.now();
-                urlOutput.textContent = url;
+                const name = id;
+                markdownOutput.textContent = `[![${name}](${url})](https://modrinth.com/${type}/${id})`;
                 preview.classList.add("active");
             }
 
@@ -231,7 +232,7 @@
             identifier.addEventListener("input", generate);
 
             function copyUrl() {
-                navigator.clipboard.writeText(urlOutput.textContent).then(() => {
+                navigator.clipboard.writeText(markdownOutput.textContent).then(() => {
                     const btn = event.target;
                     const originalText = btn.textContent;
                     btn.textContent = "Copied!";
