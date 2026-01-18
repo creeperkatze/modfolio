@@ -31,7 +31,7 @@ const handleBadgeRequest = async (req, res, next, badgeType, getValue, getDataFu
         res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
         res.send(svg);
     } catch (err) {
-        logger.error(`Error showing ${badgeType} badge for "${req.params.username || req.params.slug || req.params.id}": ${err.message}`);
+        logger.warn(`Error showing ${badgeType} badge for "${req.params.username || req.params.slug || req.params.id}": ${err.message}`);
         next(err);
     }
 };

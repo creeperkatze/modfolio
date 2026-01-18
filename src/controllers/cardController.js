@@ -32,7 +32,7 @@ const handleCardRequest = async (req, res, next, cardType, generator) => {
         res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
         res.send(svg);
     } catch (err) {
-        logger.error(`Error showing ${cardType} card for "${req.params.username}": ${err.message}`);
+        logger.warn(`Error showing ${cardType} card for "${req.params.username}": ${err.message}`);
         next(err);
     }
 };
@@ -64,7 +64,7 @@ const handleProjectCardRequest = async (req, res, next, cardType, generator) => 
         res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
         res.send(svg);
     } catch (err) {
-        logger.error(`Error showing ${cardType} card for "${req.params.slug}": ${err.message}`);
+        logger.warn(`Error showing ${cardType} card for "${req.params.slug}": ${err.message}`);
         next(err);
     }
 };
@@ -96,7 +96,7 @@ const handleOrganizationCardRequest = async (req, res, next, cardType, generator
         res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
         res.send(svg);
     } catch (err) {
-        logger.error(`Error showing ${cardType} card for "${req.params.id}": ${err.message}`);
+        logger.warn(`Error showing ${cardType} card for "${req.params.id}": ${err.message}`);
         next(err);
     }
 };
@@ -128,7 +128,7 @@ const handleCollectionCardRequest = async (req, res, next, cardType, generator) 
         res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
         res.send(svg);
     } catch (err) {
-        logger.error(`Error showing ${cardType} card for "${req.params.id}": ${err.message}`);
+        logger.warn(`Error showing ${cardType} card for "${req.params.id}": ${err.message}`);
         next(err);
     }
 };

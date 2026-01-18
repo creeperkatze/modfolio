@@ -39,7 +39,7 @@ export const getMeta = async (req, res, next) => {
         res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
         res.json(result);
     } catch (err) {
-        logger.error(`Error fetching meta for "${req.params.type}" "${req.params.id}": ${err.message}`);
+        logger.warn(`Error fetching meta for "${req.params.type}" "${req.params.id}": ${err.message}`);
         next(err);
     }
 };
