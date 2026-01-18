@@ -1,5 +1,4 @@
-import logger from '../utils/logger.js';
-import { generateBadge } from '../utils/svgGenerator.js';
+import { generateBadge } from '../generators/badge.js';
 
 function generateErrorCard(message, theme = 'dark') {
   const isDark = theme === 'dark';
