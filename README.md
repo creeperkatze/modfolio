@@ -197,7 +197,9 @@ Copy the `.env.example` file and rename it to `.env`
 
 ## Contributing
 
-Contributions are always welcome. Just open a pull request!
+Contributions are always welcome!
+
+Please ensure you run `pnpm lint` before opening a pull request.
 
 ## License
 
