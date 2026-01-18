@@ -58,7 +58,7 @@ function getStatusMessage(statusCode)
     return statusMessages[statusCode] || `Error ${statusCode}`;
 }
 
-export function errorHandler(err, req, res)
+export function errorHandler(err, req, res, next)
 {
     const theme = req.query.theme || "dark";
 
@@ -105,6 +105,6 @@ export function errorHandler(err, req, res)
         res.status(statusCode).send(generateBadge("error", message, "#f38ba8"));
     } else
     {
-        res.status(statusCode).send(generateErrorCard(message, theme, detailText));
+        res.status(statusCode).send(generateErrorCard(message, detailText));
     }
 }
