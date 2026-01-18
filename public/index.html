@@ -132,7 +132,6 @@
                 font-size: 0.75rem;
                 word-break: break-all;
                 color: #ecf9fb;
-                min-height: 60px;
             }
 
             button {
@@ -252,7 +251,17 @@
                         </div>
                     </div>
 
-                    <button class="copy-btn" onclick="copyUrl()" id="copyBtn" disabled>Copy</button>
+                    <div>
+                        <h2>HTML</h2>
+                        <div class="markdown-output empty" id="htmlOutput">
+                            <span id="htmlPlaceholder">Your HTML code will appear here</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="copy-btn" onclick="copyMarkdown()" id="copyMarkdownBtn" disabled>Copy Markdown</button>
+                        <button class="copy-btn" onclick="copyHtml()" id="copyHtmlBtn" disabled>Copy HTML</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -270,7 +279,10 @@
             const previewImg = document.getElementById("previewImg");
             const markdownOutput = document.getElementById("markdownOutput");
             const markdownPlaceholder = document.getElementById("markdownPlaceholder");
-            const copyBtn = document.getElementById("copyBtn");
+            const htmlOutput = document.getElementById("htmlOutput");
+            const htmlPlaceholder = document.getElementById("htmlPlaceholder");
+            const copyMarkdownBtn = document.getElementById("copyMarkdownBtn");
+            const copyHtmlBtn = document.getElementById("copyHtmlBtn");
 
             // URL state management functions
             function getUrlParams() {
@@ -381,7 +393,10 @@
                     previewLink.style.display = "none";
                     markdownOutput.classList.add("empty");
                     markdownOutput.innerHTML = '<span id="markdownPlaceholder">Your markdown code will appear here</span>';
-                    copyBtn.disabled = true;
+                    htmlOutput.classList.add("empty");
+                    htmlOutput.innerHTML = '<span id="htmlPlaceholder">Your HTML code will appear here</span>';
+                    copyMarkdownBtn.disabled = true;
+                    copyHtmlBtn.disabled = true;
                     return;
                 }
 
@@ -393,11 +408,15 @@
                 markdownOutput.classList.remove("empty");
                 markdownOutput.textContent = `[![${identifierValue}](${url})](${modrinthUrl})`;
 
+                htmlOutput.classList.remove("empty");
+                htmlOutput.textContent = `<a href="${modrinthUrl}"><img src="${url}" alt="${identifierValue}" /></a>`;
+
                 previewLink.href = modrinthUrl;
                 previewContainer.classList.remove("empty");
                 previewPlaceholder.style.display = "none";
                 previewLink.style.display = "block";
-                copyBtn.disabled = false;
+                copyMarkdownBtn.disabled = false;
+                copyHtmlBtn.disabled = false;
 
                 previewImg.src = `${url}?t=${Date.now()}`;
                 previewImg.onload = async () => {
@@ -407,6 +426,7 @@
                             const data = await res.json();
                             if (data?.name) {
                                 markdownOutput.textContent = `[![${data.name}](${url})](${modrinthUrl})`;
+                                htmlOutput.textContent = `<a href="${modrinthUrl}"><img src="${url}" alt="${data.name}" /></a>`;
                             }
                         }
                     } catch {}
@@ -418,15 +438,28 @@
             badgeMetric.addEventListener("change", () => { generate(); updateUrl(); });
             identifier.addEventListener("input", () => { generate(); updateUrl(); });
 
-            function copyUrl() {
+            function copyMarkdown() {
                 const text = markdownOutput.textContent.trim();
                 if (!text || text === "Your markdown code will appear here") return;
 
                 navigator.clipboard.writeText(text).then(() => {
-                    const originalText = copyBtn.textContent;
-                    copyBtn.textContent = "Copied!";
+                    const originalText = copyMarkdownBtn.textContent;
+                    copyMarkdownBtn.textContent = "Copied!";
                     setTimeout(() => {
-                        copyBtn.textContent = originalText;
+                        copyMarkdownBtn.textContent = originalText;
+                    }, 2000);
+                });
+            }
+
+            function copyHtml() {
+                const text = htmlOutput.textContent.trim();
+                if (!text || text === "Your HTML code will appear here") return;
+
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = copyHtmlBtn.textContent;
+                    copyHtmlBtn.textContent = "Copied!";
+                    setTimeout(() => {
+                        copyHtmlBtn.textContent = originalText;
                     }, 2000);
                 });
             }
