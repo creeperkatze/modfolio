@@ -1,10 +1,12 @@
 import { escapeXml } from '../utils/formatters.js';
+import { ICONS } from '../constants/icons.js';
 
 export function generateBadge(label, value, color = '#1bd96a')
 {
+    const iconWidth = 30;
     const labelWidth = label.length * 7 + 20;
     const valueWidth = value.length * 8 + 20;
-    const totalWidth = labelWidth + valueWidth;
+    const totalWidth = iconWidth + labelWidth + valueWidth;
     const height = 30;
 
     const bgColor = 'transparent';
@@ -21,13 +23,19 @@ export function generateBadge(label, value, color = '#1bd96a')
   </defs>
   <g clip-path="url(#badge_clip)">
     <rect stroke="${borderColor}" fill="${bgColor}" rx="4.5" x="0.5" y="0.5" width="${totalWidth - 1}" height="${height - 1}" vector-effect="non-scaling-stroke"/>
-    <path d="M ${labelWidth} 1 H ${labelWidth + valueWidth - 5} A 4 4 0 0 1 ${labelWidth + valueWidth - 1} 5 V ${height - 5} A 4 4 0 0 1 ${labelWidth + valueWidth - 5} ${height - 1} H ${labelWidth} Z" fill="${color}"/>
-    <line x1="${labelWidth}" y1="1" x2="${labelWidth}" y2="${height - 1}" stroke="${borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <path d="M ${iconWidth + labelWidth} 1 H ${iconWidth + labelWidth + valueWidth - 5} A 4 4 0 0 1 ${iconWidth + labelWidth + valueWidth - 1} 5 V ${height - 5} A 4 4 0 0 1 ${iconWidth + labelWidth + valueWidth - 5} ${height - 1} H ${iconWidth + labelWidth} Z" fill="${color}"/>
+    <line x1="${iconWidth}" y1="1" x2="${iconWidth}" y2="${height - 1}" stroke="${borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <line x1="${iconWidth + labelWidth}" y1="1" x2="${iconWidth + labelWidth}" y2="${height - 1}" stroke="${borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>
   </g>
 
+  <!-- Modrinth Icon -->
+  <svg x="${(iconWidth - 18) / 2}" y="${(height - 18) / 2}" width="18" height="18" viewBox="0 0 512 514">
+    ${ICONS.modrinth(color)}
+  </svg>
+
   <g text-anchor="middle" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" font-weight="500">
-    <text x="${labelWidth / 2}" y="20" fill="${labelTextColor}">${escapeXml(label)}</text>
-    <text x="${labelWidth + (valueWidth / 2)}" y="20" fill="${valueTextColor}">${escapeXml(value)}</text>
+    <text x="${iconWidth + (labelWidth / 2)}" y="20" fill="${labelTextColor}">${escapeXml(label)}</text>
+    <text x="${iconWidth + labelWidth + (valueWidth / 2)}" y="20" fill="${valueTextColor}">${escapeXml(value)}</text>
   </g>
 </svg>`.trim();
 }
