@@ -30,7 +30,7 @@ export function getProjectTypeIcon(projectType) {
         resourcepack: 'paintbrush',
         shader: 'glasses',
         plugin: 'plug',
-        datapack: 'braces',
+        datapack: 'datapack',
         project: 'box'
     };
     return iconMap[projectType?.toLowerCase()] || 'box';
