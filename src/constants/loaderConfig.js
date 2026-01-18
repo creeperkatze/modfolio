@@ -18,7 +18,6 @@ export function getLoaderColor(loader) {
         "bta-babric": "#5ba938",
         "legacy-fabric": "#6879f6",
         nilloader: "#dd5088",
-        minecraft: "#62C940"
     };
     return colors[loader.toLowerCase()] || "#8b949e";
 }
