@@ -10,135 +10,171 @@
                 padding: 0;
                 box-sizing: border-box;
             }
+
             body {
-                font-family: "Segoe UI", Ubuntu, sans-serif;
-                background: #000;
-                color: #c9d1d9;
+                font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif;
+                background: #06060d;
+                color: #b0bac5;
                 min-height: 100vh;
-                padding: 40px 20px;
+                padding: 2.5rem 1.25rem;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                font-weight: 500;
             }
+
             .card {
-                background: #1e1e2e;
-                border-radius: 12px;
-                padding: 40px;
+                background: #101014;
+                border-radius: 1rem;
+                padding: 2.5rem;
                 max-width: 1200px;
                 width: 100%;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
             }
+
             .card-content {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                gap: 40px;
+                gap: 2.5rem;
             }
-            .left-panel h1 {
+
+            h1 {
                 color: #1bd96a;
-                margin-bottom: 8px;
-                font-size: 32px;
-                font-weight: bold;
+                margin-bottom: 0.5rem;
+                font-size: 2rem;
+                font-weight: 800;
             }
+
             .subtitle {
-                color: #8b949e;
-                margin-bottom: 32px;
-                font-size: 14px;
+                margin-bottom: 2rem;
+                font-size: 0.875rem;
+                opacity: 0.8;
             }
+
             .section {
-                margin-bottom: 24px;
+                margin-bottom: 1.5rem;
             }
+
             .section h2 {
-                color: #c9d1d9;
-                font-size: 14px;
-                margin-bottom: 8px;
+                color: #c4cfdd;
+                font-size: 0.875rem;
                 font-weight: 600;
+                margin-bottom: 0.5rem;
             }
-            label {
-                display: block;
-                color: #8b949e;
-                margin-bottom: 6px;
-                font-size: 13px;
+
+            .right-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
             }
+
+            .right-panel h2 {
+                color: #c4cfdd;
+                font-size: 1.125rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+            }
+
             input,
             select {
                 width: 100%;
-                padding: 10px 12px;
-                background: #2a2a3a;
-                border: 1px solid #3a3a4a;
-                border-radius: 4px;
-                color: #c9d1d9;
-                font-size: 14px;
+                padding: 0.625rem 0.75rem;
+                background: #3c3c40;
+                border: 2px solid transparent;
+                border-radius: 0.75rem;
+                color: #ecf9fb;
+                font-size: 0.875rem;
                 font-family: inherit;
+                font-weight: 500;
+                transition: border-color 0.1s;
             }
+
             input:focus,
             select:focus {
                 outline: none;
                 border-color: #1bd96a;
             }
-            .right-panel {
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-            }
-            .right-panel h2 {
-                color: #c9d1d9;
-                font-size: 18px;
-                font-weight: 600;
-                margin-bottom: 8px;
-            }
-            .preview-container {
-                background: #2a2a3a;
+
+            .preview-container,
+            .markdown-output {
+                background: #3c3c40;
                 border: 1px solid #3a3a4a;
-                border-radius: 8px;
-                padding: 24px;
-                min-height: 400px;
+                border-radius: 0.75rem;
                 display: flex;
                 align-items: center;
+            }
+
+            .preview-container {
+                padding: 1rem;
+                min-height: 460px;
                 justify-content: center;
             }
-            .preview-container.empty {
-                color: #8b949e;
-                font-size: 14px;
+
+            .preview-container.empty,
+            .markdown-output.empty {
+                color: #929aa3;
             }
+
+            .preview-container.empty {
+                font-size: 0.875rem;
+            }
+
             .preview-container img {
                 max-width: 100%;
-                display: block;
             }
+
             .markdown-output {
-                padding: 12px;
-                background: #2a2a3a;
-                border: 1px solid #3a3a4a;
-                border-radius: 4px;
-                font-family: monospace;
-                font-size: 12px;
+                padding: 0.75rem;
+                font-family: ui-monospace, monospace;
+                font-size: 0.75rem;
                 word-break: break-all;
-                color: #c9d1d9;
+                color: #ecf9fb;
                 min-height: 60px;
-                display: flex;
-                align-items: center;
             }
-            .markdown-output.empty {
-                color: #8b949e;
-            }
+
             button {
-                padding: 10px 16px;
+                padding: 0.625rem 1rem;
                 background: #1bd96a;
-                color: #1e1e2e;
+                color: #000;
                 border: none;
-                border-radius: 4px;
-                font-size: 14px;
+                border-radius: 0.75rem;
+                font-size: 0.875rem;
                 font-weight: 600;
                 cursor: pointer;
-                transition: background 0.2s;
+                transition: filter 0.2s;
             }
+
             button:hover {
-                background: #19c25e;
+                filter: brightness(110%);
             }
+
             button:disabled {
-                background: #3a3a4a;
-                color: #8b949e;
+                background: #3c3c40;
+                color: #b0bac5;
+                opacity: 0.5;
                 cursor: not-allowed;
             }
+
+            .divider {
+                margin: 1.5rem 0;
+                border: 0;
+                border-top: 1px solid #3a3a4a;
+                position: relative;
+            }
+
+            .divider::after {
+                content: 'OR';
+                position: absolute;
+                top: -0.625rem;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #101014;
+                padding: 0 0.75rem;
+                font-size: 0.75rem;
+                color: #929aa3;
+                font-weight: 600;
+            }
+
             @media (max-width: 768px) {
                 .card-content {
                     grid-template-columns: 1fr;
@@ -151,46 +187,44 @@
             <div class="card-content">
                 <div class="left-panel">
                     <h1>Modrinth Embeds</h1>
-                    <p class="subtitle">Generate embeddable SVG cards and badges for Modrinth projects, users, organizations, and collections</p>
+                    <p class="subtitle">Generate embeddable cards and badges for Modrinth projects, users, organizations, and collections</p>
+
+                    <div class="section">
+                        <h2>Modrinth URL</h2>
+                        <input type="text" id="modrinthUrl" placeholder="https://modrinth.com/mod/fabric-api" />
+                    </div>
+
+                    <hr class="divider" />
 
                     <div class="section">
                         <h2>Type</h2>
-                        <div class="input-group">
-                            <select id="embedType">
-                                <option value="card">Card</option>
-                                <option value="badge">Badge</option>
-                            </select>
-                        </div>
+                        <select id="embedType">
+                            <option value="card">Card</option>
+                            <option value="badge">Badge</option>
+                        </select>
                     </div>
 
                     <div class="section">
                         <h2>Target</h2>
-                        <div class="input-group">
-                            <select id="targetType">
-                                <option value="user">User</option>
-                                <option value="project">Project</option>
-                                <option value="organization">Organization</option>
-                                <option value="collection">Collection</option>
-                            </select>
-                        </div>
+                        <select id="targetType">
+                            <option value="user">User</option>
+                            <option value="project">Project</option>
+                            <option value="organization">Organization</option>
+                            <option value="collection">Collection</option>
+                        </select>
                     </div>
 
                     <div class="section" id="badgeSection" style="display: none">
                         <h2>Badge Metric</h2>
-                        <div class="input-group">
-                            <select id="badgeMetric">
-                                <option value="downloads">Downloads</option>
-                                <option value="followers">Followers</option>
-                            </select>
-                        </div>
+                        <select id="badgeMetric">
+                            <option value="downloads">Downloads</option>
+                            <option value="followers">Followers</option>
+                        </select>
                     </div>
 
                     <div class="section">
-                        <h2>Details</h2>
-                        <div class="input-group">
-                            <label id="inputLabel">Username</label>
-                            <input type="text" id="identifier" placeholder="Enter username or project slug" />
-                        </div>
+                        <h2>Value</h2>
+                        <input type="text" id="identifier" placeholder="Enter username or project slug" />
                     </div>
                 </div>
 
@@ -218,12 +252,12 @@
         </div>
 
         <script>
+            const modrinthUrl = document.getElementById("modrinthUrl");
             const embedType = document.getElementById("embedType");
             const targetType = document.getElementById("targetType");
             const badgeSection = document.getElementById("badgeSection");
             const badgeMetric = document.getElementById("badgeMetric");
             const identifier = document.getElementById("identifier");
-            const inputLabel = document.getElementById("inputLabel");
             const previewContainer = document.getElementById("previewContainer");
             const previewPlaceholder = document.getElementById("previewPlaceholder");
             const previewLink = document.getElementById("previewLink");
@@ -232,40 +266,63 @@
             const markdownPlaceholder = document.getElementById("markdownPlaceholder");
             const copyBtn = document.getElementById("copyBtn");
 
-            function updateBadgeOptions() {
-                const target = targetType.value;
-                badgeMetric.innerHTML = "";
+            function parseModrinthUrl(url) {
+                try {
+                    const urlObj = new URL(url);
+                    if (!urlObj.hostname.includes('modrinth.com')) return null;
 
-                if (target === "user" || target === "organization" || target === "collection") {
-                    badgeMetric.innerHTML = `
-                    <option value="downloads">Downloads</option>
-                    <option value="followers">Followers</option>
-                    <option value="projects">Projects</option>
-                `;
-                } else {
-                    badgeMetric.innerHTML = `
-                    <option value="downloads">Downloads</option>
-                    <option value="followers">Followers</option>
-                    <option value="versions">Versions</option>
-                `;
+                    const pathParts = urlObj.pathname.split('/').filter(p => p);
+                    if (pathParts.length < 2) return null;
+
+                    const type = pathParts[0];
+                    const id = pathParts[1];
+
+                    // Map URL types to our target types
+                    const typeMap = {
+                        'mod': 'project',
+                        'modpack': 'project',
+                        'shader': 'project',
+                        'resourcepack': 'project',
+                        'datapack': 'project',
+                        'plugin': 'project',
+                        'user': 'user',
+                        'organization': 'organization',
+                        'collection': 'collection'
+                    };
+
+                    const mappedType = typeMap[type];
+                    if (!mappedType) return null;
+
+                    return { type: mappedType, id };
+                } catch {
+                    return null;
                 }
             }
 
-            function updateUI() {
-                if (targetType.value === "user") {
-                    inputLabel.textContent = "User";
-                    identifier.placeholder = "Enter username or id";
-                } else if (targetType.value === "project") {
-                    inputLabel.textContent = "Project";
-                    identifier.placeholder = "Enter project slug or id";
-                } else if (targetType.value === "organization") {
-                    inputLabel.textContent = "Organization";
-                    identifier.placeholder = "Enter organization slug or id";
-                } else {
-                    inputLabel.textContent = "Collection";
-                    identifier.placeholder = "Enter collection id";
+            modrinthUrl.addEventListener('input', () => {
+                const parsed = parseModrinthUrl(modrinthUrl.value.trim());
+                if (parsed) {
+                    targetType.value = parsed.type;
+                    identifier.value = parsed.id;
+                    updateUI();
                 }
+            });
 
+            function updateBadgeOptions() {
+                const isUserOrgOrCollection = ["user", "organization", "collection"].includes(targetType.value);
+                badgeMetric.innerHTML = isUserOrgOrCollection
+                    ? '<option value="downloads">Downloads</option><option value="followers">Followers</option><option value="projects">Projects</option>'
+                    : '<option value="downloads">Downloads</option><option value="followers">Followers</option><option value="versions">Versions</option>';
+            }
+
+            function updateUI() {
+                const placeholders = {
+                    user: "Enter username or id",
+                    project: "Enter project slug or id",
+                    organization: "Enter organization slug or id",
+                    collection: "Enter collection id"
+                };
+                identifier.placeholder = placeholders[targetType.value] || "";
                 badgeSection.style.display = embedType.value === "badge" ? "block" : "none";
                 updateBadgeOptions();
                 generate();
@@ -276,28 +333,20 @@
                 const identifierValue = identifier.value.trim();
 
                 if (!identifierValue) {
-                    // Reset to empty state
                     previewContainer.classList.add("empty");
                     previewPlaceholder.style.display = "inline";
                     previewLink.style.display = "none";
                     markdownOutput.classList.add("empty");
-                    markdownPlaceholder.style.display = "inline";
                     markdownOutput.innerHTML = '<span id="markdownPlaceholder">Your markdown code will appear here</span>';
                     copyBtn.disabled = true;
                     return;
                 }
 
-                let url;
-                if (embedType.value === "card") {
-                    url = `${window.location.origin}/${type}/${identifierValue}`;
-                } else {
-                    const metric = badgeMetric.value;
-                    url = `${window.location.origin}/${type}/${identifierValue}/${metric}`;
-                }
-
+                const url = embedType.value === "card"
+                    ? `${window.location.origin}/${type}/${identifierValue}`
+                    : `${window.location.origin}/${type}/${identifierValue}/${badgeMetric.value}`;
                 const modrinthUrl = `https://modrinth.com/${type}/${identifierValue}`;
 
-                // Show preview immediately with placeholder markdown
                 markdownOutput.classList.remove("empty");
                 markdownOutput.textContent = `[![${identifierValue}](${url})](${modrinthUrl})`;
 
@@ -307,22 +356,17 @@
                 previewLink.style.display = "block";
                 copyBtn.disabled = false;
 
-                // Load the image first
-                previewImg.src = url + "?t=" + Date.now();
-
-                // Wait for image to load, then fetch metadata
+                previewImg.src = `${url}?t=${Date.now()}`;
                 previewImg.onload = async () => {
-                    let displayName = identifierValue;
                     try {
                         const res = await fetch(`/meta/${type}/${encodeURIComponent(identifierValue)}`);
                         if (res.ok) {
                             const data = await res.json();
-                            if (data && data.name) displayName = data.name;
+                            if (data?.name) {
+                                markdownOutput.textContent = `[![${data.name}](${url})](${modrinthUrl})`;
+                            }
                         }
-                    } catch (_) {
-                        // ignore and fallback to identifier
-                    }
-                    markdownOutput.textContent = `[![${displayName}](${url})](${modrinthUrl})`;
+                    } catch {}
                 };
             }
 
