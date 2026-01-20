@@ -143,8 +143,8 @@
                             </button>
                         </div>
 
-                        <div id="customizationContent" class="hidden">
-                            <div class="mt-2 mb-2" id="showProjectsSection">
+                        <div id="customizationContent" class="hidden mt-2">
+                            <div class="mb-2" id="showProjectsSection">
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" id="showProjects" checked class="!w-[18px] h-[18px] min-w-[18px] flex-shrink-0 appearance-none bg-input-bg border-2 border-text-muted rounded cursor-pointer relative transition-all duration-200 p-0 checked:bg-modrinth-green checked:border-modrinth-green" />
                                     <span class="text-base text-text-secondary">Show Projects</span>
@@ -159,7 +159,7 @@
                             <div class="mb-2 hidden" id="showVersionsSection">
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" id="showVersions" checked class="!w-[18px] h-[18px] min-w-[18px] flex-shrink-0 appearance-none bg-input-bg border-2 border-text-muted rounded cursor-pointer relative transition-all duration-200 p-0 checked:bg-modrinth-green checked:border-modrinth-green" />
-                                    <span class="text-sm text-text-secondary">Show Versions</span>
+                                    <span class="text-base text-text-secondary">Show Versions</span>
                                 </label>
                             </div>
 
@@ -168,7 +168,7 @@
                                 <input type="number" id="maxVersions" min="1" max="50" value="5" class="w-full py-2.5 px-3 bg-input-bg border-2 border-transparent rounded-xl text-text-bright text-sm font-medium transition-[border-color] duration-100 focus:outline-none focus:border-modrinth-green" />
                             </div>
 
-                            <div class="mb-2">
+                            <div>
                                 <h3 class="text-text-secondary text-base font-semibold mb-2">Accent Color</h3>
                                 <div id="colorButtons" class="flex flex-wrap gap-2"></div>
                             </div>
@@ -188,7 +188,7 @@
                                 <span id="generationTime" class="text-yellow"></span>
                             </span>
                         </h2>
-                        <div class="bg-section-bg border border-border-dark rounded-xl p-4 min-h-[460px] flex items-center justify-center text-text-muted" id="previewContainer">
+                        <div class="bg-section-bg border border-border-dark rounded-xl min-h-[460px] flex items-center justify-center text-text-muted" id="previewContainer">
                             <span id="previewPlaceholder">Your embed will appear here</span>
                             <a id="previewLink" href="" target="_blank" class="hidden">
                                 <img id="previewImg" src="" alt="Preview" class="max-w-full" />
