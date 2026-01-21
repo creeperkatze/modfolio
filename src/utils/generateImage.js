@@ -13,7 +13,8 @@ export async function generatePng(svgString)
 {
     const options = {
         fitTo: {
-            mode: "original"
+            mode: "width",
+            value: 800
         },
         font: {
             loadSystemFonts: false,
