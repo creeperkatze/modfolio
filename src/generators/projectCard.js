@@ -59,7 +59,7 @@ ${generateActivitySparkline(versionDates, colors)}
   </svg>
 
   <!-- Title -->
-  <text x="87" y="35" font-family="'Segoe UI', Ubuntu, sans-serif"
+  <text x="87" y="35" font-family="Inter, sans-serif"
         font-size="20" font-weight="bold" fill="${colors.textColor}">
     ${project.title.length > 22 ? project.title.substring(0, 22) + "..." : project.title}
   </text>

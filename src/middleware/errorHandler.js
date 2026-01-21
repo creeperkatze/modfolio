@@ -32,10 +32,10 @@ function generateErrorCard(message, detailText = "")
     </svg>
 
     <!-- Error Text -->
-    <text x="225" y="${detailText ? "55" : "65"}" text-anchor="middle" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="16" font-weight="600" fill="${errorTextColor}">
+    <text x="225" y="${detailText ? "55" : "65"}" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="${errorTextColor}">
       ${message}
     </text>
-    ${detailText ? `<text x="225" y="75" text-anchor="middle" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="12" fill="${detailTextColor}">
+    ${detailText ? `<text x="225" y="75" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="${detailTextColor}">
       ${truncatedDetail}
     </text>` : ""}
 

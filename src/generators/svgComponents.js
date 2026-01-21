@@ -82,7 +82,7 @@ export function generateHeader(entityType, iconName, title, colors)
   </svg>
 
   <!-- Title -->
-  <text x="87" y="35" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="20" font-weight="bold" fill="${colors.textColor}">
+  <text x="87" y="35" font-family="Inter, sans-serif" font-size="20" font-weight="bold" fill="${colors.textColor}">
     ${escapeXml(truncateText(title, 22))}
   </text>`;
 }
@@ -113,10 +113,10 @@ export function generateStatsGrid(stats, colors)
 {
     return stats.map(({ x, label, value }) => `
   <g transform="translate(${x}, 70)">
-    <text font-family="'Segoe UI', Ubuntu, sans-serif" font-size="26" font-weight="bold" fill="${colors.accentColor}">
+    <text font-family="Inter, sans-serif" font-size="26" font-weight="bold" fill="${colors.accentColor}">
       ${value}
     </text>
-    <text y="20" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="12" fill="${colors.textColor}">
+    <text y="20" font-family="Inter, sans-serif" font-size="12" fill="${colors.textColor}">
       ${label}
     </text>
   </g>`).join("");
@@ -193,7 +193,7 @@ export function generateProjectListItem(project, index, totalDownloads, colors)
     <!-- Project image -->
     ${projectIconUrl ? `<image x="20" y="${yPos - 12}" width="28" height="28" href="${projectIconUrl}" clip-path="url(#project-icon-clip-${index})"/>` : `<rect x="20" y="${yPos - 12}" width="28" height="28" fill="${colors.borderColor}" rx="4"/>`}
 
-    <text x="54" y="${yPos - 2}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="13" font-weight="600" fill="${colors.textColor}">
+    <text x="54" y="${yPos - 2}" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="${colors.textColor}">
       ${projectName}
     </text>
 
@@ -201,7 +201,7 @@ export function generateProjectListItem(project, index, totalDownloads, colors)
     ${loaderIconsHtml}
 
     <!-- Downloads -->
-    <text x="380" y="${yPos}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="11" fill="${colors.textColor}" text-anchor="end">
+    <text x="380" y="${yPos}" font-family="Inter, sans-serif" font-size="11" fill="${colors.textColor}" text-anchor="end">
       ${downloads}
     </text>
     <svg x="385" y="${yPos - 12}" width="14" height="14" viewBox="0 0 24 24">
@@ -209,7 +209,7 @@ export function generateProjectListItem(project, index, totalDownloads, colors)
     </svg>
 
     <!-- Follows -->
-    <text x="380" y="${yPos + 18}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="11" fill="${colors.textColor}" text-anchor="end">
+    <text x="380" y="${yPos + 18}" font-family="Inter, sans-serif" font-size="11" fill="${colors.textColor}" text-anchor="end">
       ${followers}
     </text>
     <svg x="385" y="${yPos + 6}" width="14" height="14" viewBox="0 0 24 24">
@@ -241,7 +241,7 @@ export function generateProjectList(topProjects, sectionTitle, colors)
 
     return `
   <!-- Projects Header -->
-  <text x="15" y="130" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}">
+  <text x="15" y="130" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}">
     ${sectionTitle}
   </text>
 
@@ -291,7 +291,7 @@ export function generateVersionListItem(version, index, colors, relativeTime)
     </defs>
     <rect x="15" y="${yPos - 18}" width="420" height="40" fill="none" stroke="${colors.borderColor}" stroke-width="1" rx="6" vector-effect="non-scaling-stroke"/>
 
-    <text x="20" y="${yPos - 2}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="13" font-weight="600" fill="${colors.textColor}">
+    <text x="20" y="${yPos - 2}" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="${colors.textColor}">
       ${versionNumber}
     </text>
 
@@ -299,12 +299,12 @@ export function generateVersionListItem(version, index, colors, relativeTime)
     ${loaderIconsHtml}
 
     <!-- Game versions (next to loaders at bottom) -->
-    <text x="${gameVersionsX}" y="${yPos + 15}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="12" fill="${colors.textColor}">
+    <text x="${gameVersionsX}" y="${yPos + 15}" font-family="Inter, sans-serif" font-size="12" fill="${colors.textColor}">
       ${escapeXml(gameVersionsText)}
     </text>
 
     <!-- Date -->
-    <text x="410" y="${yPos}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="11" fill="${colors.textColor}" text-anchor="end">
+    <text x="410" y="${yPos}" font-family="Inter, sans-serif" font-size="11" fill="${colors.textColor}" text-anchor="end">
       ${dateStr}
     </text>
     <svg x="415" y="${yPos - 12}" width="14" height="14" viewBox="0 0 24 24">
@@ -312,7 +312,7 @@ export function generateVersionListItem(version, index, colors, relativeTime)
     </svg>
 
     <!-- Downloads (below date) -->
-    <text x="410" y="${yPos + 18}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="11" fill="${colors.textColor}" text-anchor="end">
+    <text x="410" y="${yPos + 18}" font-family="Inter, sans-serif" font-size="11" fill="${colors.textColor}" text-anchor="end">
       ${versionDownloads}
     </text>
     <svg x="415" y="${yPos + 6}" width="14" height="14" viewBox="0 0 24 24">
@@ -331,7 +331,7 @@ export function generateVersionList(versions, colors, relativeTime)
 
     return `
   <!-- Latest Versions Header -->
-  <text x="15" y="130" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}">
+  <text x="15" y="130" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}">
     Latest Versions
   </text>
 
@@ -342,7 +342,7 @@ export function generateAttribution(height, colors)
 {
     return `
   <!-- Bottom right attribution -->
-  <text x="435" y="${height - 5}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="${colors.textColor}" text-anchor="end" opacity="0.6">
+  <text x="435" y="${height - 5}" font-family="Inter, sans-serif" font-size="10" fill="${colors.textColor}" text-anchor="end" opacity="0.6">
     modrinth-embeds.creeperkatze.de
   </text>`;
 }
@@ -361,7 +361,7 @@ export function generateInfo(height, colors)
     return `
   <!-- Bottom left version + date -->
   <text x="15" y="${height - 5}"
-        font-family="'Segoe UI', Ubuntu, sans-serif"
+        font-family="Inter, sans-serif"
         font-size="10"
         fill="${colors.textColor}"
         text-anchor="start"
