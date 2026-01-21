@@ -1,4 +1,5 @@
 import { formatNumber, escapeXml, truncateText, generateSparkline } from "../utils/formatters.js";
+import { formatDistanceToNow } from "date-fns";
 import { ICONS } from "../constants/icons.js";
 import { getLoaderColor, getProjectTypeIcon } from "../constants/loaderConfig.js";
 
@@ -139,7 +140,8 @@ export function generateProjectListItem(project, index, totalDownloads, colors)
     const projectTypeIcon = ICONS[projectTypeIconName];
 
     const loaders = project.loaders || [];
-    const loaderIconsHtml = loaders.map((loader, loaderIndex) => {
+    const loaderIconsHtml = loaders.map((loader, loaderIndex) =>
+    {
         const loaderName = loader.toLowerCase();
         const iconFunc = ICONS[loaderName];
         const loaderColor = getLoaderColor(loaderName);
@@ -246,20 +248,24 @@ export function generateProjectList(topProjects, sectionTitle, colors)
   ${projectsHtml}`;
 }
 
-export function generateVersionListItem(version, index, colors)
+export function generateVersionListItem(version, index, colors, relativeTime)
 {
     const yPos = 160 + (index * 50);
     const versionNumber = escapeXml(truncateText(version.version_number, 18));
 
     const publishedDate = new Date(version.date_published);
-    const dateStr = publishedDate.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric"
-    });
+
+    const dateStr = relativeTime
+        ? formatDistanceToNow(new Date(publishedDate), { addSuffix: true })
+        : publishedDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric"
+        });
 
     const loaders = version.loaders || [];
-    const loaderIconsHtml = loaders.map((loader, loaderIndex) => {
+    const loaderIconsHtml = loaders.map((loader, loaderIndex) =>
+    {
         const loaderName = loader.toLowerCase();
         const iconFunc = ICONS[loaderName];
         const loaderColor = getLoaderColor(loaderName);
@@ -315,12 +321,12 @@ export function generateVersionListItem(version, index, colors)
   </g>`;
 }
 
-export function generateVersionList(versions, colors)
+export function generateVersionList(versions, colors, relativeTime)
 {
     if (!versions || versions.length === 0) return "";
 
     const versionsHtml = versions.map((version, index) =>
-        generateVersionListItem(version, index, colors)
+        generateVersionListItem(version, index, colors, relativeTime)
     ).join("");
 
     return `

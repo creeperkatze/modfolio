@@ -16,7 +16,7 @@ const CARD_CONFIGS = {
     },
     project: {
         paramKey: "slug",
-        dataFetcher: (client, id, options) => client.getProjectStats(id, options.maxVersions),
+        dataFetcher: (client, id, options) => client.getProjectStats(id, options.maxVersions, options.showVersions),
         generator: generateProjectCard
     },
     organization: {
@@ -41,8 +41,9 @@ const handleCardRequest = async (req, res, next, cardType) => {
         const options = {
             showProjects: req.query.showProjects !== "false",
             showVersions: req.query.showVersions !== "false",
-            maxProjects: Math.min(Math.max(parseInt(req.query.maxProjects) || 5, 1), 50),
-            maxVersions: Math.min(Math.max(parseInt(req.query.maxVersions) || 5, 1), 50),
+            maxProjects: Math.min(Math.max(parseInt(req.query.maxProjects) || 10, 1), 50),
+            maxVersions: Math.min(Math.max(parseInt(req.query.maxVersions) || 10, 1), 50),
+            relativeTime: req.query.relativeTime !== "false",
             color: req.query.color ? `#${req.query.color.replace(/^#/, "")}` : null
         };
 

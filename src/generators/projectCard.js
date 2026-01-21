@@ -76,7 +76,7 @@ ${generateRectImage(
     )}
 ${generateStatsGrid(statsData, colors)}
 ${generateDivider(colors)}
-${generateVersionList(latestVersions, colors)}
+${generateVersionList(latestVersions, colors, options.relativeTime)}
 ${generateInfo(height, colors)}
 ${generateAttribution(height, colors)}
 `;

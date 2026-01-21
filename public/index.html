@@ -66,6 +66,42 @@
                 border-width: 0 2.5px 2.5px 0;
                 transform: translate(-50%, -50%) rotate(45deg);
             }
+            input[type="range"] {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 100%;
+                height: 6px;
+                background: #3c3c40;
+                border-radius: 3px;
+                outline: none;
+            }
+            input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 18px;
+                height: 18px;
+                background: #1bd96a;
+                cursor: pointer;
+                border-radius: 50%;
+                transition: all 0.2s;
+            }
+            input[type="range"]::-webkit-slider-thumb:hover {
+                background: #1fef76;
+                transform: scale(1.1);
+            }
+            input[type="range"]::-moz-range-thumb {
+                width: 18px;
+                height: 18px;
+                background: #1bd96a;
+                cursor: pointer;
+                border-radius: 50%;
+                border: none;
+                transition: all 0.2s;
+            }
+            input[type="range"]::-moz-range-thumb:hover {
+                background: #1fef76;
+                transform: scale(1.1);
+            }
             .color-btn {
                 width: 39px;
                 height: 39px;
@@ -162,8 +198,11 @@
                             </div>
 
                             <div class="mb-2" id="maxProjectsSection">
-                                <h3 class="text-text-secondary text-base font-semibold mb-2">Max Projects (1-50)</h3>
-                                <input type="number" id="maxProjects" min="1" max="50" value="5" class="w-full py-2.5 px-3 bg-input-bg border-2 border-transparent rounded-xl text-text-bright text-sm font-medium transition-[border-color] duration-100 focus:outline-none focus:border-modrinth-green" />
+                                <div class="flex justify-between items-center mb-2">
+                                    <h3 class="text-text-secondary text-base font-semibold">Max Projects</h3>
+                                    <span class="text-modrinth-green text-base font-bold" id="maxProjectsValue">5</span>
+                                </div>
+                                <input type="range" id="maxProjects" min="1" max="10" value="5" class="w-full" />
                             </div>
 
                             <div class="mb-2 hidden" id="showVersionsSection">
@@ -174,8 +213,18 @@
                             </div>
 
                             <div class="mb-2 hidden" id="maxVersionsSection">
-                                <h3 class="text-text-secondary text-base font-semibold mb-2">Max Versions (1-50)</h3>
-                                <input type="number" id="maxVersions" min="1" max="50" value="5" class="w-full py-2.5 px-3 bg-input-bg border-2 border-transparent rounded-xl text-text-bright text-sm font-medium transition-[border-color] duration-100 focus:outline-none focus:border-modrinth-green" />
+                                <div class="flex justify-between items-center mb-2">
+                                    <h3 class="text-text-secondary text-base font-semibold">Max Versions</h3>
+                                    <span class="text-modrinth-green text-base font-bold" id="maxVersionsValue">5</span>
+                                </div>
+                                <input type="range" id="maxVersions" min="1" max="10" value="5" class="w-full" />
+                            </div>
+
+                            <div class="mb-2 hidden" id="relativeTimeSection">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="relativeTime" checked class="!w-[18px] h-[18px] min-w-[18px] flex-shrink-0 appearance-none bg-input-bg border-2 border-text-muted rounded cursor-pointer relative transition-all duration-200 p-0 checked:bg-modrinth-green checked:border-modrinth-green" />
+                                    <span class="text-base text-text-secondary">Relative Time</span>
+                                </label>
                             </div>
 
                             <div class="mb-2">
@@ -259,13 +308,17 @@
             const copyHtmlBtn = document.getElementById("copyHtmlBtn");
             const showProjects = document.getElementById("showProjects");
             const maxProjects = document.getElementById("maxProjects");
+            const maxProjectsValue = document.getElementById("maxProjectsValue");
             const showVersions = document.getElementById("showVersions");
             const maxVersions = document.getElementById("maxVersions");
+            const maxVersionsValue = document.getElementById("maxVersionsValue");
+            const relativeTime = document.getElementById("relativeTime");
             const colorButtons = document.getElementById("colorButtons");
             const showProjectsSection = document.getElementById("showProjectsSection");
             const maxProjectsSection = document.getElementById("maxProjectsSection");
             const showVersionsSection = document.getElementById("showVersionsSection");
             const maxVersionsSection = document.getElementById("maxVersionsSection");
+            const relativeTimeSection = document.getElementById("relativeTimeSection");
 
             let selectedColor = "1bd96a";
 
@@ -373,6 +426,7 @@
                     maxProjects: parseInt(params.get("maxProjects")) || 5,
                     showVersions: params.get("showVersions") !== "false",
                     maxVersions: parseInt(params.get("maxVersions")) || 5,
+                    relativeTime: params.get("relativeTime") !== "false",
                     color: params.get("color") || "1bd96a",
                 };
             }
@@ -395,6 +449,7 @@
                     if (maxProjects.value !== "5") params.set("maxProjects", maxProjects.value);
                     if (!showVersions.checked) params.set("showVersions", "false");
                     if (maxVersions.value !== "5") params.set("maxVersions", maxVersions.value);
+                    if (!relativeTime.checked) params.set("relativeTime", "false");
                     if (selectedColor !== "1bd96a") params.set("color", selectedColor);
                 }
 
@@ -410,8 +465,11 @@
                 identifier.value = params.value;
                 showProjects.checked = params.showProjects;
                 maxProjects.value = params.maxProjects;
+                maxProjectsValue.textContent = params.maxProjects;
                 showVersions.checked = params.showVersions;
                 maxVersions.value = params.maxVersions;
+                maxVersionsValue.textContent = params.maxVersions;
+                relativeTime.checked = params.relativeTime;
                 selectedColor = params.color;
                 // Update all color button selections
                 document.querySelectorAll("[data-color]").forEach((b) => {
@@ -490,6 +548,7 @@
                 maxProjectsSection.classList.toggle("hidden", !(isCard && isUserOrgOrCollection && showProjects.checked));
                 showVersionsSection.classList.toggle("hidden", !(isCard && isProject));
                 maxVersionsSection.classList.toggle("hidden", !(isCard && isProject && showVersions.checked));
+                relativeTimeSection.classList.toggle("hidden", !(isCard && isProject && showVersions.checked));
 
                 generate();
             }
@@ -538,6 +597,9 @@
                     }
                     if (maxVersions.value !== "5" && type === "project") {
                         urlParams.set("maxVersions", maxVersions.value);
+                    }
+                    if (!relativeTime.checked && type === "project") {
+                        urlParams.set("relativeTime", "false");
                     }
                     if (selectedColor !== "1bd96a") {
                         urlParams.set("color", selectedColor);
@@ -624,6 +686,7 @@
                 updateUrl();
             });
             maxProjects.addEventListener("input", () => {
+                maxProjectsValue.textContent = maxProjects.value;
                 generate();
                 updateUrl();
             });
@@ -632,6 +695,11 @@
                 updateUrl();
             });
             maxVersions.addEventListener("input", () => {
+                maxVersionsValue.textContent = maxVersions.value;
+                generate();
+                updateUrl();
+            });
+            relativeTime.addEventListener("change", () => {
                 generate();
                 updateUrl();
             });
