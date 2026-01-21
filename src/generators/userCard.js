@@ -38,7 +38,7 @@ export function generateUserCard(data, theme = "dark", options = {})
     const content = `
 ${generateActivitySparkline(stats.allVersionDates || [], colors)}
 ${generateHeader("user", "user", user.username, colors)}
-${generateProfileImage(user.avatar_url_base64 || user.avatar_url, "profile-clip", 400, 60, 35, colors)}
+${generateProfileImage(user.avatar_url_base64, "profile-clip", 400, 60, 35, colors)}
 ${generateStatsGrid(statsData, colors)}
 ${generateDivider(colors)}
 ${generateProjectList(topProjects, "Top Projects", colors)}

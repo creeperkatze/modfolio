@@ -1,5 +1,6 @@
 import logger from "./logger.js";
 import { pLimit, requestDeduplicator } from "./asyncUtils.js";
+import sharp from "sharp";
 
 const USER_AGENT = process.env.USER_AGENT;
 const MAX_CONCURRENT_REQUESTS = parseInt(process.env.MAX_CONCURRENT_REQUESTS || "10", 10);
@@ -19,9 +20,17 @@ export async function fetchImageAsBase64(url)
 
             const arrayBuffer = await response.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
-            const base64 = buffer.toString("base64");
             const contentType = response.headers.get("content-type") || "image/png";
-            return `data:${contentType};base64,${base64}`;
+
+            // Convert to PNG if needed for Resvg compatibility
+            // Resvg doesn't support WebP embedded in SVG
+            let pngBuffer = buffer;
+            if (contentType.includes("webp") || contentType.includes("svg")) {
+                pngBuffer = await sharp(buffer).png().toBuffer();
+            }
+
+            const base64 = pngBuffer.toString("base64");
+            return `data:image/png;base64,${base64}`;
         } catch (error)
         {
             logger.warn(`Failed to fetch image ${url}: ${error.message}`);

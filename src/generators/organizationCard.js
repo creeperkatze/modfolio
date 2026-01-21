@@ -38,7 +38,7 @@ export function generateOrganizationCard(data, theme = "dark", options = {})
     const content = `
 ${generateActivitySparkline(stats.allVersionDates || [], colors)}
 ${generateHeader("organization", "building", organization.name, colors)}
-${generateProfileImage(organization.icon_url_base64 || organization.icon_url, "org-clip", 400, 60, 35, colors)}
+${generateProfileImage(organization.icon_url_base64, "org-clip", 400, 60, 35, colors)}
 ${generateStatsGrid(statsData, colors)}
 ${generateDivider(colors)}
 ${generateProjectList(topProjects, "Top Projects", colors)}

@@ -65,7 +65,7 @@ ${generateActivitySparkline(versionDates, colors)}
   </text>
 
 ${generateRectImage(
-        project.icon_url_base64 || project.icon_url,
+        project.icon_url_base64,
         "project-image-clip",
         365,
         25,

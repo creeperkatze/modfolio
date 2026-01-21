@@ -13,12 +13,11 @@ export const discordEmbedMiddleware = (req, res, next) =>
     next();
 };
 
-export const generateDiscordEmbedHTML = (title, imageUrl) =>
+export const generateDiscordEmbedHTML = (imageUrl) =>
 {
     return `<!DOCTYPE html>
 <html>
 <head>
-    <meta property="og:title" content="${escapeHtml(title)}" />
     <meta property="og:image" content="${escapeHtml(imageUrl)}" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="450" />
@@ -26,8 +25,5 @@ export const generateDiscordEmbedHTML = (title, imageUrl) =>
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="${escapeHtml(imageUrl)}" />
 </head>
-<body>
-    <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}" />
-</body>
 </html>`;
 };

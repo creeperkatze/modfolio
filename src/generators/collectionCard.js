@@ -38,7 +38,7 @@ export function generateCollectionCard(data, theme = "dark", options = {})
     const content = `
 ${generateActivitySparkline(stats.allVersionDates || [], colors)}
 ${generateHeader("collection", "collection", collection.name, colors)}
-${generateProfileImage(collection.icon_url_base64 || collection.icon_url, "collection-clip", 400, 60, 35, colors)}
+${generateProfileImage(collection.icon_url_base64, "collection-clip", 400, 60, 35, colors)}
 ${generateStatsGrid(statsData, colors)}
 ${generateDivider(colors)}
 ${generateProjectList(topProjects, "Projects", colors)}

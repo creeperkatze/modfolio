@@ -53,45 +53,36 @@ const handleCardRequest = async (req, res, next, cardType) => {
 
         const cacheKey = `${cardType}:${identifier}:${theme}:${JSON.stringify(options)}`;
 
-        // If Discord bot and no format specified, serve HTML with Open Graph meta tags
-        if (req.isDiscordBot && !format) {
-            const protocol = req.protocol;
-            const host = req.get("host");
-            const url = new URL(`${protocol}://${host}${req.originalUrl}`);
-            url.searchParams.set("format", "png");
-            const imageUrl = url.toString();
+        // Generate PNG for Discord bots or when format=png is requested
+        if (req.isDiscordBot || format === "png") {
+            const pngCacheKey = `${cacheKey}:png`;
+            const cachedPng = cache.get(pngCacheKey);
 
-            const title = `${identifier} - Modrinth ${cardType.charAt(0).toUpperCase() + cardType.slice(1)}`;
-            const html = generateDiscordEmbedHTML(title, imageUrl);
-
-            logger.info(`Showing ${cardType} card for "${identifier}" (Discord embed)`);
-            res.setHeader("Content-Type", "text/html");
-            res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
-            return res.send(html);
-        }
-
-        const cached = cache.get(cacheKey);
-        if (cached) {
-            // If PNG format requested, convert cached SVG to PNG
-            if (format === "png") {
-                const pngCacheKey = `${cacheKey}:png`;
-                const cachedPng = cache.get(pngCacheKey);
-
-                if (cachedPng) {
-                    logger.info(`Showing ${cardType} card for "${identifier}" (cached PNG)`);
-                    res.setHeader("Content-Type", "image/png");
-                    res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
-                    return res.send(cachedPng);
-                }
-
-                const pngBuffer = await generatePng(cached);
-                cache.set(pngCacheKey, pngBuffer);
-                logger.info(`Showing ${cardType} card for "${identifier}" (PNG)`);
+            if (cachedPng) {
+                logger.info(`Showing ${cardType} card for "${identifier}" (cached image)`);
                 res.setHeader("Content-Type", "image/png");
                 res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
-                return res.send(pngBuffer);
+                return res.send(cachedPng);
             }
 
+            // Generate PNG from cached SVG or generate new one
+            const svg = cache.get(cacheKey) || await (async () => {
+                const data = await config.dataFetcher(modrinthClient, identifier, options);
+                const generatedSvg = config.generator(data, theme, options);
+                cache.set(cacheKey, generatedSvg);
+                return generatedSvg;
+            })();
+            const pngBuffer = await generatePng(svg);
+
+            logger.info(`Showing ${cardType} card for "${identifier}" (image)`);
+            res.setHeader("Content-Type", "image/png");
+            res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
+            return res.send(pngBuffer);
+        }
+
+        // Serve cached SVG
+        const cached = cache.get(cacheKey);
+        if (cached) {
             logger.info(`Showing ${cardType} card for "${identifier}" (cached)`);
             res.setHeader("Content-Type", "image/svg+xml");
             res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
@@ -102,17 +93,6 @@ const handleCardRequest = async (req, res, next, cardType) => {
         const svg = config.generator(data, theme, options);
 
         cache.set(cacheKey, svg);
-
-        // If PNG format requested, convert to PNG
-        if (format === "png") {
-            const pngBuffer = await generatePng(svg);
-            const pngCacheKey = `${cacheKey}:png`;
-            cache.set(pngCacheKey, pngBuffer);
-            logger.info(`Showing ${cardType} card for "${identifier}" (PNG)`);
-            res.setHeader("Content-Type", "image/png");
-            res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
-            return res.send(pngBuffer);
-        }
 
         logger.info(`Showing ${cardType} card for "${identifier}"`);
         res.setHeader("Content-Type", "image/svg+xml");

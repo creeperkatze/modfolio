@@ -152,7 +152,7 @@ export function generateProjectListItem(project, index, totalDownloads, colors)
     </svg>`;
     }).join("");
 
-    const projectIconUrl = project.icon_url_base64 || project.icon_url || "";
+    const projectIconUrl = project.icon_url_base64 || "";
 
     return `
   <!-- Project ${index + 1} -->
@@ -307,17 +307,17 @@ export function generateVersionListItem(version, index, colors, relativeTime)
     <text x="410" y="${yPos}" font-family="Inter, sans-serif" font-size="11" fill="${colors.textColor}" text-anchor="end">
       ${dateStr}
     </text>
-    <svg x="415" y="${yPos - 12}" width="14" height="14" viewBox="0 0 24 24">
+    <g transform="translate(415, ${yPos - 12}) scale(${14 / 24})">
       ${ICONS.calendar(colors.textColor)}
-    </svg>
+    </g>
 
     <!-- Downloads (below date) -->
     <text x="410" y="${yPos + 18}" font-family="Inter, sans-serif" font-size="11" fill="${colors.textColor}" text-anchor="end">
       ${versionDownloads}
     </text>
-    <svg x="415" y="${yPos + 6}" width="14" height="14" viewBox="0 0 24 24">
+    <g transform="translate(415, ${yPos + 6}) scale(${14 / 24})">
       ${ICONS.download(colors.textColor)}
-    </svg>
+    </g>
   </g>`;
 }
 
