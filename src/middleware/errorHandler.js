@@ -112,18 +112,27 @@ export async function errorHandler(err, req, res, next)
         res.status(statusCode).send(generateBadge("error", message, "#f38ba8"));
     } else if (useImage)
     {
-        // Generate PNG for Discord bots or when format=png is requested
         const svg = generateErrorCard(message, detailText);
         const pngBuffer = await generatePng(svg);
 
         res.setHeader("Content-Type", "image/png");
         res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        res.status(statusCode).send(pngBuffer);
+
+        // Use Code 200 for crawlers since they dont like error codes
+        if (req.isCrawler)
+        {
+            res.status(200).send(pngBuffer);
+        }
+        else
+        {
+            res.status(statusCode).send(pngBuffer);
+        }
     } else
     {
         // Return SVG
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        res.status(statusCode).send(generateErrorCard(message, detailText));
+        res.setHeader("X-Error-Status", statusCode.toString());
+        res.status(200).send(generateErrorCard(message, detailText));
     }
 }
