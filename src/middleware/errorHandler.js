@@ -65,7 +65,6 @@ function getStatusMessage(statusCode)
 
 export async function errorHandler(err, req, res, next)
 {
-    const theme = req.query.theme || "dark";
     const format = req.query.format;
 
     let statusCode = 500;
