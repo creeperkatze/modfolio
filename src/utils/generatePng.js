@@ -1,10 +1,13 @@
 import path from "path";
 import { Resvg } from "@resvg/resvg-js";
 import { readFileSync } from "fs";
+import logger from "./logger.js";
 
 // Load Inter font from public/fonts
 const fontPath = path.join(process.cwd(), "public", "fonts", "inter.ttf");
 const fontBuffer = readFileSync(fontPath);
+
+logger.warn(path.join(process.cwd(), "public", "fonts", "inter.ttf"));
 
 export async function generatePng(svgString)
 {
