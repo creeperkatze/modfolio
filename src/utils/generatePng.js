@@ -6,9 +6,10 @@ import logger from "./logger.js";
 // Load Inter font from public/fonts
 const fontPath = path.join(process.cwd(), "public", "fonts", "inter.ttf");
 const fontBuffer = readFileSync(fontPath);
+
 export async function generatePng(svgString)
 {
-    logger.warn(path.join(process.cwd(), "public", "fonts", "inter.ttf"));
+    logger.info(fontPath);
 
     const options = {
         fitTo: {
