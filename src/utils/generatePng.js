@@ -1,8 +1,13 @@
 import path from "path";
+import { readdirSync } from "fs";
 import { Resvg } from "@resvg/resvg-js";
 
-// Load Inter font from public/fonts
-const fontPath = path.join(process.cwd(), "public", "fonts", "inter.ttf");
+// Load font files
+const fontsDir = path.join(process.cwd(), "public", "fonts");
+
+const fontFiles = readdirSync(fontsDir)
+    .filter(file => /\.(ttf|otf|woff2)$/i.test(file))
+    .map(file => path.join(fontsDir, file));
 
 export async function generatePng(svgString)
 {
@@ -12,7 +17,7 @@ export async function generatePng(svgString)
         },
         font: {
             loadSystemFonts: false,
-            fontFiles: [fontPath],
+            fontFiles: fontFiles,
             defaultFontFamily: "Inter"
         }
     };
