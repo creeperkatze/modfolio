@@ -39,7 +39,6 @@ export class ModrinthClient
                 errorText = json.error || json.message || json.description || errorBody;
             } catch { }
 
-            logger.warn(`API error ${response.status}: ${url}`);
             throw new Error(`Modrinth API error: ${response.status}: ${errorText}`);
         }
 
