@@ -1,6 +1,6 @@
 {
   "name": "modrinth-embeds",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "main": "src/server.js",
   "scripts": {
