@@ -28,7 +28,7 @@ export async function fetchImageAsBase64(url)
             // Convert to PNG if needed for Resvg compatibility
             // Resvg doesn't support WebP embedded in SVG
             let pngBuffer = buffer;
-            const needsConversion = detectedType?.mime === "image/webp" || detectedType?.mime === "image/svg+xml";
+            const needsConversion = detectedType?.mime !== "image/png";
 
             if (needsConversion) {
                 logger.info(`Converting ${detectedType?.mime || "unknown"} image to png: ${url}`);
