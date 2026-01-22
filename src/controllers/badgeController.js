@@ -30,18 +30,19 @@ const BADGE_CONFIGS = {
 };
 
 const DATA_FETCHERS = {
-    user: modrinthClient.getUserStats.bind(modrinthClient),
-    project: modrinthClient.getProjectStats.bind(modrinthClient),
-    organization: modrinthClient.getOrganizationStats.bind(modrinthClient),
-    collection: modrinthClient.getCollectionStats.bind(modrinthClient)
+    user: modrinthClient.getUserBadgeStats.bind(modrinthClient),
+    project: modrinthClient.getProjectBadgeStats.bind(modrinthClient),
+    organization: modrinthClient.getOrganizationBadgeStats.bind(modrinthClient),
+    collection: modrinthClient.getCollectionBadgeStats.bind(modrinthClient)
 };
 
 const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
     try {
         const identifier = req.params.username || req.params.slug || req.params.id;
         const color = req.query.color ? `#${req.query.color.replace(/^#/, "")}` : "#1bd96a";
+        const backgroundColor = req.query.backgroundColor ? `#${req.query.backgroundColor.replace(/^#/, "")}` : null;
         const config = BADGE_CONFIGS[entityType][badgeType];
-        const cacheKey = `badge:${config.label}:${identifier}:${color}`;
+        const cacheKey = `badge:${config.label}:${identifier}:${color}:${backgroundColor || 'transparent'}`;
 
         const cached = cache.get(cacheKey);
         if (cached) {
@@ -51,9 +52,11 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
             return res.send(cached);
         }
 
-        const data = await DATA_FETCHERS[entityType](identifier);
+        // Only fetch versions for version count badges
+        const fetchVersions = entityType === "project" && badgeType === "versions";
+        const data = await DATA_FETCHERS[entityType](identifier, fetchVersions);
         const value = config.getValue(data.stats);
-        const svg = generateBadge(config.label, value, color);
+        const svg = generateBadge(config.label, value, color, backgroundColor);
 
         cache.set(cacheKey, svg);
         logger.info(`Showing ${config.label} badge for "${identifier}"`);

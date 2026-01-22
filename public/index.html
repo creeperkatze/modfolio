@@ -249,6 +249,22 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="mb-2">
+                                <h3 class="text-text-secondary text-base font-semibold mb-1">Background Color</h3>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div id="bgColorButtons" class="flex flex-wrap gap-2"></div>
+
+                                    <div id="manualBgColorPickerContainer" class="color-btn relative flex items-center justify-center bg-input-bg overflow-hidden border-2 border-border-dark">
+                                        <input type="color" id="manualBgColorPicker" value="#ffffff" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none text-text-secondary">
+                                            <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                            <path d="m15 5 4 4" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -365,6 +381,9 @@
             const colorButtons = document.getElementById("colorButtons");
             const manualColorPicker = document.getElementById("manualColorPicker");
             const manualColorPickerContainer = document.getElementById("manualColorPickerContainer");
+            const bgColorButtons = document.getElementById("bgColorButtons");
+            const manualBgColorPicker = document.getElementById("manualBgColorPicker");
+            const manualBgColorPickerContainer = document.getElementById("manualBgColorPickerContainer");
             const showProjectsSection = document.getElementById("showProjectsSection");
             const maxProjectsSection = document.getElementById("maxProjectsSection");
             const showVersionsSection = document.getElementById("showVersionsSection");
@@ -372,6 +391,7 @@
             const relativeTimeSection = document.getElementById("relativeTimeSection");
 
             let selectedColor = "1bd96a";
+            let selectedBgColor = null;
 
             // HSL to Hex conversion (S=100%, L=75%)
             function hslToHex(h) {
@@ -446,6 +466,59 @@
                 createColorButton(color, colorButtons);
             });
 
+            // Create background color buttons (transparent + predefined colors)
+            const bgColors = [
+                { name: "transparent", value: null },
+                { name: "white", value: "ffffff" },
+                { name: "light gray", value: "858585" },
+                { name: "black", value: "000000" }
+            ];
+
+            function createBgColorButton(colorObj, container) {
+                const btn = document.createElement("button");
+                const isSelected = selectedBgColor === colorObj.value;
+                btn.className = "color-btn" + (isSelected ? " color-btn-selected" : "");
+
+                if (colorObj.value === null) {
+                    // Transparent button with checkerboard pattern
+                    btn.style.background = `
+                        linear-gradient(45deg, #ccc 25%, transparent 25%),
+                        linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #ccc 75%),
+                        linear-gradient(-45deg, transparent 75%, #ccc 75%)
+                    `;
+                    btn.style.backgroundPosition = "0 0, 0 10px, 10px -10px, -10px 0px";
+                    btn.style.backgroundSize = "20px 20px";
+                    btn.title = "Transparent";
+                } else {
+                    btn.style.background = `#${colorObj.value}`;
+                }
+
+                btn.dataset.bgColor = colorObj.value;
+                btn.onclick = () => {
+                    selectedBgColor = colorObj.value;
+
+                    if (colorObj.value !== null) {
+                        manualBgColorPicker.value = `#${colorObj.value}`;
+                        manualBgColorPickerContainer.style.background = `#${colorObj.value}`;
+                    }
+
+                    manualBgColorPickerContainer.classList.remove("color-btn-selected");
+
+                    document.querySelectorAll("[data-bg-color]").forEach((b) => {
+                        b.classList.toggle("color-btn-selected", b.dataset.bgColor === String(selectedBgColor));
+                    });
+
+                    generate();
+                    updateUrl();
+                };
+                container.appendChild(btn);
+            }
+
+            bgColors.forEach((colorObj) => {
+                createBgColorButton(colorObj, bgColorButtons);
+            });
+
             // Basic section toggle
             const basicToggle = document.getElementById("basicToggle");
             const basicContent = document.getElementById("basicContent");
@@ -486,6 +559,23 @@
                 generate();
                 updateUrl();
             });
+
+            manualBgColorPicker.addEventListener("input", (e) => {
+                selectedBgColor = e.target.value.substring(1);
+
+                manualBgColorPickerContainer.style.background = `#${selectedBgColor}`;
+
+                // deselect all preset buttons
+                document.querySelectorAll("[data-bg-color]").forEach((b) => {
+                    b.classList.remove("color-btn-selected");
+                });
+
+                // select manual picker
+                manualBgColorPickerContainer.classList.add("color-btn-selected");
+
+                generate();
+                updateUrl();
+            });
             // URL state management functions
             function getUrlParams() {
                 const params = new URLSearchParams(window.location.search);
@@ -500,6 +590,7 @@
                     maxVersions: parseInt(params.get("maxVersions")) || 5,
                     relativeTime: params.get("relativeTime") !== "false",
                     color: params.get("color") || "1bd96a",
+                    backgroundColor: params.get("backgroundColor") || null,
                 };
             }
 
@@ -523,6 +614,10 @@
                     if (maxVersions.value !== "5") params.set("maxVersions", maxVersions.value);
                     if (!relativeTime.checked) params.set("relativeTime", "false");
                     if (selectedColor !== "1bd96a") params.set("color", selectedColor);
+                    if (selectedBgColor !== null) params.set("backgroundColor", selectedBgColor);
+                } else {
+                    if (selectedColor !== "1bd96a") params.set("color", selectedColor);
+                    if (selectedBgColor !== null) params.set("backgroundColor", selectedBgColor);
                 }
 
                 const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
@@ -547,6 +642,7 @@
 
                 relativeTime.checked = params.relativeTime;
                 selectedColor = params.color;
+                selectedBgColor = params.backgroundColor;
 
                 const isPresetColor = colors.includes(selectedColor);
 
@@ -557,6 +653,20 @@
 
                 document.querySelectorAll("[data-color]").forEach((b) => {
                     b.classList.toggle("color-btn-selected", b.dataset.color === selectedColor);
+                });
+
+                // Background color
+                const isPresetBgColor = bgColors.some(c => String(c.value) === String(selectedBgColor));
+
+                if (selectedBgColor !== null) {
+                    manualBgColorPicker.value = `#${selectedBgColor}`;
+                    manualBgColorPickerContainer.style.background = `#${selectedBgColor}`;
+                }
+
+                manualBgColorPickerContainer.classList.toggle("color-btn-selected", !isPresetBgColor && selectedBgColor !== null);
+
+                document.querySelectorAll("[data-bg-color]").forEach((b) => {
+                    b.classList.toggle("color-btn-selected", b.dataset.bgColor === String(selectedBgColor));
                 });
 
                 if (hasCustomizationFromUrl(params)) {
@@ -696,6 +806,9 @@
                     if (selectedColor !== "1bd96a") {
                         urlParams.set("color", selectedColor);
                     }
+                    if (selectedBgColor !== null) {
+                        urlParams.set("backgroundColor", selectedBgColor);
+                    }
 
                     const queryString = urlParams.toString();
                     url = `${window.location.origin}/${type}/${identifierValue}${queryString ? "?" + queryString : ""}`;
@@ -703,6 +816,9 @@
                     const badgeParams = new URLSearchParams();
                     if (selectedColor !== "1bd96a") {
                         badgeParams.set("color", selectedColor);
+                    }
+                    if (selectedBgColor !== null) {
+                        badgeParams.set("backgroundColor", selectedBgColor);
                     }
                     const badgeQuery = badgeParams.toString();
                     url = `${window.location.origin}/${type}/${identifierValue}/${badgeMetric.value}${badgeQuery ? "?" + badgeQuery : ""}`;
@@ -844,7 +960,7 @@
             }
 
             function hasCustomizationFromUrl(params) {
-                return params.showProjects === false || params.maxProjects !== 5 || params.showVersions === false || params.maxVersions !== 5 || params.relativeTime === false || params.color !== "1bd96a";
+                return params.showProjects === false || params.maxProjects !== 5 || params.showVersions === false || params.maxVersions !== 5 || params.relativeTime === false || params.color !== "1bd96a" || params.backgroundColor !== null;
             }
 
             loadFromUrl();

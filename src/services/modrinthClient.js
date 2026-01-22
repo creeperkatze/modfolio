@@ -208,6 +208,86 @@ export class ModrinthClient
             }
         };
     }
+
+    // Lightweight badge data fetchers - only fetch minimal stats
+    async getUserBadgeStats(username)
+    {
+        const [user, projects] = await Promise.all([
+            this.getUser(username),
+            this.getUserProjects(username)
+        ]);
+
+        const stats = {
+            totalDownloads: projects.reduce((sum, p) => sum + (p.downloads || 0), 0),
+            totalFollowers: projects.reduce((sum, p) => sum + (p.followers || 0), 0),
+            projectCount: projects.length
+        };
+
+        return { stats };
+    }
+
+    async getProjectBadgeStats(slug, fetchVersions = false)
+    {
+        const project = await this.getProject(slug);
+
+        const stats = {
+            downloads: project.downloads || 0,
+            followers: project.followers || 0,
+            versionCount: 0
+        };
+
+        // Only fetch versions if specifically requested (for version count badge)
+        if (fetchVersions) {
+            try {
+                const versions = await this.getProjectVersions(slug);
+                stats.versionCount = versions.length;
+            } catch {
+                stats.versionCount = 0;
+            }
+        }
+
+        return { stats };
+    }
+
+    async getOrganizationBadgeStats(id)
+    {
+        const [organization, rawProjects] = await Promise.all([
+            this.getOrganization(id),
+            this.getOrganizationProjects(id)
+        ]);
+
+        const projects = normalizeV3ProjectFields(rawProjects);
+
+        const stats = {
+            totalDownloads: projects.reduce((sum, p) => sum + (p.downloads || 0), 0),
+            totalFollowers: projects.reduce((sum, p) => sum + (p.followers || 0), 0),
+            projectCount: projects.length
+        };
+
+        return { stats };
+    }
+
+    async getCollectionBadgeStats(id)
+    {
+        const collection = await this.getCollection(id);
+
+        let stats = {
+            totalDownloads: 0,
+            totalFollowers: 0,
+            projectCount: 0
+        };
+
+        if (collection.projects && collection.projects.length > 0) {
+            const projects = await this.getProjects(collection.projects);
+            stats = {
+                totalDownloads: projects.reduce((sum, p) => sum + (p.downloads || 0), 0),
+                totalFollowers: projects.reduce((sum, p) => sum + (p.followers || 0), 0),
+                projectCount: projects.length
+            };
+        }
+
+        return { stats };
+    }
 }
 
 export default new ModrinthClient();

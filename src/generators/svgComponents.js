@@ -6,7 +6,7 @@ import { getLoaderColor, getProjectTypeIcon } from "../constants/loaderConfig.js
 import packageJson from "../../package.json" with { type: "json" };
 const VERSION = packageJson.version;
 
-export function getThemeColors(theme = "dark", customColor = null)
+export function getThemeColors(theme = "dark", customColor = null, backgroundColor = null)
 {
     const isDark = theme === "dark";
     const defaultAccentColor = "#1bd96a";
@@ -15,8 +15,12 @@ export function getThemeColors(theme = "dark", customColor = null)
     const isValidHex = customColor && /^#[0-9A-F]{6}$/i.test(customColor);
     const accentColor = isValidHex ? customColor : defaultAccentColor;
 
+    // Validate background hex color format
+    const isValidBgHex = backgroundColor && /^#[0-9A-F]{6}$/i.test(backgroundColor);
+    const bgColor = isValidBgHex ? backgroundColor : "transparent";
+
     return {
-        bgColor: "transparent",
+        bgColor,
         textColor: isDark ? "#c9d1d9" : "#1e1e2e",
         accentColor,
         borderColor: "#E4E2E2"

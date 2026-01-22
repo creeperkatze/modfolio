@@ -46,7 +46,8 @@ const handleCardRequest = async (req, res, next, cardType) => {
             maxProjects: Math.min(Math.max(parseInt(req.query.maxProjects) || 5, 1), 50),
             maxVersions: Math.min(Math.max(parseInt(req.query.maxVersions) || 5, 1), 50),
             relativeTime: req.query.relativeTime !== "false",
-            color: req.query.color ? `#${req.query.color.replace(/^#/, "")}` : null
+            color: req.query.color ? `#${req.query.color.replace(/^#/, "")}` : null,
+            backgroundColor: req.query.backgroundColor ? `#${req.query.backgroundColor.replace(/^#/, "")}` : null
         };
 
         const cacheKey = `${cardType}:${identifier}:${theme}:${JSON.stringify(options)}`;

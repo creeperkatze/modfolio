@@ -22,10 +22,11 @@ export function generateProjectCard(data, theme = "dark", options = {})
     const {
         showVersions = true,
         maxVersions = DEFAULT_VERSIONS_COUNT,
-        color = null
+        color = null,
+        backgroundColor = null
     } = options;
 
-    const colors = getThemeColors(theme, color);
+    const colors = getThemeColors(theme, color, backgroundColor);
 
     const projectTypeIconName = getProjectTypeIcon(project.project_type);
     const latestVersions = showVersions ? versions.slice(0, maxVersions) : [];

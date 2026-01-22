@@ -1,7 +1,7 @@
 import { escapeXml } from "../utils/formatters.js";
 import { ICONS } from "../constants/icons.js";
 
-export function generateBadge(label, value, color = "#1bd96a")
+export function generateBadge(label, value, color = "#1bd96a", backgroundColor = null)
 {
     const iconWidth = 30;
     const labelWidth = label.length * 7 + 20;
@@ -9,7 +9,9 @@ export function generateBadge(label, value, color = "#1bd96a")
     const totalWidth = iconWidth + labelWidth + valueWidth;
     const height = 30;
 
-    const bgColor = "transparent";
+    // Validate background hex color format
+    const isValidBgHex = backgroundColor && /^#[0-9A-F]{6}$/i.test(backgroundColor);
+    const bgColor = isValidBgHex ? backgroundColor : "transparent";
     const labelTextColor = "#8b949e";
     const valueTextColor = color;
     const borderColor = "#E4E2E2";
