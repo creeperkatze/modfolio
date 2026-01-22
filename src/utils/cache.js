@@ -20,9 +20,27 @@ export class Cache {
         return item.value;
     }
 
+    // Get cached value with metadata (cachedAt timestamp)
+    getWithMeta(key) {
+        const item = this.cache.get(key);
+
+        if (!item) {
+            return null;
+        }
+
+        // Check if expired
+        if (Date.now() > item.expiry) {
+            this.cache.delete(key);
+            return null;
+        }
+
+        return { value: item.value, cachedAt: item.cachedAt };
+    }
+
     set(key, value) {
         this.cache.set(key, {
             value,
+            cachedAt: Date.now(),
             expiry: Date.now() + this.ttl
         });
     }
@@ -36,4 +54,7 @@ export class Cache {
     }
 }
 
-export default new Cache(10); // 10 minute default TTL
+// Cache for API data (1 hour TTL)
+export const apiCache = new Cache(60);
+
+export default new Cache(10);

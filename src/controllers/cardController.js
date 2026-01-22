@@ -1,5 +1,5 @@
 import modrinthClient from "../services/modrinthClient.js";
-import cache from "../utils/cache.js";
+import { apiCache } from "../utils/cache.js";
 import { generateUserCard } from "../generators/userCard.js";
 import { generateProjectCard } from "../generators/projectCard.js";
 import { generateOrganizationCard } from "../generators/organizationCard.js";
@@ -7,7 +7,7 @@ import { generateCollectionCard } from "../generators/collectionCard.js";
 import logger from "../utils/logger.js";
 import { generatePng } from "../utils/generateImage.js";
 
-const MAX_AGE = Math.floor(cache.ttl / 1000);
+const API_CACHE_TTL = 3600; // 1 hour
 
 const CARD_CONFIGS = {
     user: {
@@ -54,58 +54,49 @@ const handleCardRequest = async (req, res, next, cardType) => {
             backgroundColor: req.query.backgroundColor ? `#${req.query.backgroundColor.replace(/^#/, "")}` : null
         };
 
-        const cacheKey = `${cardType}:${identifier}:${theme}:${JSON.stringify(options)}`;
+        // API data cache key - simple, independent of styling options
+        const apiCacheKey = `${cardType}:${identifier}`;
+
+        // Check for cached API data
+        let cached = apiCache.getWithMeta(apiCacheKey);
+        let data = cached?.value;
+        let fromCache = !!data;
+
+        if (!data) {
+            // Fetch from API with PNG images (works for both SVG and PNG output)
+            data = await config.dataFetcher(modrinthClient, identifier, options, true);
+            apiCache.set(apiCacheKey, data);
+        }
+
+        // Calculate cache age
+        let cacheAge = null;
+        if (fromCache && cached?.cachedAt) {
+            const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
+            cacheAge = `${minutesAgo}m ago`;
+        }
+
+        // Always regenerate the output from cached data
+        const svg = config.generator(data, theme, options);
 
         // Generate PNG for Discord bots or when format=image is requested
         if (needsImages) {
-            const pngCacheKey = `${cacheKey}:png`;
-            const cachedPng = cache.get(pngCacheKey);
-
-            if (cachedPng) {
-                logger.info(`Showing ${cardType} card for "${identifier}" (cached image)`);
-                res.setHeader("Content-Type", "image/png");
-                res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
-                return res.send(cachedPng);
-            }
-
-            // Generate new SVG with PNG-converted images, then render to PNG
-            const data = await config.dataFetcher(modrinthClient, identifier, options, true);
-            const svg = config.generator(data, theme, options);
             const { buffer: pngBuffer, renderTime } = await generatePng(svg);
 
-            // Cache both SVG and PNG
-            cache.set(cacheKey, svg);
-            cache.set(pngCacheKey, pngBuffer);
-
-            const apiTime = data.timings?.api ? `${Math.round(data.timings.api)}ms` : "N/A";
-            const conversionTime = data.timings?.imageConversion ? `${Math.round(data.timings.imageConversion)}ms` : "N/A";
+            const apiTime = fromCache ? `cached (${cacheAge})` : (data.timings?.api ? `${Math.round(data.timings.api)}ms` : "N/A");
+            const conversionTime = fromCache ? "cached" : (data.timings?.imageConversion ? `${Math.round(data.timings.imageConversion)}ms` : "N/A");
             const pngTime = `${Math.round(renderTime)}ms`;
 
             logger.info(`Showing ${cardType} card for "${identifier}" (api: ${apiTime}, image conversion: ${conversionTime}, render: ${pngTime})`);
             res.setHeader("Content-Type", "image/png");
-            res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
+            res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             return res.send(pngBuffer);
         }
 
-        // Serve cached SVG
-        const cached = cache.get(cacheKey);
-        if (cached) {
-            logger.info(`Showing ${cardType} card for "${identifier}" (cached)`);
-            res.setHeader("Content-Type", "image/svg+xml");
-            res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
-            return res.send(cached);
-        }
-
-        // Generate fresh SVG without converting images (WebP/GIF/etc. are fine in SVG)
-        const data = await config.dataFetcher(modrinthClient, identifier, options, false);
-        const svg = config.generator(data, theme, options);
-
-        cache.set(cacheKey, svg);
-
-        const apiTime = data.timings?.api ? `${Math.round(data.timings.api)}ms` : "N/A";
+        // Return SVG
+        const apiTime = fromCache ? `cached (${cacheAge})` : (data.timings?.api ? `${Math.round(data.timings.api)}ms` : "N/A");
         logger.info(`Showing ${cardType} card for "${identifier}" (api: ${apiTime})`);
         res.setHeader("Content-Type", "image/svg+xml");
-        res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
+        res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.send(svg);
     } catch (err) {
         const config = CARD_CONFIGS[cardType];

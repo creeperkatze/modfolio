@@ -1,10 +1,10 @@
 import modrinthClient from "../services/modrinthClient.js";
-import cache from "../utils/cache.js";
+import { apiCache } from "../utils/cache.js";
 import { generateBadge } from "../generators/badge.js";
 import { formatNumber } from "../utils/formatters.js";
 import logger from "../utils/logger.js";
 
-const MAX_AGE = Math.floor(cache.ttl / 1000);
+const API_CACHE_TTL = 3600; // 1 hour
 
 const BADGE_CONFIGS = {
     user: {
@@ -42,27 +42,37 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         const color = req.query.color ? `#${req.query.color.replace(/^#/, "")}` : "#1bd96a";
         const backgroundColor = req.query.backgroundColor ? `#${req.query.backgroundColor.replace(/^#/, "")}` : null;
         const config = BADGE_CONFIGS[entityType][badgeType];
-        const cacheKey = `badge:${config.label}:${identifier}:${color}:${backgroundColor || 'transparent'}`;
 
-        const cached = cache.get(cacheKey);
-        if (cached) {
-            logger.info(`Showing ${config.label} badge for "${identifier}" (cached)`);
-            res.setHeader("Content-Type", "image/svg+xml");
-            res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
-            return res.send(cached);
+        // API data cache key - independent of styling options
+        const apiCacheKey = `badge:${entityType}:${identifier}`;
+
+        // Check for cached stats data
+        let cached = apiCache.getWithMeta(apiCacheKey);
+        let data = cached?.value;
+        let fromCache = !!data;
+
+        if (!data) {
+            // Only fetch versions for version count badges
+            const fetchVersions = entityType === "project" && badgeType === "versions";
+            data = await DATA_FETCHERS[entityType](identifier, fetchVersions);
+            apiCache.set(apiCacheKey, data);
         }
 
-        // Only fetch versions for version count badges
-        const fetchVersions = entityType === "project" && badgeType === "versions";
-        const data = await DATA_FETCHERS[entityType](identifier, fetchVersions);
+        // Calculate cache age
+        let cacheAge = null;
+        if (fromCache && cached?.cachedAt) {
+            const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
+            cacheAge = `${minutesAgo}m ago`;
+        }
+
+        // Always regenerate the badge from cached data
         const value = config.getValue(data.stats);
         const svg = generateBadge(config.label, value, color, backgroundColor);
 
-        cache.set(cacheKey, svg);
-        logger.info(`Showing ${config.label} badge for "${identifier}"`);
+        logger.info(`Showing ${config.label} badge for "${identifier}"${fromCache ? ` (cached ${cacheAge})` : ""}`);
 
         res.setHeader("Content-Type", "image/svg+xml");
-        res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
+        res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.send(svg);
     } catch (err) {
         const identifier = req.params.username || req.params.slug || req.params.id;
