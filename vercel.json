@@ -1,3 +1,7 @@
 {
-  "includeFiles": ["public/fonts/**"]
+  "functions": {
+    "src/server.js": {
+      "includeFiles": "public/fonts/**"
+    }
+  }
 }
