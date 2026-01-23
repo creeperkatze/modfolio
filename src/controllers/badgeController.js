@@ -69,7 +69,10 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         const value = config.getValue(data.stats);
         const svg = generateBadge(config.label, value, color, backgroundColor);
 
-        logger.info(`Showing ${config.label} badge for "${identifier}"${fromCache ? ` (cached ${cacheAge})` : ""}`);
+        const apiTime = fromCache ? `cached (${cacheAge})` : "N/A";
+        const crawlerType = req.crawlerType;
+        const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
+        logger.info(`Showing ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}${crawlerLog})`);
 
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);

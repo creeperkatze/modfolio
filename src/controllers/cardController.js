@@ -84,9 +84,10 @@ const handleCardRequest = async (req, res, next, cardType) => {
             const apiTime = fromCache ? `cached (${cacheAge})` : (data.timings?.api ? `${Math.round(data.timings.api)}ms` : "N/A");
             const conversionTime = fromCache ? "cached" : (data.timings?.imageConversion ? `${Math.round(data.timings.imageConversion)}ms` : "N/A");
             const pngTime = `${Math.round(renderTime)}ms`;
-            const crawlerType = req.crawlerType || "N/A";
+            const crawlerType = req.crawlerType;
+            const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
 
-            logger.info(`Showing ${cardType} card for "${identifier}" (api: ${apiTime}, image conversion: ${conversionTime}, render: ${pngTime}, crawler: ${crawlerType})`);
+            logger.info(`Showing ${cardType} card for "${identifier}" (api: ${apiTime}, image conversion: ${conversionTime}, render: ${pngTime}${crawlerLog})`);
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             return res.send(pngBuffer);
@@ -94,8 +95,9 @@ const handleCardRequest = async (req, res, next, cardType) => {
 
         // Return SVG
         const apiTime = fromCache ? `cached (${cacheAge})` : (data.timings?.api ? `${Math.round(data.timings.api)}ms` : "N/A");
-        const crawlerType = req.crawlerType || "N/A";
-        logger.info(`Showing ${cardType} card for "${identifier}" (api: ${apiTime}, crawler: ${crawlerType})`);
+        const crawlerType = req.crawlerType;
+        const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
+        logger.info(`Showing ${cardType} card for "${identifier}" (api: ${apiTime}${crawlerLog})`);
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.send(svg);
