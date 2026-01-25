@@ -1,5 +1,4 @@
 import { escapeXml } from "../utils/formatters.js";
-import { ICONS } from "../constants/icons.js";
 import { PLATFORMS, getPlatform } from "../constants/platforms.js";
 
 /**
@@ -10,10 +9,9 @@ import { PLATFORMS, getPlatform } from "../constants/platforms.js";
  * @param {string} [platformId="modrinth"] - The platform ID for icon and default color
  * @param {string} [color] - Custom color (overrides platform default)
  * @param {string|null} [backgroundColor] - Optional background color hex
- * @param {boolean} [fromCache=false] - Whether data is from cache (shows cached indicator)
  * @returns {string} The SVG badge markup
  */
-export function generateBadge(label, value, platformId = "modrinth", color = null, backgroundColor = null, fromCache = false)
+export function generateBadge(label, value, platformId = "modrinth", color = null, backgroundColor = null)
 {
     const platform = getPlatform(platformId) || PLATFORMS.MODRINTH;
     const badgeColor = color || platform.defaultColor;

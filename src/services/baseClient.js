@@ -2,6 +2,19 @@ import packageJson from "../../package.json" with { type: "json" };
 const VERSION = packageJson.version;
 
 /**
+ * Get the default user agent from environment or package info.
+ * The USER_AGENT env var can contain {version} as a placeholder for the package version.
+ */
+function getDefaultUserAgent() {
+    const envUserAgent = process.env.USER_AGENT;
+    if (envUserAgent) {
+        return envUserAgent.replace("{version}", VERSION);
+    }
+    // Minimal fallback without email
+    return `modfolio/${VERSION}`;
+}
+
+/**
  * Base class for API clients with shared fetch logic and error handling.
  * Platform-specific clients extend this class to inherit common functionality.
  */
@@ -11,13 +24,13 @@ export class BasePlatformClient {
      * @param {Object} config - Client configuration
      * @param {string} config.baseUrl - Base URL for the API
      * @param {string} [config.apiKey] - Optional API key
-     * @param {string} [config.userAgent] - Custom user agent string (defaults to package user agent)
+     * @param {string} [config.userAgent] - Custom user agent string (defaults to env or minimal)
      */
     constructor(platformName, config = {}) {
         this.platformName = platformName;
         this.baseUrl = config.baseUrl;
         this.apiKey = config.apiKey;
-        this.userAgent = config.userAgent || `creeperkatze/modrinth-embeds/${VERSION} (contact@creeperkatze.de)`;
+        this.userAgent = config.userAgent || getDefaultUserAgent();
     }
 
     /**

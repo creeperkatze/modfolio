@@ -38,7 +38,7 @@ export const getCfMeta = async (req, res, next) => {
 };
 
 // CurseForge slug to ID lookup
-export const getCfSlugLookup = async (req, res, next) => {
+export const getCfSlugLookup = async (req, res) => {
     try {
         const { slug } = req.params;
 

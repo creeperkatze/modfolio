@@ -1,5 +1,6 @@
 import { formatNumber, escapeXml, truncateText } from "../utils/formatters.js";
 import { ICONS } from "../constants/icons.js";
+import { PLATFORMS } from "../constants/platforms.js";
 import {
     getThemeColors,
     generateSvgWrapper,
@@ -13,11 +14,6 @@ import {
 } from "./svgComponents.js";
 
 const DEFAULT_FILE_COUNT = 5;
-
-// CurseForge logo SVG path (viewBox 0 0 32 32)
-const CURSEFORGE_LOGO = (color) => `
-<path fill="${color}" d="M23.9074 12.0181C23.9074 12.0181 30.0327 11.0522 31 8.23523H21.6168V6H1L3.53975 8.94699V11.9664C3.53975 11.9664 9.94812 11.6332 12.427 13.5129C15.8202 16.6579 8.61065 20.9092 8.61065 20.9092L7.37439 25C9.30758 23.1593 12.9921 20.7781 19.7474 20.8929C17.1767 21.7053 14.5917 22.9743 12.5794 25H26.2354L24.9494 20.9092C24.9494 20.9092 15.0519 15.0732 23.9074 12.0184V12.0181Z"/>
-`;
 
 /**
  * Get project type icon from CurseForge class ID
@@ -58,9 +54,8 @@ export function generateCurseforgeCard(data, options = {})
         relativeTime = false
     } = options;
 
-    // Use CurseForge orange (#F16436) as default if no custom color specified
-    // We need to check if color is null/undefined and use the CF default
-    const accentColor = color || "#F16436";
+    // Use CurseForge orange as default if no custom color specified
+    const accentColor = color || PLATFORMS.CURSEFORGE.defaultColor;
     const colors = getThemeColors(accentColor, backgroundColor);
 
     // Override accent color to ensure CurseForge orange is used
@@ -106,7 +101,7 @@ ${generateRectImage(
 
   <!-- CurseForge Icon -->
   <svg x="15" y="15" width="24" height="24" viewBox="0 0 32 32">
-    ${CURSEFORGE_LOGO(colors.accentColor)}
+    ${PLATFORMS.CURSEFORGE.icon(colors.accentColor)}
   </svg>
 
   <!-- Chevron -->

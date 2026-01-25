@@ -7,68 +7,53 @@
    viewBox="0 0 100 100"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
-   sodipodi:docname="favicon.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview1"
-     pagecolor="#505050"
-     bordercolor="#ffffff"
-     borderopacity="1"
-     inkscape:showpageshadow="0"
-     inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="1"
-     inkscape:deskcolor="#505050"
-     inkscape:document-units="mm"
-     inkscape:zoom="1.0167041"
-     inkscape:cx="90.488473"
-     inkscape:cy="235.5651"
-     inkscape:window-width="1920"
-     inkscape:window-height="1009"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
   <defs
      id="defs1" />
   <g
-     inkscape:label="Ebene 1"
-     inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.35776;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.382462;stroke-linejoin:round;stroke-opacity:1"
        id="rect1"
-       width="70"
-       height="15"
-       x="5"
-       y="12.5"
-       ry="7.5" />
+       width="60"
+       height="20"
+       x="5.6199999"
+       y="10"
+       ry="10" />
     <rect
-       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.165611;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.220815;stroke-linejoin:round;stroke-opacity:1"
        id="rect1-8"
-       width="15"
-       height="15"
-       x="80"
-       y="12.5"
-       ry="7.5" />
+       width="20"
+       height="20"
+       x="75.619995"
+       y="10"
+       ry="10" />
     <rect
-       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.405661;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.468417;stroke-linejoin:round;stroke-opacity:1"
        id="rect1-3"
        width="90"
-       height="15"
-       x="5"
-       y="72.5"
-       ry="7.5" />
+       height="20"
+       x="5.6199999"
+       y="70"
+       ry="10" />
     <rect
-       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.405661;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.468417;stroke-linejoin:round;stroke-opacity:1"
        id="rect1-3-8"
        width="90"
-       height="15"
+       height="20"
        x="5"
-       y="42.5"
-       ry="7.5" />
+       y="40"
+       ry="10" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:109.361px;font-family:Inter;-inkscape-font-specification:Inter;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#1bd96a;fill-opacity:1;stroke-width:0.264583;stroke-linejoin:round"
+       x="115.72809"
+       y="90.632378"
+       id="text1"><tspan
+         id="tspan1"
+         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:109.361px;font-family:Inter;-inkscape-font-specification:'Inter Heavy';fill:#1bd96a;fill-opacity:1;stroke-width:0.264583"
+         x="115.72809"
+         y="90.632378">Modfolio</tspan></text>
   </g>
 </svg>

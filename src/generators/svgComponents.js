@@ -346,7 +346,7 @@ export function generateAttribution(height, colors)
     return `
   <!-- Bottom right attribution -->
   <text x="435" y="${height - 5}" font-family="Inter, sans-serif" font-size="10" fill="${colors.textColor}" text-anchor="end" opacity="0.6">
-    modrinth-embeds.creeperkatze.de
+    modfolio.creeperkatze.de
   </text>`;
 }
 

@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="1000mm"
+   width="600mm"
    height="100mm"
-   viewBox="0 0 1000 100"
+   viewBox="0 0 600 100"
    version="1.1"
    id="svg1"
    sodipodi:docname="logo.svg"
@@ -23,60 +23,60 @@
      inkscape:pagecheckerboard="1"
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
-     inkscape:zoom="0.16613474"
-     inkscape:cx="1221.8998"
-     inkscape:cy="303.97014"
+     inkscape:zoom="0.23495"
+     inkscape:cx="949.1381"
+     inkscape:cy="534.1562"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1" />
+     inkscape:current-layer="layer1" />
   <defs
      id="defs1" />
   <g
      id="layer1">
     <rect
-       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.35776;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.382462;stroke-linejoin:round;stroke-opacity:1"
        id="rect1"
-       width="70"
-       height="15"
-       x="5"
-       y="12.5"
-       ry="7.5" />
+       width="60"
+       height="20"
+       x="10"
+       y="10"
+       ry="10" />
     <rect
-       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.165611;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.220815;stroke-linejoin:round;stroke-opacity:1"
        id="rect1-8"
-       width="15"
-       height="15"
+       width="20"
+       height="20"
        x="80"
-       y="12.5"
-       ry="7.5" />
+       y="10"
+       ry="10" />
     <rect
-       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.405661;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.468417;stroke-linejoin:round;stroke-opacity:1"
        id="rect1-3"
        width="90"
-       height="15"
-       x="5"
-       y="72.5"
-       ry="7.5" />
+       height="20"
+       x="10"
+       y="70"
+       ry="10" />
     <rect
-       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.405661;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.468417;stroke-linejoin:round;stroke-opacity:1"
        id="rect1-3-8"
        width="90"
-       height="15"
-       x="5"
-       y="42.5"
-       ry="7.5" />
+       height="20"
+       x="9.3800001"
+       y="40"
+       ry="10" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:100.542px;font-family:Inter;-inkscape-font-specification:Inter;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#1bd96a;fill-opacity:1;stroke-width:0.264583;stroke-linejoin:round"
-       x="125.98731"
-       y="87.402863"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:109.361px;font-family:Inter;-inkscape-font-specification:Inter;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#1bd96a;fill-opacity:1;stroke-width:0.264583;stroke-linejoin:round"
+       x="115.72809"
+       y="90.632378"
        id="text1"><tspan
          id="tspan1"
-         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:100.542px;font-family:Inter;-inkscape-font-specification:'Inter Heavy';fill:#1bd96a;fill-opacity:1;stroke-width:0.264583"
-         x="125.98731"
-         y="87.402863">Modrinth Embeds</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:109.361px;font-family:Inter;-inkscape-font-specification:'Inter Heavy';fill:#1bd96a;fill-opacity:1;stroke-width:0.264583"
+         x="115.72809"
+         y="90.632378">Modfolio</tspan></text>
   </g>
 </svg>

@@ -75,7 +75,7 @@ function getStatusMessage(statusCode)
     return statusMessages[statusCode] || `Error ${statusCode}`;
 }
 
-export async function errorHandler(err, req, res, next)
+export async function errorHandler(err, req, res)
 {
     const format = req.query.format;
     const isCurseforge = req.path.includes("/curseforge/");

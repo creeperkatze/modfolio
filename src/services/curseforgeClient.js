@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import { performance } from "perf_hooks";
 import { fetchImageAsBase64 } from "../utils/imageFetcher.js";
+import { BasePlatformClient } from "./baseClient.js";
 
 dotenv.config({ quiet: true });
 
@@ -9,6 +10,7 @@ const VERSION = packageJson.version;
 
 const CURSEFORGE_API_URL = process.env.CURSEFORGE_API_URL || "https://api.curseforge.com";
 const CURSEFORGE_API_KEY = process.env.CURSEFORGE_API_KEY;
+const USER_AGENT = process.env.USER_AGENT;
 
 // Known loader names (for detecting loaders in gameVersions array)
 const KNOWN_LOADERS = ["Forge", "Fabric", "NeoForge", "Quilt", "Rift", "LiteLoader", "Cauldron", "ModLoader", "Canvas", "Iris", "OptiFine", "Sodium"];
@@ -20,66 +22,39 @@ const FILTERED_TAGS = ["Client", "Server", "Singleplayer", "Java"];
 // These are type IDs that represent mod loaders rather than game versions
 const GAME_VERSION_TYPE_IDS = {
     68441: "NeoForge",
-    // Add more as discovered - Forge and Fabric type IDs are unknown
-};
-
-// CurseForge ModLoaderType enum to loader name mapping (legacy, for direct modLoader field if it exists)
-const MOD_LOADER_TYPES = {
-    1: "Forge",
-    2: "Cauldron",
-    3: "LiteLoader",
-    4: "Fabric",
-    5: "Quilt",
-    6: "NeoForge",
-    // Additional loader types that may appear
-    7: "Rift",
-    8: "ModLoader"
 };
 
 // Default number of files to display
 const DEFAULT_FILES_COUNT = 5;
 
-export class CurseforgeClient
+export class CurseforgeClient extends BasePlatformClient
 {
-    async fetch(url)
+    constructor()
     {
-        const headers = {
-            "User-Agent": `creeperkatze/modrinth-embeds/${VERSION}`
-        };
+        super("CurseForge", {
+            baseUrl: CURSEFORGE_API_URL,
+            apiKey: CURSEFORGE_API_KEY,
+            userAgent: USER_AGENT ? USER_AGENT.replace("{version}", VERSION) : undefined
+        });
+    }
 
-        if (CURSEFORGE_API_KEY) {
-            headers["x-api-key"] = CURSEFORGE_API_KEY;
+    getHeaders()
+    {
+        const headers = super.getHeaders();
+        if (this.apiKey) {
+            headers["x-api-key"] = this.apiKey;
         }
-
-        const response = await fetch(url, { headers });
-
-        if (!response.ok) {
-            if (response.status === 404) {
-                throw new Error("Resource not found");
-            }
-
-            const errorBody = await response.text().catch(() => "");
-            let errorText = errorBody;
-
-            try {
-                const json = JSON.parse(errorBody);
-                errorText = json.error || json.message || json.description || errorBody;
-            } catch { }
-
-            throw new Error(`CurseForge API error: ${response.status}: ${errorText}`);
-        }
-
-        return response.json();
+        return headers;
     }
 
     async getMod(modId)
     {
-        return this.fetch(`${CURSEFORGE_API_URL}/v1/mods/${modId}`);
+        return this.fetch(`/v1/mods/${modId}`);
     }
 
     async getModFiles(modId, pageSize = 10)
     {
-        return this.fetch(`${CURSEFORGE_API_URL}/v1/mods/${modId}/files?pageSize=${pageSize}`);
+        return this.fetch(`/v1/mods/${modId}/files?pageSize=${pageSize}`);
     }
 
     /**

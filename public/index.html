@@ -3,14 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Generate beautiful, embeddable cards and badges for Modrinth projects, users, organizations, and collections." />
-        <meta property="og:title" content="Modrinth Embeds" />
-        <meta property="og:description" content="Generate beautiful, embeddable cards and badges for Modrinth projects, users, organizations, and collections." />
+        <meta name="description" content="Generate beautiful, embeddable cards and badges for Modrinth and CurseForge content." />
+        <meta property="og:title" content="Modfolio" />
+        <meta property="og:description" content="Generate beautiful, embeddable cards and badges for Modrinth and CurseForge content." />
         <meta property="og:image" content="/favicon.svg" />
         <meta property="og:type" content="website" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-        <title>Modding Embeds</title>
+        <title>Modfolio</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
             tailwind.config = {
@@ -130,11 +130,11 @@
                 <div>
                     <a href="/" class="inline-block no-underline">
                         <div class="flex items-center gap-4 mb-2">
-                            <img src="/favicon.svg" alt="Modrinth Logo" class="w-8 h-8 mt-0.5" />
-                            <h1 class="text-modrinth-green mb-0 text-3xl font-extrabold">Modfolio</h1>
+                            <img src="/favicon.svg" alt="Modfolio Logo" class="w-8 h-8" />
+                            <h1 class="text-modrinth-green mb-0 leading-8 text-4xl font-extrabold">Modfolio</h1>
                         </div>
                     </a>
-                    <p class="mb-8 text-sm opacity-80">Generate embeddable cards and badges for Modrinth projects, users, organizations, and collections.</p>
+                    <p class="mb-8 text-sm opacity-80">Generate embeddable cards and badges for Modrinth and CurseForge projects.</p>
 
                     <div class="bg-section-bg border border-border-dark rounded-xl px-4 py-2 mb-4">
                         <div class="mb-0">
@@ -390,8 +390,8 @@
             </div>
         </div>
         <footer class="text-center py-8 px-5 pt-8 text-base text-text-muted font-semibold">
-            Made with &hearts; by <a href="https://github.com/creeperkatze" target="_blank" class="text-modrinth-green no-underline">Creeperkatze</a> · View <a href="https://github.com/creeperkatze/modrinth-embeds" target="_blank" class="text-modrinth-green no-underline">Source</a> ·
-            <a href="https://github.com/creeperkatze/modrinth-embeds" target="_blank" class="text-yellow no-underline">&starf; On Github</a> · Not affiliated with Modrinth
+            Made with &hearts; by <a href="https://github.com/creeperkatze" target="_blank" class="text-modrinth-green no-underline">Creeperkatze</a> · View <a href="https://github.com/creeperkatze/modfolio" target="_blank" class="text-modrinth-green no-underline">Source</a> ·
+            <a href="https://github.com/creeperkatze/modfolio" target="_blank" class="text-yellow no-underline">&starf; On Github</a> · Not affiliated with Modrinth or CurseForge
         </footer>
         <script>
             const modrinthUrl = document.getElementById("modrinthUrl");
@@ -439,12 +439,39 @@
             const urlLabel = document.getElementById("urlLabel");
             const valueLabel = document.getElementById("valueLabel");
 
+            // Platform configuration (mirrors backend PLATFORMS constant)
+            const PLATFORMS = {
+                modrinth: {
+                    id: "modrinth",
+                    name: "Modrinth",
+                    defaultColor: "1bd96a",
+                    baseUrl: "modrinth.com",
+                    projectPath: "mod",
+                    targets: ["user", "project", "organization", "collection"],
+                    badgeMetrics: {
+                        user: ["downloads", "followers", "projects"],
+                        project: ["downloads", "followers", "versions"],
+                        organization: ["downloads", "followers", "projects"],
+                        collection: ["downloads", "followers", "projects"]
+                    }
+                },
+                curseforge: {
+                    id: "curseforge",
+                    name: "CurseForge",
+                    defaultColor: "F16436",
+                    baseUrl: "curseforge.com",
+                    projectPath: "minecraft/mc-mods",
+                    targets: ["project"],
+                    badgeMetrics: {
+                        project: ["downloads", "rank", "versions"]
+                    }
+                }
+            };
+
             let selectedColor = "1bd96a";
             let selectedBgColor = null;
-            let selectedPlatform = "modrinth"; // "modrinth" or "curseforge"
+            let selectedPlatform = "modrinth";
             let curseforgeSlug = null; // Store the slug for link generation
-
-            const CURSEFORGE_COLOR = "F16436";
 
             // HSL to Hex conversion (S=100%, L=75%)
             function hslToHex(h) {
@@ -488,12 +515,8 @@
                 return toHex(r) + toHex(g) + toHex(b);
             }
 
-            // Create color buttons - different sets for Modrinth vs CurseForge
-            const modrinthColors = ["1bd96a", ...[0, 30, 60, 150, 180, 210, 240, 270, 330].map((h) => hslToHex(h))];
-            const curseforgeColors = ["F16436", ...[0, 30, 60, 150, 180, 210, 240, 270, 330].map((h) => hslToHex(h))];
-
             function getColors() {
-                return selectedPlatform === "curseforge" ? curseforgeColors : modrinthColors;
+                return [PLATFORMS[selectedPlatform].defaultColor, ...[0, 30, 60, 150, 180, 210, 240, 270, 330].map((h) => hslToHex(h))];
             }
 
             let colors = getColors();
@@ -578,16 +601,12 @@
 
             // Update warning messages based on platform
             function updateWarningMessages() {
+                const config = PLATFORMS[selectedPlatform];
                 const slowWarningText = document.getElementById("apiSlowWarningText");
                 const errorWarningText = document.getElementById("apiErrorWarningText");
 
-                if (selectedPlatform === "curseforge") {
-                    slowWarningText.textContent = "The CurseForge API is responding slowly. Embeds may take longer to load.";
-                    errorWarningText.innerHTML = 'The CurseForge API is currently down. Check <a href="https://status.curseforge.com" target="_blank" class="underline hover:text-red-80">status.curseforge.com</a> for updates.';
-                } else {
-                    slowWarningText.textContent = "The Modrinth API is responding slowly. Embeds may take longer to load.";
-                    errorWarningText.innerHTML = 'The Modrinth API is currently down. Check <a href="https://status.modrinth.com" target="_blank" class="underline hover:text-red-80">status.modrinth.com</a> for updates.';
-                }
+                slowWarningText.textContent = `The ${config.name} API is responding slowly. Embeds may take longer to load.`;
+                errorWarningText.innerHTML = `The ${config.name} API is currently down. Check <a href="https://status.${config.baseUrl.toLowerCase()}" target="_blank" class="underline hover:text-red-80">status.${config.baseUrl.toLowerCase()}</a> for updates.`;
             }
 
             // Update labels based on platform
@@ -606,22 +625,25 @@
 
             // Platform toggle
             function setPlatform(platform) {
+                const config = PLATFORMS[platform];
                 selectedPlatform = platform;
+                selectedColor = config.defaultColor;
+
+                // Update button styles
                 if (platform === "modrinth") {
                     platformModrinth.className = "flex-1 py-2.5 px-3 bg-modrinth-green text-black border-none rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
                     platformCurseforge.className = "flex-1 py-2.5 px-3 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
-                    modrinthUrl.placeholder = "https://modrinth.com/mod/fabric-api";
-                    targetType.innerHTML = '<option value="user">User</option><option value="project">Project</option><option value="organization">Organization</option><option value="collection">Collection</option>';
-                    targetType.value = "user";
-                    selectedColor = "1bd96a";
                 } else {
                     platformModrinth.className = "flex-1 py-2.5 px-3 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
                     platformCurseforge.className = "flex-1 py-2.5 px-3 bg-[#F16436] text-black border-none rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
-                    modrinthUrl.placeholder = "https://www.curseforge.com/minecraft/mc-mods/example-mod";
-                    targetType.innerHTML = '<option value="project">Project</option>';
-                    targetType.value = "project";
-                    selectedColor = CURSEFORGE_COLOR;
                 }
+
+                // Update URL placeholder
+                modrinthUrl.placeholder = `https://www.${config.baseUrl}/${config.projectPath}/example`;
+
+                // Update target type dropdown
+                targetType.innerHTML = config.targets.map(t => `<option value="${t}">${t.charAt(0).toUpperCase() + t.slice(1)}</option>`).join('');
+                targetType.value = config.targets[0];
 
                 // Update color picker and regenerate color buttons
                 colors = getColors();
@@ -644,15 +666,15 @@
 
             // Reset to defaults for the current platform
             function resetToDefaults() {
-                const isCurseForge = selectedPlatform === "curseforge";
-                const defaultColor = isCurseForge ? CURSEFORGE_COLOR : "1bd96a";
+                const config = PLATFORMS[selectedPlatform];
+                const defaultColor = config.defaultColor;
 
                 // Reset slug storage
                 curseforgeSlug = null;
 
                 // Reset embed type and target
                 embedType.value = "card";
-                targetType.value = isCurseForge ? "project" : "user";
+                targetType.value = config.targets[0];
                 badgeMetric.value = "downloads";
                 identifier.value = "";
 
@@ -777,11 +799,11 @@
             function getUrlParams() {
                 const params = new URLSearchParams(window.location.search);
                 const platform = params.get("platform") || "modrinth";
-                const defaultColor = platform === "curseforge" ? CURSEFORGE_COLOR : "1bd96a";
+                const config = PLATFORMS[platform];
                 return {
                     platform,
                     type: params.get("type") || "card",
-                    target: params.get("target") || "user",
+                    target: params.get("target") || config.targets[0],
                     metric: params.get("metric") || "downloads",
                     value: params.get("value") || "",
                     showProjects: params.get("showProjects") !== "false",
@@ -790,13 +812,14 @@
                     maxVersions: parseInt(params.get("maxVersions")) || 5,
                     relativeTime: params.get("relativeTime") !== "false",
                     showSparklines: params.get("showSparklines") !== "false",
-                    color: params.get("color") || defaultColor,
+                    color: params.get("color") || config.defaultColor,
                     backgroundColor: params.get("backgroundColor") || null,
                 };
             }
 
             function updateUrl() {
                 const params = new URLSearchParams();
+                const config = PLATFORMS[selectedPlatform];
                 const type = embedType.value;
                 const target = targetType.value;
                 const metric = badgeMetric.value;
@@ -816,12 +839,10 @@
                     if (maxVersions.value !== "5") params.set("maxVersions", maxVersions.value);
                     if (!relativeTime.checked) params.set("relativeTime", "false");
                     if (!showSparklines.checked) params.set("showSparklines", "false");
-                    const defaultColor = selectedPlatform === "curseforge" ? CURSEFORGE_COLOR : "1bd96a";
-                    if (selectedColor !== defaultColor) params.set("color", selectedColor);
+                    if (selectedColor !== config.defaultColor) params.set("color", selectedColor);
                     if (selectedBgColor !== null) params.set("backgroundColor", selectedBgColor);
                 } else {
-                    const defaultColor = selectedPlatform === "curseforge" ? CURSEFORGE_COLOR : "1bd96a";
-                    if (selectedColor !== defaultColor) params.set("color", selectedColor);
+                    if (selectedColor !== config.defaultColor) params.set("color", selectedColor);
                     if (selectedBgColor !== null) params.set("backgroundColor", selectedBgColor);
                 }
 
@@ -891,25 +912,23 @@
                 try {
                     const urlObj = new URL(url);
 
-                    // Handle CurseForge URLs
-                    if (urlObj.hostname.includes("curseforge.com")) {
+                    // Check which platform this URL belongs to
+                    const platform = Object.values(PLATFORMS).find(p => urlObj.hostname.includes(p.baseUrl));
+
+                    if (platform && platform.id === "curseforge") {
+                        // Handle CurseForge URLs: /minecraft/mc-mods/geckolib
                         const pathParts = urlObj.pathname.split("/").filter((p) => p);
                         if (pathParts.length < 3) return null;
-
-                        // CurseForge URLs are like: /minecraft/mc-mods/geckolib
-                        const game = pathParts[0];
-                        const category = pathParts[1];
                         const slug = pathParts[2];
-
                         if (slug) {
                             return { type: "project", id: slug, slug, isCurseForge: true };
                         }
                         return null;
                     }
 
-                    // Handle Modrinth URLs
-                    if (!urlObj.hostname.includes("modrinth.com")) return null;
+                    if (!platform || platform.id !== "modrinth") return null;
 
+                    // Handle Modrinth URLs
                     const pathParts = urlObj.pathname.split("/").filter((p) => p);
                     if (pathParts.length < 2) return null;
 
@@ -943,10 +962,9 @@
                 const urlValue = modrinthUrl.value.trim();
 
                 // Auto-detect platform from URL
-                if (urlValue.includes("curseforge.com")) {
-                    setPlatform("curseforge");
-                } else if (urlValue.includes("modrinth.com")) {
-                    setPlatform("modrinth");
+                const platform = Object.values(PLATFORMS).find(p => urlValue.includes(p.baseUrl));
+                if (platform) {
+                    setPlatform(platform.id);
                 }
 
                 const parsed = parseModrinthUrl(urlValue);
@@ -981,25 +999,26 @@
             });
 
             function updateBadgeOptions() {
-                if (selectedPlatform === "curseforge") {
-                    badgeMetric.innerHTML = '<option value="downloads">Downloads</option><option value="rank">Rank</option><option value="versions">Versions</option>';
-                } else {
-                    const isUserOrgOrCollection = ["user", "organization", "collection"].includes(targetType.value);
-                    badgeMetric.innerHTML = isUserOrgOrCollection
-                        ? '<option value="downloads">Downloads</option><option value="followers">Followers</option><option value="projects">Projects</option>'
-                        : '<option value="downloads">Downloads</option><option value="followers">Followers</option><option value="versions">Versions</option>';
-                }
+                const config = PLATFORMS[selectedPlatform];
+                const metrics = config.badgeMetrics[targetType.value] || config.badgeMetrics.project;
+                const metricLabels = {
+                    downloads: "Downloads",
+                    followers: "Followers",
+                    projects: "Projects",
+                    rank: "Rank",
+                    versions: "Versions"
+                };
+                badgeMetric.innerHTML = metrics.map(m => `<option value="${m}">${metricLabels[m]}</option>`).join('');
             }
 
             function updateUI() {
-                const placeholders = selectedPlatform === "curseforge"
-                    ? { project: "Enter project ID or slug" }
-                    : {
-                        user: "Enter username or id",
-                        project: "Enter project slug or id",
-                        organization: "Enter organization slug or id",
-                        collection: "Enter collection id",
-                    };
+                const config = PLATFORMS[selectedPlatform];
+                const placeholders = {
+                    user: "Enter username or id",
+                    project: "Enter project ID or slug",
+                    organization: "Enter organization slug or id",
+                    collection: "Enter collection id",
+                };
                 identifier.placeholder = placeholders[targetType.value] || "";
                 valueLabel.textContent = selectedPlatform === "curseforge" ? "Project ID" : "Value";
                 const isCard = embedType.value === "card";
@@ -1059,6 +1078,7 @@
                 previewLink.classList.add("hidden");
 
                 // Build URL with customization parameters
+                const config = PLATFORMS[selectedPlatform];
                 let url;
                 if (embedType.value === "card") {
                     const urlParams = new URLSearchParams();
@@ -1076,7 +1096,7 @@
                         if (!showSparklines.checked) {
                             urlParams.set("showSparklines", "false");
                         }
-                        if (selectedColor !== CURSEFORGE_COLOR) {
+                        if (selectedColor !== config.defaultColor) {
                             urlParams.set("color", selectedColor);
                         }
                         if (selectedBgColor !== null) {
@@ -1104,7 +1124,7 @@
                         if (!showSparklines.checked) {
                             urlParams.set("showSparklines", "false");
                         }
-                        if (selectedColor !== "1bd96a") {
+                        if (selectedColor !== config.defaultColor) {
                             urlParams.set("color", selectedColor);
                         }
                         if (selectedBgColor !== null) {
@@ -1115,7 +1135,7 @@
                     }
                 } else {
                     const badgeParams = new URLSearchParams();
-                    if (selectedColor !== (selectedPlatform === "curseforge" ? CURSEFORGE_COLOR : "1bd96a")) {
+                    if (selectedColor !== config.defaultColor) {
                         badgeParams.set("color", selectedColor);
                     }
                     if (selectedBgColor !== null) {
@@ -1130,7 +1150,7 @@
                 }
 
                 const modrinthUrl = selectedPlatform === "curseforge"
-                    ? `https://www.curseforge.com/minecraft/mc-mods/${curseforgeSlug || identifierValue}`
+                    ? `https://www.${config.baseUrl}/${config.projectPath}/${curseforgeSlug || identifierValue}`
                     : `https://modrinth.com/${type}/${identifierValue}`;
                 const cacheBuster = `timestamp=${Date.now()}`;
                 const urlForDiscord = `${url}${url.includes("?") ? "&" : "?"}${cacheBuster}`;
@@ -1187,6 +1207,7 @@
                     previewLink.classList.remove("hidden");
 
                     try {
+                        const config = PLATFORMS[selectedPlatform];
                         const metaPath = selectedPlatform === "curseforge"
                             ? `/meta/curseforge/${encodeURIComponent(identifierValue)}`
                             : `/meta/${type}/${encodeURIComponent(identifierValue)}`;
@@ -1313,8 +1334,8 @@
             }
 
             function hasCustomizationFromUrl(params) {
-                const defaultColor = params.platform === "curseforge" ? CURSEFORGE_COLOR : "1bd96a";
-                return params.showProjects === false || params.maxProjects !== 5 || params.showVersions === false || params.maxVersions !== 5 || params.relativeTime === false || params.showSparklines === false || params.color !== defaultColor || params.backgroundColor !== null;
+                const config = PLATFORMS[params.platform];
+                return params.showProjects === false || params.maxProjects !== 5 || params.showVersions === false || params.maxVersions !== 5 || params.relativeTime === false || params.showSparklines === false || params.color !== config.defaultColor || params.backgroundColor !== null;
             }
 
             loadFromUrl();

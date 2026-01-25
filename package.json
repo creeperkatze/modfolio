@@ -1,6 +1,6 @@
 {
-  "name": "modrinth-embeds",
-  "version": "1.0.16",
+  "name": "modfolio",
+  "version": "1.0.17",
   "type": "module",
   "main": "src/server.js",
   "scripts": {
