@@ -9,6 +9,7 @@ import { generateCurseforgeCard } from "../generators/curseforgeCard.js";
 import logger from "../utils/logger.js";
 import { generatePng } from "../utils/generateImage.js";
 import { modrinthKeys, curseforgeKeys } from "../utils/cacheKeys.js";
+import { PLATFORMS } from "../constants/platforms.js";
 
 const API_CACHE_TTL = 3600; // 1 hour
 
@@ -27,35 +28,40 @@ const CARD_CONFIGS = {
         dataFetcher: (client, id, options, convertToPng) => client.getUserStats(id, options.maxProjects, convertToPng),
         generator: generateUserCard,
         cacheKeyFn: modrinthKeys.user,
-        entityName: "user"
+        entityName: "user",
+        platformName: "modrinth"
     },
     project: {
         paramKey: "slug",
         dataFetcher: (client, id, options, convertToPng) => client.getProjectStats(id, options.maxVersions, convertToPng),
         generator: generateProjectCard,
         cacheKeyFn: modrinthKeys.project,
-        entityName: "project"
+        entityName: "project",
+        platformName: "modrinth"
     },
     organization: {
         paramKey: "id",
         dataFetcher: (client, id, options, convertToPng) => client.getOrganizationStats(id, options.maxProjects, convertToPng),
         generator: generateOrganizationCard,
         cacheKeyFn: modrinthKeys.organization,
-        entityName: "organization"
+        entityName: "organization",
+        platformName: "modrinth"
     },
     collection: {
         paramKey: "id",
         dataFetcher: (client, id, options, convertToPng) => client.getCollectionStats(id, options.maxProjects, convertToPng),
         generator: generateCollectionCard,
         cacheKeyFn: modrinthKeys.collection,
-        entityName: "collection"
+        entityName: "collection",
+        platformName: "modrinth"
     },
     curseforge_mod: {
         paramKey: "modId",
         dataFetcher: (client, id, options, convertToPng) => client.getModStats(id, options.maxVersions, convertToPng),
         generator: generateCurseforgeCard,
         cacheKeyFn: curseforgeKeys.mod,
-        entityName: "mod"
+        entityName: "mod",
+        platformName: "curseforge"
     }
 };
 
@@ -117,7 +123,7 @@ const handleCardRequest = async (req, res, next, cardType) => {
             const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
             const size = `${(Buffer.byteLength(pngBuffer) / 1024).toFixed(1)} KB`;
 
-            logger.info(`Showing ${config.entityName} card for "${identifier}" (api: ${apiTime}, image conversion: ${conversionTime}, render: ${pngTime}${crawlerLog}, size: ${size})`);
+            logger.info(`Showing ${config.platformName} ${config.entityName} card for "${identifier}" (api: ${apiTime}, image conversion: ${conversionTime}, render: ${pngTime}${crawlerLog}, size: ${size})`);
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             res.setHeader("X-Cache", fromCache ? "HIT" : "MISS");
@@ -129,7 +135,7 @@ const handleCardRequest = async (req, res, next, cardType) => {
         const crawlerType = req.crawlerType;
         const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
         const size = `${(Buffer.byteLength(svg) / 1024).toFixed(1)} KB`;
-        logger.info(`Showing ${config.entityName} card for "${identifier}" (api: ${apiTime}${crawlerLog}, size: ${size})`);
+        logger.info(`Showing ${config.platformName} ${config.entityName} card for "${identifier}" (api: ${apiTime}${crawlerLog}, size: ${size})`);
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.setHeader("X-Cache", fromCache ? "HIT" : "MISS");
@@ -137,7 +143,7 @@ const handleCardRequest = async (req, res, next, cardType) => {
     } catch (err) {
         const config = CARD_CONFIGS[cardType];
         const identifier = req.params[config.paramKey];
-        logger.warn(`Error showing ${cardType} card for "${identifier}": ${err.message}`);
+        logger.warn(`Error showing ${config.platformName} ${config.entityName} card for "${identifier}": ${err.message}`);
         next(err);
     }
 };

@@ -1,4 +1,4 @@
-# <a href="https://modfolio.creeperkatze.de"><img src=".github/assets/logo.png" alt="Logo" width="600"></a>
+# <a href="https://modfolio.creeperkatze.de"><img src=".github/assets/logo.png" alt="Logo" width="400"></a>
 
 Generate beautiful, customizable and fast embeddable cards and badges for Modrinth projects, users, organizations, and collections.
 

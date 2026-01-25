@@ -471,7 +471,7 @@
             let selectedColor = "1bd96a";
             let selectedBgColor = null;
             let selectedPlatform = "modrinth";
-            let curseforgeSlug = null; // Store the slug for link generation
+            let curseforgeSlug = null;
 
             // HSL to Hex conversion (S=100%, L=75%)
             function hslToHex(h) {
@@ -971,24 +971,21 @@
                 if (parsed) {
                     targetType.value = parsed.type;
 
-                    // For CurseForge, we need to resolve the slug to an ID
+                    // For CurseForge, silently resolve slug to ID in background
                     if (parsed.isCurseForge && parsed.slug) {
-                        curseforgeSlug = parsed.slug; // Store the slug for link generation
-                        try {
-                            identifier.value = "Resolving...";
-                            const response = await fetch(`/curseforge/lookup/${encodeURIComponent(parsed.slug)}`);
-                            if (!response.ok) {
-                                throw new Error("Mod not found");
-                            }
-                            const data = await response.json();
-                            identifier.value = data.id;
-                            updateUrl();
-                            updateUI();
-                        } catch (err) {
-                            identifier.value = "";
-                            curseforgeSlug = null;
-                            console.error("Failed to resolve CurseForge slug:", err);
-                        }
+                        curseforgeSlug = parsed.slug;
+                        // Do lookup in background without showing "Resolving..."
+                        fetch(`/curseforge/lookup/${encodeURIComponent(parsed.slug)}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                identifier.value = data.id;
+                                updateUrl();
+                                generate();
+                            })
+                            .catch(() => {
+                                // If lookup fails, clear the slug
+                                curseforgeSlug = null;
+                            });
                     } else {
                         curseforgeSlug = null;
                         identifier.value = parsed.id;

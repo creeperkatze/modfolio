@@ -65,6 +65,11 @@ export class CurseforgeClient extends BasePlatformClient
      */
     async getModStats(modId, maxFiles = DEFAULT_FILES_COUNT, convertToPng = false)
     {
+        // Validate modId is a number
+        if (!/^\d+$/.test(String(modId))) {
+            throw new Error("Invalid CurseForge mod ID: must be a number. Use /curseforge/lookup/{slug} to resolve slugs to IDs.");
+        }
+
         const apiStart = performance.now();
 
         const modResponse = await this.getMod(modId);
@@ -149,6 +154,11 @@ export class CurseforgeClient extends BasePlatformClient
      */
     async getModBadgeStats(modId, fetchFiles = false)
     {
+        // Validate modId is a number
+        if (!/^\d+$/.test(String(modId))) {
+            throw new Error("Invalid CurseForge mod ID: must be a number. Use /curseforge/lookup/{slug} to resolve slugs to IDs.");
+        }
+
         const apiStart = performance.now();
 
         const modResponse = await this.getMod(modId);

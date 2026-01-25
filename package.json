@@ -1,6 +1,6 @@
 {
   "name": "modfolio",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "type": "module",
   "main": "src/server.js",
   "scripts": {

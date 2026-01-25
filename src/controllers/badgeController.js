@@ -52,11 +52,11 @@ const DATA_FETCHERS = {
 
 // Platform and cache key mapping for each entity type
 const ENTITY_CONFIG = {
-    user: { platform: PLATFORMS.MODRINTH.id, cacheKeyFn: modrinthKeys.userBadge },
-    project: { platform: PLATFORMS.MODRINTH.id, cacheKeyFn: modrinthKeys.projectBadge },
-    organization: { platform: PLATFORMS.MODRINTH.id, cacheKeyFn: modrinthKeys.organizationBadge },
-    collection: { platform: PLATFORMS.MODRINTH.id, cacheKeyFn: modrinthKeys.collectionBadge },
-    curseforge_mod: { platform: PLATFORMS.CURSEFORGE.id, cacheKeyFn: curseforgeKeys.modBadge }
+    user: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.userBadge },
+    project: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.projectBadge },
+    organization: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.organizationBadge },
+    collection: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.collectionBadge },
+    curseforge_mod: { platform: PLATFORMS.CURSEFORGE.id, platformName: "curseforge", cacheKeyFn: curseforgeKeys.modBadge }
 };
 
 const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
@@ -109,7 +109,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
             const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
             const size = `${(Buffer.byteLength(pngBuffer) / 1024).toFixed(1)} KB`;
 
-            logger.info(`Showing ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}, render: ${pngTime}${crawlerLog}, size: ${size})`);
+            logger.info(`Showing ${entityConfig.platformName} ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}, render: ${pngTime}${crawlerLog}, size: ${size})`);
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             res.setHeader("X-Cache", fromCache ? "HIT" : "MISS");
@@ -121,7 +121,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         const crawlerType = req.crawlerType;
         const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
         const size = `${(Buffer.byteLength(svg) / 1024).toFixed(1)} KB`;
-        logger.info(`Showing ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}${crawlerLog}, size: ${size})`);
+        logger.info(`Showing ${entityConfig.platformName} ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}${crawlerLog}, size: ${size})`);
 
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
@@ -129,7 +129,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         res.send(svg);
     } catch (err) {
         const identifier = req.params.username || req.params.slug || req.params.id || req.params.modId;
-        logger.warn(`Error showing ${badgeType} badge for "${identifier}": ${err.message}`);
+        logger.warn(`Error showing ${entityConfig.platformName} ${badgeType} badge for "${identifier}": ${err.message}`);
         next(err);
     }
 };
