@@ -13,8 +13,8 @@ const MODRINTH_API_URL = process.env.MODRINTH_API_URL;
 const MODRINTH_API_V3_URL = process.env.MODRINTH_API_V3_URL;
 const USER_AGENT = process.env.USER_AGENT;
 
-// Default number of top projects to display
-const DEFAULT_TOP_PROJECTS_COUNT = 5;
+// Default number of top projects/versions to display
+const DEFAULT_TOP_PROJECTS_COUNT = 10;
 
 export class ModrinthClient extends BasePlatformClient
 {
@@ -77,6 +77,11 @@ export class ModrinthClient extends BasePlatformClient
             this.getUserProjects(username)
         ]);
 
+        // Return null if user not found
+        if (!user) {
+            return null;
+        }
+
         const apiTime = performance.now() - apiStart;
 
         // Use combined aggregation for single-pass efficiency
@@ -118,6 +123,11 @@ export class ModrinthClient extends BasePlatformClient
             this.getProjectVersions(slug)
         ]);
 
+        // Return null if project not found
+        if (!project) {
+            return null;
+        }
+
         const apiTime = performance.now() - apiStart;
 
         let imageConversionTime = 0;
@@ -154,6 +164,11 @@ export class ModrinthClient extends BasePlatformClient
             this.getOrganization(id),
             this.getOrganizationProjects(id)
         ]);
+
+        // Return null if organization not found
+        if (!organization) {
+            return null;
+        }
 
         const apiTime = performance.now() - apiStart;
 
@@ -194,6 +209,11 @@ export class ModrinthClient extends BasePlatformClient
         const apiStart = performance.now();
 
         const collection = await this.getCollection(id);
+
+        // Return null if collection not found
+        if (!collection) {
+            return null;
+        }
 
         const projects = collection.projects && collection.projects.length > 0
             ? await this.getProjects(collection.projects)
@@ -238,10 +258,15 @@ export class ModrinthClient extends BasePlatformClient
     {
         const apiStart = performance.now();
 
-        const [, projects] = await Promise.all([
+        const [user, projects] = await Promise.all([
             this.getUser(username),
             this.getUserProjects(username)
         ]);
+
+        // Return null if user not found
+        if (!user) {
+            return null;
+        }
 
         const apiTime = performance.now() - apiStart;
 
@@ -259,6 +284,11 @@ export class ModrinthClient extends BasePlatformClient
         const apiStart = performance.now();
 
         const project = await this.getProject(slug);
+
+        // Return null if project not found
+        if (!project) {
+            return null;
+        }
 
         let apiTime = performance.now() - apiStart;
 
@@ -286,10 +316,15 @@ export class ModrinthClient extends BasePlatformClient
     {
         const apiStart = performance.now();
 
-        const [, rawProjects] = await Promise.all([
+        const [organization, rawProjects] = await Promise.all([
             this.getOrganization(id),
             this.getOrganizationProjects(id)
         ]);
+
+        // Return null if organization not found
+        if (!organization) {
+            return null;
+        }
 
         const apiTime = performance.now() - apiStart;
 
@@ -309,6 +344,11 @@ export class ModrinthClient extends BasePlatformClient
         const apiStart = performance.now();
 
         const collection = await this.getCollection(id);
+
+        // Return null if collection not found
+        if (!collection) {
+            return null;
+        }
 
         let stats = {
             totalDownloads: 0,

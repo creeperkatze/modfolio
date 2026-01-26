@@ -67,12 +67,15 @@ export class CurseforgeClient extends BasePlatformClient
     {
         // Validate modId is a number
         if (!/^\d+$/.test(String(modId))) {
-            throw new Error("Invalid CurseForge mod ID: must be a number. Use /curseforge/lookup/{slug} to resolve slugs to IDs.");
+            return null; // Return null instead of throwing to avoid stack trace
         }
 
         const apiStart = performance.now();
 
         const modResponse = await this.getMod(modId);
+        if (!modResponse) {
+            return null; // Return null instead of throwing to avoid stack trace
+        }
         const mod = modResponse.data;
 
         let imageConversionTime = 0;
@@ -85,7 +88,7 @@ export class CurseforgeClient extends BasePlatformClient
         }
 
         // Fetch files for the mod
-        let files = [];
+        let versions = [];
         let totalFileCount = 0;
         try {
             const filesResponse = await this.getModFiles(modId, maxFiles);
@@ -94,7 +97,7 @@ export class CurseforgeClient extends BasePlatformClient
             totalFileCount = filesResponse.pagination?.totalCount ?? allFiles.length;
 
             // Sort by date (newest first) and take maxFiles
-            files = allFiles
+            versions = allFiles
                 .sort((a, b) => new Date(b.fileDate) - new Date(a.fileDate))
                 .slice(0, maxFiles)
                 .map(file => {
@@ -115,30 +118,28 @@ export class CurseforgeClient extends BasePlatformClient
                         .filter(v => !KNOWN_LOADERS.includes(v) && !FILTERED_TAGS.includes(v));
 
                     return {
-                        displayName: file.displayName || file.fileName,
-                        fileName: file.fileName,
-                        fileDate: file.fileDate,
-                        releaseType: file.releaseType, // 1=Release, 2=Beta, 3=Alpha
-                        downloadCount: file.downloadCount || 0,
-                        gameVersions: gameVersionsOnly,
-                        sortableGameVersions: file.sortableGameVersions || [],
-                        modLoaders: loaders
+                        version_number: file.displayName || file.fileName,
+                        date_published: file.fileDate,
+                        loaders: loaders,
+                        game_versions: gameVersionsOnly,
+                        downloads: file.downloadCount || 0
                     };
                 });
         } catch {
-            // If files fetch fails, continue with empty files array
-            files = [];
+            // If files fetch fails, continue with empty versions array
+            versions = [];
         }
 
         const apiTime = performance.now() - apiStart;
 
         return {
-            mod,
-            files,
+            project: mod, // Use 'project' key for consistency with unified system
+            versions, // Use 'versions' key for consistency (instead of 'files')
             stats: {
                 downloads: mod?.downloadCount || 0,
                 rank: mod?.gamePopularityRank || null,
-                fileCount: totalFileCount
+                versionCount: totalFileCount, // Use 'versionCount' for consistency
+                fileCount: totalFileCount // Keep for backward compatibility
             },
             timings: {
                 api: apiTime,
@@ -156,12 +157,15 @@ export class CurseforgeClient extends BasePlatformClient
     {
         // Validate modId is a number
         if (!/^\d+$/.test(String(modId))) {
-            throw new Error("Invalid CurseForge mod ID: must be a number. Use /curseforge/lookup/{slug} to resolve slugs to IDs.");
+            return null; // Return null instead of throwing to avoid stack trace
         }
 
         const apiStart = performance.now();
 
         const modResponse = await this.getMod(modId);
+        if (!modResponse) {
+            return null; // Return null instead of throwing to avoid stack trace
+        }
         const mod = modResponse.data;
 
         let apiTime = performance.now() - apiStart;
@@ -169,6 +173,7 @@ export class CurseforgeClient extends BasePlatformClient
         const stats = {
             downloads: mod?.downloadCount || 0,
             rank: mod?.gamePopularityRank || null,
+            versionCount: 0,
             fileCount: 0
         };
 
@@ -177,9 +182,12 @@ export class CurseforgeClient extends BasePlatformClient
             try {
                 const filesResponse = await this.getModFiles(modId);
                 // Use pagination totalCount if available, otherwise use the array length
-                stats.fileCount = filesResponse.pagination?.totalCount ?? filesResponse.data?.length ?? 0;
+                const count = filesResponse.pagination?.totalCount ?? filesResponse.data?.length ?? 0;
+                stats.versionCount = count; // Use versionCount for consistency
+                stats.fileCount = count;
             } catch {
                 stats.fileCount = 0;
+                stats.versionCount = 0;
             }
             apiTime = performance.now() - apiStart;
         }

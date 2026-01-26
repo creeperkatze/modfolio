@@ -14,7 +14,8 @@
 
 export const PLATFORM = {
     MODRINTH: "modrinth",
-    CURSEFORGE: "curseforge"
+    CURSEFORGE: "curseforge",
+    HANGAR: "hangar"
 };
 
 export const ENTITY_TYPE = {
@@ -126,4 +127,24 @@ export const curseforgeKeys = {
     mod: (id) => curseforgeKey(ENTITY_TYPE.MOD, id),
     modBadge: (id) => badgeKey(PLATFORM.CURSEFORGE, ENTITY_TYPE.MOD, id),
     slugLookup: (slug) => curseforgeKey(ENTITY_TYPE.SLUG, slug)
+};
+
+/**
+ * Creates a cache key for a Hangar entity.
+ *
+ * @param {string} entityType - The entity type (project)
+ * @param {string} id - The entity identifier
+ * @param {string} [suffix] - Optional suffix
+ * @returns {string} The formatted cache key
+ */
+export function hangarKey(entityType, id, suffix = null) {
+    return createCacheKey(PLATFORM.HANGAR, entityType, id, suffix);
+}
+
+// Convenience exports for common Hangar entities
+export const hangarKeys = {
+    project: (id) => hangarKey(ENTITY_TYPE.PROJECT, id),
+    projectBadge: (id) => badgeKey(PLATFORM.HANGAR, ENTITY_TYPE.PROJECT, id),
+    user: (id) => hangarKey(ENTITY_TYPE.USER, id),
+    userBadge: (id) => badgeKey(PLATFORM.HANGAR, ENTITY_TYPE.USER, id)
 };

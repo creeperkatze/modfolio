@@ -57,11 +57,12 @@ export class BasePlatformClient {
 
     /**
      * Fetch data from the API with standardized error handling.
+     * For user-caused errors (404), returns null instead of throwing.
      *
      * @param {string} endpoint - API endpoint (will be appended to baseUrl if not a full URL)
      * @param {Object} [options] - Additional fetch options
-     * @returns {Promise<any>} Parsed JSON response
-     * @throws {Error} With descriptive error message on failure
+     * @returns {Promise<any>} Parsed JSON response, or null for 404s
+     * @throws {Error} With descriptive error message on failure (except 404s)
      */
     async fetch(endpoint, options = {}) {
         // Handle full URLs vs relative endpoints
@@ -76,8 +77,9 @@ export class BasePlatformClient {
         });
 
         if (!response.ok) {
+            // For 404s, return null instead of throwing - this is a user-caused error
             if (response.status === 404) {
-                throw new Error("Resource not found");
+                return null;
             }
 
             const errorBody = await response.text().catch(() => "");

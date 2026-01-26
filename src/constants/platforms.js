@@ -16,6 +16,12 @@ export const PLATFORMS = {
         name: "CurseForge",
         defaultColor: "#F16436",
         icon: (color) => ICONS.curseforge(color)
+    },
+    HANGAR: {
+        id: "hangar",
+        name: "Hangar",
+        defaultColor: "#3371ED",
+        icon: (color) => ICONS.hangar(color)
     }
 };
 

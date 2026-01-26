@@ -65,13 +65,14 @@ export function generateActivitySparkline(versionDates, colors)
   </g>`;
 }
 
-export function generateHeader(entityType, iconName, title, colors)
+export function generateHeader(entityType, iconName, title, colors, platformIcon = null, platformIconViewBox = "0 0 512 514")
 {
     const icon = ICONS[iconName];
+    const platformIconSvg = platformIcon || ICONS.modrinth(colors.accentColor);
     return `
-  <!-- Modrinth Icon -->
-  <svg x="15" y="15" width="24" height="24" viewBox="0 0 512 514">
-    ${ICONS.modrinth(colors.accentColor)}
+  <!-- Platform Icon -->
+  <svg x="15" y="15" width="24" height="24" viewBox="${platformIconViewBox}">
+    ${platformIconSvg}
   </svg>
 
   <!-- Chevron -->

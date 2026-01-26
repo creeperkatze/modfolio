@@ -163,6 +163,9 @@
                                     <button id="platformCurseforge" class="flex-1 py-2.5 px-3 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110">
                                         CurseForge
                                     </button>
+                                    <button id="platformHangar" class="flex-1 py-2.5 px-3 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110">
+                                        Hangar
+                                    </button>
                                 </div>
                             </div>
 
@@ -191,6 +194,10 @@
                                 <select id="badgeMetric" class="w-full py-2.5 px-3 bg-input-bg border-2 border-transparent rounded-xl text-text-bright text-sm font-medium transition-[border-color] duration-100 focus:outline-none focus:border-modrinth-green">
                                     <option value="downloads">Downloads</option>
                                     <option value="followers">Followers</option>
+                                    <option value="versions">Versions</option>
+                                    <option value="views">Views</option>
+                                    <option value="rank">Rank</option>
+                                    <option value="projects">Projects</option>
                                 </select>
                             </div>
 
@@ -391,7 +398,7 @@
         </div>
         <footer class="text-center py-8 px-5 pt-8 text-base text-text-muted font-semibold">
             Made with &hearts; by <a href="https://github.com/creeperkatze" target="_blank" class="text-modrinth-green no-underline">Creeperkatze</a> · View <a href="https://github.com/creeperkatze/modfolio" target="_blank" class="text-modrinth-green no-underline">Source</a> ·
-            <a href="https://github.com/creeperkatze/modfolio" target="_blank" class="text-yellow no-underline">&starf; On Github</a> · Not affiliated with Modrinth or CurseForge
+            <a href="https://github.com/creeperkatze/modfolio" target="_blank" class="text-yellow no-underline">&starf; On Github</a> · Not affiliated with Modrinth, CurseForge, Hangar or Spigot
         </footer>
         <script>
             const modrinthUrl = document.getElementById("modrinthUrl");
@@ -436,6 +443,7 @@
             const showSparklinesSection = document.getElementById("showSparklinesSection");
             const platformModrinth = document.getElementById("platformModrinth");
             const platformCurseforge = document.getElementById("platformCurseforge");
+            const platformHangar = document.getElementById("platformHangar");
             const urlLabel = document.getElementById("urlLabel");
             const valueLabel = document.getElementById("valueLabel");
 
@@ -464,6 +472,18 @@
                     targets: ["project"],
                     badgeMetrics: {
                         project: ["downloads", "rank", "versions"]
+                    }
+                },
+                hangar: {
+                    id: "hangar",
+                    name: "Hangar",
+                    defaultColor: "3371ED",
+                    baseUrl: "hangar.papermc.io",
+                    projectPath: "plugins",
+                    targets: ["user", "project"],
+                    badgeMetrics: {
+                        user: ["downloads", "projects", "stars"],
+                        project: ["downloads", "versions", "views"]
                     }
                 }
             };
@@ -617,6 +637,9 @@
                 if (selectedPlatform === "curseforge") {
                     showVersionsLabel.textContent = "Show Files";
                     maxVersionsLabel.textContent = "Max Files";
+                } else if (selectedPlatform === "hangar") {
+                    showVersionsLabel.textContent = "Show Versions";
+                    maxVersionsLabel.textContent = "Max Versions";
                 } else {
                     showVersionsLabel.textContent = "Show Versions";
                     maxVersionsLabel.textContent = "Max Versions";
@@ -633,9 +656,15 @@
                 if (platform === "modrinth") {
                     platformModrinth.className = "flex-1 py-2.5 px-3 bg-modrinth-green text-black border-none rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
                     platformCurseforge.className = "flex-1 py-2.5 px-3 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
-                } else {
+                    platformHangar.className = "flex-1 py-2.5 px-3 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
+                } else if (platform === "curseforge") {
                     platformModrinth.className = "flex-1 py-2.5 px-3 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
                     platformCurseforge.className = "flex-1 py-2.5 px-3 bg-[#F16436] text-black border-none rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
+                    platformHangar.className = "flex-1 py-2.5 px-3 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
+                } else if (platform === "hangar") {
+                    platformModrinth.className = "flex-1 py-2.5 px-3 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
+                    platformCurseforge.className = "flex-1 py-2.5 px-3 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
+                    platformHangar.className = "flex-1 py-2.5 px-3 bg-[#3371ED] text-black border-none rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
                 }
 
                 // Update URL placeholder
@@ -675,7 +704,7 @@
                 // Reset embed type and target
                 embedType.value = "card";
                 targetType.value = config.targets[0];
-                badgeMetric.value = "downloads";
+                badgeMetric.value = config.badgeMetrics[config.targets[0]][0] || "downloads";
                 identifier.value = "";
 
                 // Reset customization options
@@ -732,6 +761,10 @@
             });
             platformCurseforge.addEventListener("click", () => {
                 setPlatform("curseforge");
+                resetToDefaults();
+            });
+            platformHangar.addEventListener("click", () => {
+                setPlatform("hangar");
                 resetToDefaults();
             });
 
@@ -833,8 +866,11 @@
 
                 // Only add customization params for cards
                 if (type === "card") {
-                    if (!showProjects.checked && selectedPlatform === "modrinth") params.set("showProjects", "false");
-                    if (maxProjects.value !== "5" && selectedPlatform === "modrinth") params.set("maxProjects", maxProjects.value);
+                    const isUserOrgOrCollection = ["user", "organization", "collection"].includes(target);
+                    const isHangarUser = selectedPlatform === "hangar" && target === "user";
+                    const isModrinthUserOrg = selectedPlatform === "modrinth" && isUserOrgOrCollection;
+                    if (!showProjects.checked && (isModrinthUserOrg || isHangarUser)) params.set("showProjects", "false");
+                    if (maxProjects.value !== "5" && (isModrinthUserOrg || isHangarUser)) params.set("maxProjects", maxProjects.value);
                     if (!showVersions.checked) params.set("showVersions", "false");
                     if (maxVersions.value !== "5") params.set("maxVersions", maxVersions.value);
                     if (!relativeTime.checked) params.set("relativeTime", "false");
@@ -926,6 +962,23 @@
                         return null;
                     }
 
+                    if (platform && platform.id === "hangar") {
+                        // Handle Hangar URLs: /plugins/ExamplePlugin or /username or /username/project
+                        const pathParts = urlObj.pathname.split("/").filter((p) => p);
+                        if (pathParts.length < 1) return null;
+                        const firstPart = pathParts[0];
+                        if (firstPart === "plugins" && pathParts[1]) {
+                            // /plugins/ExamplePlugin
+                            return { type: "project", id: pathParts[1], slug: pathParts[1] };
+                        } else if (pathParts[1]) {
+                            // /username/project (scoped project)
+                            return { type: "project", id: pathParts[1], slug: pathParts[1] };
+                        } else {
+                            // Single path part is a username
+                            return { type: "user", id: firstPart };
+                        }
+                    }
+
                     if (!platform || platform.id !== "modrinth") return null;
 
                     // Handle Modrinth URLs
@@ -1003,7 +1056,9 @@
                     followers: "Followers",
                     projects: "Projects",
                     rank: "Rank",
-                    versions: "Versions"
+                    stars: "Stars",
+                    versions: "Versions",
+                    views: "Views"
                 };
                 badgeMetric.innerHTML = metrics.map(m => `<option value="${m}">${metricLabels[m]}</option>`).join('');
             }
@@ -1017,7 +1072,13 @@
                     collection: "Enter collection id",
                 };
                 identifier.placeholder = placeholders[targetType.value] || "";
-                valueLabel.textContent = selectedPlatform === "curseforge" ? "Project ID" : "Value";
+                const valueLabels = {
+                    user: "Username",
+                    project: selectedPlatform === "curseforge" ? "Project ID" : "Project Slug",
+                    organization: "Organization Slug",
+                    collection: "Collection ID",
+                };
+                valueLabel.textContent = valueLabels[targetType.value] || "Value";
                 const isCard = embedType.value === "card";
                 const isBadge = embedType.value === "badge";
 
@@ -1027,9 +1088,10 @@
                 // Show/hide customization sections based on target type
                 const isProject = targetType.value === "project";
                 const isUserOrgOrCollection = ["user", "organization", "collection"].includes(targetType.value);
+                const isHangarUser = selectedPlatform === "hangar" && targetType.value === "user";
 
-                showProjectsSection.classList.toggle("hidden", !(isCard && isUserOrgOrCollection && selectedPlatform === "modrinth"));
-                maxProjectsSection.classList.toggle("hidden", !(isCard && isUserOrgOrCollection && showProjects.checked && selectedPlatform === "modrinth"));
+                showProjectsSection.classList.toggle("hidden", !(isCard && (isUserOrgOrCollection || isHangarUser)));
+                maxProjectsSection.classList.toggle("hidden", !(isCard && (isUserOrgOrCollection || isHangarUser) && showProjects.checked));
                 showVersionsSection.classList.toggle("hidden", !(isCard && isProject));
                 maxVersionsSection.classList.toggle("hidden", !(isCard && isProject && showVersions.checked));
                 relativeTimeSection.classList.toggle("hidden", !(isCard && isProject && showVersions.checked));
@@ -1101,6 +1163,39 @@
                         }
                         const queryString = urlParams.toString();
                         url = `${window.location.origin}/curseforge/project/${identifierValue}${queryString ? "?" + queryString : ""}`;
+                    } else if (selectedPlatform === "hangar") {
+                        // Hangar card URL: /hangar/project/:slug or /hangar/user/:username
+                        const isProject = type === "project";
+                        const isUser = type === "user";
+                        if (isProject) {
+                            if (!showVersions.checked) {
+                                urlParams.set("showVersions", "false");
+                            }
+                            if (maxVersions.value !== "5") {
+                                urlParams.set("maxVersions", maxVersions.value);
+                            }
+                            if (!relativeTime.checked) {
+                                urlParams.set("relativeTime", "false");
+                            }
+                        } else if (isUser) {
+                            if (!showProjects.checked) {
+                                urlParams.set("showProjects", "false");
+                            }
+                            if (maxProjects.value !== "5") {
+                                urlParams.set("maxProjects", maxProjects.value);
+                            }
+                        }
+                        if (!showSparklines.checked) {
+                            urlParams.set("showSparklines", "false");
+                        }
+                        if (selectedColor !== config.defaultColor) {
+                            urlParams.set("color", selectedColor);
+                        }
+                        if (selectedBgColor !== null) {
+                            urlParams.set("backgroundColor", selectedBgColor);
+                        }
+                        const queryString = urlParams.toString();
+                        url = `${window.location.origin}/hangar/${type}/${identifierValue}${queryString ? "?" + queryString : ""}`;
                     } else {
                         // Modrinth card URL
                         if (!showProjects.checked && ["user", "organization", "collection"].includes(type)) {
@@ -1141,6 +1236,8 @@
                     const badgeQuery = badgeParams.toString();
                     if (selectedPlatform === "curseforge") {
                         url = `${window.location.origin}/curseforge/project/${identifierValue}/${badgeMetric.value}${badgeQuery ? "?" + badgeQuery : ""}`;
+                    } else if (selectedPlatform === "hangar") {
+                        url = `${window.location.origin}/hangar/${type}/${identifierValue}/${badgeMetric.value}${badgeQuery ? "?" + badgeQuery : ""}`;
                     } else {
                         url = `${window.location.origin}/modrinth/${type}/${identifierValue}/${badgeMetric.value}${badgeQuery ? "?" + badgeQuery : ""}`;
                     }
@@ -1148,6 +1245,10 @@
 
                 const modrinthUrl = selectedPlatform === "curseforge"
                     ? `https://www.${config.baseUrl}/${config.projectPath}/${curseforgeSlug || identifierValue}`
+                    : selectedPlatform === "hangar"
+                    ? type === "user"
+                        ? `https://${config.baseUrl}/u/${identifierValue}`
+                        : `https://${config.baseUrl}/${config.projectPath}/${identifierValue}`
                     : `https://modrinth.com/${type}/${identifierValue}`;
                 const cacheBuster = `timestamp=${Date.now()}`;
                 const urlForDiscord = `${url}${url.includes("?") ? "&" : "?"}${cacheBuster}`;
@@ -1207,6 +1308,8 @@
                         const config = PLATFORMS[selectedPlatform];
                         const metaPath = selectedPlatform === "curseforge"
                             ? `/meta/curseforge/${encodeURIComponent(identifierValue)}`
+                            : selectedPlatform === "hangar"
+                            ? `/meta/hangar/${encodeURIComponent(identifierValue)}`
                             : `/meta/${type}/${encodeURIComponent(identifierValue)}`;
                         const res = await fetch(metaPath);
                         if (res.ok) {
@@ -1332,7 +1435,8 @@
 
             function hasCustomizationFromUrl(params) {
                 const config = PLATFORMS[params.platform];
-                return params.showProjects === false || params.maxProjects !== 5 || params.showVersions === false || params.maxVersions !== 5 || params.relativeTime === false || params.showSparklines === false || params.color !== config.defaultColor || params.backgroundColor !== null;
+                const relevantPlatform = params.platform === "modrinth" || params.platform === "hangar";
+                return (relevantPlatform && params.showProjects === false) || (relevantPlatform && params.maxProjects !== 5) || params.showVersions === false || params.maxVersions !== 5 || params.relativeTime === false || params.showSparklines === false || params.color !== config.defaultColor || params.backgroundColor !== null;
             }
 
             loadFromUrl();

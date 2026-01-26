@@ -1,11 +1,12 @@
 import modrinthClient from "../services/modrinthClient.js";
 import curseforgeClient from "../services/curseforgeClient.js";
+import hangarClient from "../services/hangarClient.js";
 import { apiCache } from "../utils/cache.js";
 import { generateBadge } from "../generators/badge.js";
 import { formatNumber } from "../utils/formatters.js";
 import logger from "../utils/logger.js";
 import { generatePng } from "../utils/generateImage.js";
-import { modrinthKeys, curseforgeKeys } from "../utils/cacheKeys.js";
+import { modrinthKeys, curseforgeKeys, hangarKeys } from "../utils/cacheKeys.js";
 import { PLATFORMS } from "../constants/platforms.js";
 
 const API_CACHE_TTL = 3600; // 1 hour
@@ -37,6 +38,17 @@ const BADGE_CONFIGS = {
         downloads: { label: "Downloads", getValue: stats => formatNumber(stats.downloads) },
         rank: { label: "Rank", getValue: stats => stats.rank ? `#${stats.rank}` : "N/A" },
         versions: { label: "Files", getValue: stats => stats.fileCount.toString() }
+    },
+    // Hangar entities
+    hangar_project: {
+        downloads: { label: "Downloads", getValue: stats => formatNumber(stats.downloads) },
+        versions: { label: "Versions", getValue: stats => stats.versionCount.toString() },
+        views: { label: "Views", getValue: stats => formatNumber(stats.views) }
+    },
+    hangar_user: {
+        downloads: { label: "Downloads", getValue: stats => formatNumber(stats.totalDownloads) },
+        projects: { label: "Projects", getValue: stats => stats.projectCount.toString() },
+        stars: { label: "Stars", getValue: stats => formatNumber(stats.totalFollowers) }
     }
 };
 
@@ -47,7 +59,10 @@ const DATA_FETCHERS = {
     organization: modrinthClient.getOrganizationBadgeStats.bind(modrinthClient),
     collection: modrinthClient.getCollectionBadgeStats.bind(modrinthClient),
     // CurseForge fetchers
-    curseforge_mod: curseforgeClient.getModBadgeStats.bind(curseforgeClient)
+    curseforge_mod: curseforgeClient.getModBadgeStats.bind(curseforgeClient),
+    // Hangar fetchers
+    hangar_project: hangarClient.getProjectBadgeStats.bind(hangarClient),
+    hangar_user: hangarClient.getUserBadgeStats.bind(hangarClient)
 };
 
 // Platform and cache key mapping for each entity type
@@ -56,7 +71,9 @@ const ENTITY_CONFIG = {
     project: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.projectBadge },
     organization: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.organizationBadge },
     collection: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.collectionBadge },
-    curseforge_mod: { platform: PLATFORMS.CURSEFORGE.id, platformName: "curseforge", cacheKeyFn: curseforgeKeys.modBadge }
+    curseforge_mod: { platform: PLATFORMS.CURSEFORGE.id, platformName: "curseforge", cacheKeyFn: curseforgeKeys.modBadge },
+    hangar_project: { platform: PLATFORMS.HANGAR.id, platformName: "hangar", cacheKeyFn: hangarKeys.projectBadge },
+    hangar_user: { platform: PLATFORMS.HANGAR.id, platformName: "hangar", cacheKeyFn: hangarKeys.userBadge }
 };
 
 const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
@@ -65,7 +82,11 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         const platform = entityConfig.platform;
         const identifier = req.params.username || req.params.slug || req.params.id || req.params.modId;
         const format = req.query.format;
-        const defaultColor = platform === PLATFORMS.CURSEFORGE.id ? PLATFORMS.CURSEFORGE.defaultColor : PLATFORMS.MODRINTH.defaultColor;
+        const defaultColor = platform === PLATFORMS.CURSEFORGE.id
+            ? PLATFORMS.CURSEFORGE.defaultColor
+            : platform === PLATFORMS.HANGAR.id
+                ? PLATFORMS.HANGAR.defaultColor
+                : PLATFORMS.MODRINTH.defaultColor;
         const color = req.query.color ? `#${req.query.color.replace(/^#/, "")}` : defaultColor;
         const backgroundColor = req.query.backgroundColor ? `#${req.query.backgroundColor.replace(/^#/, "")}` : null;
         const config = BADGE_CONFIGS[entityType][badgeType];
@@ -83,7 +104,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 
         if (!data) {
             // Only fetch versions for version count badges
-            const fetchVersions = (entityType === "project" || entityType === "curseforge_mod") && badgeType === "versions";
+            const fetchVersions = (entityType === "project" || entityType === "curseforge_mod" || entityType === "hangar_project") && badgeType === "versions";
             data = await DATA_FETCHERS[entityType](identifier, fetchVersions);
             apiCache.set(apiCacheKey, data);
         }
@@ -129,6 +150,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         res.send(svg);
     } catch (err) {
         const identifier = req.params.username || req.params.slug || req.params.id || req.params.modId;
+        const entityConfig = ENTITY_CONFIG[entityType];
         logger.warn(`Error showing ${entityConfig.platformName} ${badgeType} badge for "${identifier}": ${err.message}`);
         next(err);
     }
@@ -158,3 +180,13 @@ export const getCollectionFollowers = (req, res, next) => handleBadgeRequest(req
 export const getCfModDownloads = (req, res, next) => handleBadgeRequest(req, res, next, "curseforge_mod", "downloads");
 export const getCfModRank = (req, res, next) => handleBadgeRequest(req, res, next, "curseforge_mod", "rank");
 export const getCfModVersions = (req, res, next) => handleBadgeRequest(req, res, next, "curseforge_mod", "versions");
+
+// Hangar project badges
+export const getHangarProjectDownloads = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_project", "downloads");
+export const getHangarProjectVersions = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_project", "versions");
+export const getHangarProjectViews = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_project", "views");
+
+// Hangar user badges
+export const getHangarUserDownloads = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_user", "downloads");
+export const getHangarUserProjects = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_user", "projects");
+export const getHangarUserStars = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_user", "stars");
