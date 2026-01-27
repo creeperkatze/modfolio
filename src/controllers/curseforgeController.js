@@ -57,13 +57,13 @@ export const getCfSlugLookup = async (req, res) => {
 
         if (cached?.value) {
             const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
-            logger.info(`Curseforge slug lookup for "${slug}" -> ID ${cached.value} (cached ${minutesAgo}m ago)`);
+            logger.info(`Curseforge slug lookup for "${slug}": ${cached.value} (cached ${minutesAgo}m ago)`);
             return res.json({ id: cached.value });
         }
 
         const modId = await curseforgeClient.searchModBySlug(slug);
         apiCache.set(cacheKey, modId);
-        logger.info(`Curseforge slug lookup for "${slug}" -> ID ${modId}`);
+        logger.info(`Curseforge slug lookup for "${slug}": ${modId}`);
 
         res.json({ id: modId });
     } catch (err) {

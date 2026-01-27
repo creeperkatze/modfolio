@@ -1,6 +1,6 @@
 # <a href="https://modfolio.creeperkatze.de"><img src=".github/assets/logo.png" alt="Logo" width="400"></a>
 
-Generate beautiful, customizable and fast embeddable cards and badges for Modrinth projects, users, organizations, and collections.
+Generate fast, beautiful and consistent embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content.
 
 [![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/2d89t.svg)](https://status.creeperkatze.de)
 ![GitHub Issues](https://img.shields.io/github/issues/creeperkatze/modfolio?labelColor=0d143c)
