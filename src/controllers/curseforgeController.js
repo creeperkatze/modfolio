@@ -8,37 +8,37 @@ const API_CACHE_TTL = 3600; // 1 hour;
 // CurseForge meta endpoint
 export const getCfMeta = async (req, res, next) => {
     try {
-        const { modId } = req.params;
+        const { projectId } = req.params;
 
-        // Validate modId is a number
-        if (!/^\d+$/.test(String(modId))) {
-            return res.status(400).json({ error: "Invalid CurseForge mod ID: must be a number. Use /curseforge/lookup/{slug} to resolve slugs to IDs." });
+        // Validate projectId is a number
+        if (!/^\d+$/.test(String(projectId))) {
+            return res.status(400).json({ error: "Invalid curseforge project ID: must be a number. Use /curseforge/lookup/{slug} to resolve slugs to IDs." });
         }
 
-        const cacheKey = metaKey(PLATFORM.CURSEFORGE, "mod", modId);
+        const cacheKey = metaKey(PLATFORM.CURSEFORGE, "project", projectId);
 
         const cached = apiCache.getWithMeta(cacheKey);
         const cachedResult = cached?.value;
 
         if (cachedResult) {
             const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
-            logger.info(`Showing Curseforge meta for mod "${modId}" (cached ${minutesAgo}m ago)`);
+            logger.info(`Showing curseforge meta for project "${projectId}" (cached ${minutesAgo}m ago)`);
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             return res.json(cachedResult);
         }
 
-        const modResponse = await curseforgeClient.getMod(modId);
+        const modResponse = await curseforgeClient.getMod(projectId);
         const mod = modResponse.data;
-        const name = mod?.name || modId;
+        const name = mod?.name || projectId;
 
         const result = { name };
         apiCache.set(cacheKey, result);
-        logger.info(`Showing Curseforge meta for mod "${modId}"`);
+        logger.info(`Showing curseforge meta for project "${projectId}"`);
 
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);
     } catch (err) {
-        logger.warn(`Error fetching Curseforge meta for mod "${req.params.modId}": ${err.message}`);
+        logger.warn(`Error fetching curseforge meta for project "${req.params.projectId}": ${err.message}`);
         next(err);
     }
 };
@@ -67,7 +67,7 @@ export const getCfSlugLookup = async (req, res) => {
 
         res.json({ id: modId });
     } catch (err) {
-        logger.warn(`Error looking up Curseforge slug "${req.params.slug}": ${err.message}`);
-        res.status(404).json({ error: "Mod not found", message: err.message });
+        logger.warn(`Error looking up curseforge slug "${req.params.slug}": ${err.message}`);
+        res.status(404).json({ error: "Project not found", message: err.message });
     }
 };

@@ -12,7 +12,7 @@ router.get("/meta/:type/:id", metaController.getMeta);
 router.get("/meta/modrinth/:type/:id", (req, res) => res.redirect(301, `/meta/${req.params.type}/${req.params.id}`));
 
 // CurseForge meta endpoint
-router.get("/meta/curseforge/:modId", curseforgeController.getCfMeta);
+router.get("/meta/curseforge/:projectId", curseforgeController.getCfMeta);
 
 // Hangar meta endpoint
 router.get("/meta/hangar/:slug", hangarController.getHangarMeta);

@@ -1166,11 +1166,18 @@
                         curseforgeSlug = parsed.slug;
                         // Do lookup in background without showing "Resolving..."
                         fetch(`/curseforge/lookup/${encodeURIComponent(parsed.slug)}`)
-                            .then(res => res.json())
+                            .then(res => {
+                                if (!res.ok) throw new Error("Lookup failed");
+                                return res.json();
+                            })
                             .then(data => {
-                                identifier.value = data.id;
-                                updateUrl();
-                                generate();
+                                if (data.id) {
+                                    identifier.value = data.id;
+                                    updateUrl();
+                                    generate();
+                                } else {
+                                    curseforgeSlug = null;
+                                }
                             })
                             .catch(() => {
                                 // If lookup fails, clear the slug

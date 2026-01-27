@@ -125,8 +125,8 @@ export const modrinthKeys = {
 
 // Convenience exports for common CurseForge entities
 export const curseforgeKeys = {
-    mod: (id) => curseforgeKey(ENTITY_TYPE.MOD, id),
-    modBadge: (id) => badgeKey(PLATFORM.CURSEFORGE, ENTITY_TYPE.MOD, id),
+    project: (id) => curseforgeKey(ENTITY_TYPE.PROJECT, id),
+    projectBadge: (id) => badgeKey(PLATFORM.CURSEFORGE, ENTITY_TYPE.PROJECT, id),
     slugLookup: (slug) => curseforgeKey(ENTITY_TYPE.SLUG, slug)
 };
 

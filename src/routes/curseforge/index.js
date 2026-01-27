@@ -9,11 +9,11 @@ const router = express.Router();
 router.get("/curseforge/lookup/:slug", curseforgeController.getCfSlugLookup);
 
 // Card routes
-router.get("/curseforge/project/:modId", cardController.getCfMod);
+router.get("/curseforge/project/:projectId", cardController.getCfMod);
 
 // Badge routes
-router.get("/curseforge/project/:modId/downloads", badgeController.getCfModDownloads);
-router.get("/curseforge/project/:modId/rank", badgeController.getCfModRank);
-router.get("/curseforge/project/:modId/versions", badgeController.getCfModVersions);
+router.get("/curseforge/project/:projectId/downloads", badgeController.getCfModDownloads);
+router.get("/curseforge/project/:projectId/rank", badgeController.getCfModRank);
+router.get("/curseforge/project/:projectId/versions", badgeController.getCfModVersions);
 
 export default router;

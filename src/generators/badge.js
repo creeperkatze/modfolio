@@ -30,8 +30,8 @@ export function generateBadge(label, value, platformId = "modrinth", color = nul
     const valueTextColor = badgeColor;
     const borderColor = "#E4E2E2";
 
-    // Get icon viewBox - Modrinth uses 0 0 512 514, CurseForge uses 0 0 32 32
-    const iconViewBox = platformId === "curseforge" ? "0 0 32 32" : "0 0 512 514";
+    // Get icon viewBox - Modrinth uses 0 0 512 514, CurseForge uses 0 0 32 32, Hangar/Spigot use 0 0 100 100
+    const iconViewBox = platformId === "curseforge" ? "0 0 32 32" : platformId === "hangar" || platformId === "spigot" ? "0 0 100 100" : "0 0 512 514";
 
     return `
 <svg width="${totalWidth}" height="${height}" xmlns="http://www.w3.org/2000/svg">

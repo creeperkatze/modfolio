@@ -9,8 +9,8 @@ const router = express.Router();
 router.get("/spigot/meta/:id", spigotController.getSpigotMeta);
 
 // Card routes
-router.get("/spigot/resource/:id", cardController.getSpigetResource);
-router.get("/spigot/author/:id", cardController.getSpigetAuthor);
+router.get("/spigot/resource/:id", cardController.getSpigotResource);
+router.get("/spigot/author/:id", cardController.getSpigotAuthor);
 
 // Badge routes - Resource
 router.get("/spigot/resource/:id/downloads", badgeController.getSpigotResourceDownloads);

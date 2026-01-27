@@ -38,10 +38,10 @@ const STAT_CONFIGS = {
         ]
     },
     curseforge: {
-        mod: [
+        project: [
             { label: "Downloads", field: "downloads" },
             { label: "Rank", field: "rank" },
-            { label: "Files", field: "fileCount" }
+            { label: "Files", field: "versionCount" }
         ]
     },
     hangar: {

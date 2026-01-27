@@ -3,10 +3,6 @@ import curseforgeClient from "../services/curseforgeClient.js";
 import hangarClient from "../services/hangarClient.js";
 import spigotClient from "../services/spigotClient.js";
 import { apiCache } from "../utils/cache.js";
-import { generateUserCard } from "../generators/userCard.js";
-import { generateProjectCard } from "../generators/projectCard.js";
-import { generateOrganizationCard } from "../generators/organizationCard.js";
-import { generateCollectionCard } from "../generators/collectionCard.js";
 import { generateUnifiedCard } from "../generators/unifiedCard.js";
 import logger from "../utils/logger.js";
 import { generatePng } from "../utils/generateImage.js";
@@ -18,11 +14,11 @@ const API_CACHE_TTL = 3600; // 1 hour
 
 // Map card types to their API clients
 const CARD_CLIENTS = {
-    user: modrinthClient,
-    project: modrinthClient,
-    organization: modrinthClient,
-    collection: modrinthClient,
-    curseforge_mod: curseforgeClient,
+    modrinth_user: modrinthClient,
+    modrinth_project: modrinthClient,
+    modrinth_organization: modrinthClient,
+    modrinth_collection: modrinthClient,
+    curseforge_project: curseforgeClient,
     hangar_project: hangarClient,
     hangar_user: hangarClient,
     spigot_resource: spigotClient,
@@ -30,43 +26,43 @@ const CARD_CLIENTS = {
 };
 
 const CARD_CONFIGS = {
-    user: {
+    modrinth_user: {
         paramKey: "username",
         dataFetcher: (client, id, options, convertToPng) => client.getUserStats(id, options.maxProjects, convertToPng),
-        generator: generateUserCard,
         cacheKeyFn: modrinthKeys.user,
         entityName: "user",
-        platformId: "modrinth"
+        platformId: "modrinth",
+        useUnified: true
     },
-    project: {
+    modrinth_project: {
         paramKey: "slug",
         dataFetcher: (client, id, options, convertToPng) => client.getProjectStats(id, options.maxVersions, convertToPng),
-        generator: generateProjectCard,
         cacheKeyFn: modrinthKeys.project,
         entityName: "project",
-        platformId: "modrinth"
+        platformId: "modrinth",
+        useUnified: true
     },
-    organization: {
+    modrinth_organization: {
         paramKey: "id",
         dataFetcher: (client, id, options, convertToPng) => client.getOrganizationStats(id, options.maxProjects, convertToPng),
-        generator: generateOrganizationCard,
         cacheKeyFn: modrinthKeys.organization,
         entityName: "organization",
-        platformId: "modrinth"
+        platformId: "modrinth",
+        useUnified: true
     },
-    collection: {
+    modrinth_collection: {
         paramKey: "id",
         dataFetcher: (client, id, options, convertToPng) => client.getCollectionStats(id, options.maxProjects, convertToPng),
-        generator: generateCollectionCard,
         cacheKeyFn: modrinthKeys.collection,
         entityName: "collection",
-        platformId: "modrinth"
+        platformId: "modrinth",
+        useUnified: true
     },
-    curseforge_mod: {
-        paramKey: "modId",
+    curseforge_project: {
+        paramKey: "projectId",
         dataFetcher: (client, id, options, convertToPng) => client.getModStats(id, options.maxVersions, convertToPng),
-        cacheKeyFn: curseforgeKeys.mod,
-        entityName: "mod",
+        cacheKeyFn: curseforgeKeys.project,
+        entityName: "project",
         platformId: "curseforge",
         useUnified: true
     },
@@ -180,10 +176,8 @@ const handleCardRequest = async (req, res, next, cardType) => {
         // Always regenerate the output from cached data
         options.fromCache = fromCache;
 
-        // Use unified generator for platforms marked with useUnified, otherwise use legacy generator
-        const svg = config.useUnified
-            ? generateUnifiedCard(data, config.platformId, config.entityName, options)
-            : config.generator(data, options);
+        // Use unified card generator for all platforms
+        const svg = generateUnifiedCard(data, config.platformId, config.entityName, options);
 
         // Generate PNG for Discord bots or when format=png is requested
         if (renderImage) {
@@ -221,13 +215,13 @@ const handleCardRequest = async (req, res, next, cardType) => {
     }
 };
 
-export const getUser = (req, res, next) => handleCardRequest(req, res, next, "user");
-export const getProject = (req, res, next) => handleCardRequest(req, res, next, "project");
-export const getOrganization = (req, res, next) => handleCardRequest(req, res, next, "organization");
-export const getCollection = (req, res, next) => handleCardRequest(req, res, next, "collection");
+export const getUser = (req, res, next) => handleCardRequest(req, res, next, "modrinth_user");
+export const getProject = (req, res, next) => handleCardRequest(req, res, next, "modrinth_project");
+export const getOrganization = (req, res, next) => handleCardRequest(req, res, next, "modrinth_organization");
+export const getCollection = (req, res, next) => handleCardRequest(req, res, next, "modrinth_collection");
 
-// CurseForge mod card (using unified card controller)
-export const getCfMod = (req, res, next) => handleCardRequest(req, res, next, "curseforge_mod");
+// CurseForge project card
+export const getCfMod = (req, res, next) => handleCardRequest(req, res, next, "curseforge_project");
 
 // Hangar project card
 export const getHangarProject = (req, res, next) => handleCardRequest(req, res, next, "hangar_project");
@@ -235,8 +229,8 @@ export const getHangarProject = (req, res, next) => handleCardRequest(req, res, 
 // Hangar user card
 export const getHangarUser = (req, res, next) => handleCardRequest(req, res, next, "hangar_user");
 
-// Spiget resource card
-export const getSpigetResource = (req, res, next) => handleCardRequest(req, res, next, "spigot_resource");
+// Spigot resource card
+export const getSpigotResource = (req, res, next) => handleCardRequest(req, res, next, "spigot_resource");
 
-// Spiget author card
-export const getSpigetAuthor = (req, res, next) => handleCardRequest(req, res, next, "spigot_author");
+// Spigot author card
+export const getSpigotAuthor = (req, res, next) => handleCardRequest(req, res, next, "spigot_author");
