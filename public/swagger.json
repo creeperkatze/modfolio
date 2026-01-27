@@ -1,0 +1,885 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Modfolio",
+    "description": "Generate fast, beautiful and consistent embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content.",
+    "version": "1.1.7",
+    "contact": {
+      "name": "Creeperkatze",
+      "url": "https://github.com/creeperkatze/modfolio"
+    },
+    "license": {
+      "name": "AGPL-3.0",
+      "url": "https://spdx.org/licenses/AGPL-3.0-only.html"
+    }
+  },
+  "externalDocs": {
+    "description": "GitHub Repository",
+    "url": "https://github.com/creeperkatze/modfolio"
+  },
+  "servers": [
+    {
+      "url": "https://modfolio.creeperkatze.de",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    { "name": "Modrinth", "description": "Modrinth platform endpoints" },
+    { "name": "CurseForge", "description": "CurseForge platform endpoints" },
+    { "name": "Hangar", "description": "Hangar platform endpoints" },
+    { "name": "Spigot", "description": "Spigot platform endpoints" }
+  ],
+  "paths": {
+    "/modrinth/project/{slug}": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth project card",
+        "description": "Returns a rich SVG card showing project stats, versions, and activity sparkline.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/ShowProjects" },
+          { "$ref": "#/components/parameters/ShowVersions" },
+          { "$ref": "#/components/parameters/MaxProjects" },
+          { "$ref": "#/components/parameters/MaxVersions" },
+          { "$ref": "#/components/parameters/RelativeTime" },
+          { "$ref": "#/components/parameters/ShowSparklines" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGCard" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/project/{slug}/downloads": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth project downloads badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/project/{slug}/followers": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth project followers badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/project/{slug}/versions": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth project versions badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/user/{username}": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth user card",
+        "description": "Returns a rich SVG card showing user stats and top projects.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Username" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/ShowProjects" },
+          { "$ref": "#/components/parameters/MaxProjects" },
+          { "$ref": "#/components/parameters/RelativeTime" },
+          { "$ref": "#/components/parameters/ShowSparklines" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGCard" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/user/{username}/downloads": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth user total downloads badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Username" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/user/{username}/projects": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth user projects count badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Username" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/user/{username}/followers": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth user followers badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Username" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/organization/{id}": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth organization card",
+        "description": "Returns a rich SVG card showing organization stats and top projects.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/ShowProjects" },
+          { "$ref": "#/components/parameters/MaxProjects" },
+          { "$ref": "#/components/parameters/RelativeTime" },
+          { "$ref": "#/components/parameters/ShowSparklines" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGCard" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/organization/{id}/downloads": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth organization total downloads badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/organization/{id}/projects": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth organization projects count badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/organization/{id}/followers": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth organization followers badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/collection/{id}": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth collection card",
+        "description": "Returns a rich SVG card showing collection stats and projects.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/ShowProjects" },
+          { "$ref": "#/components/parameters/MaxProjects" },
+          { "$ref": "#/components/parameters/RelativeTime" },
+          { "$ref": "#/components/parameters/ShowSparklines" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGCard" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/collection/{id}/downloads": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth collection total downloads badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/collection/{id}/projects": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth collection projects count badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/collection/{id}/followers": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth collection followers badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/modrinth/meta/{type}/{id}": {
+      "get": {
+        "tags": ["Modrinth"],
+        "summary": "Get Modrinth entity metadata",
+        "description": "Returns JSON metadata for a Modrinth entity (project, user, organization, collection).",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "enum": ["project", "user", "organization", "collection"] },
+            "description": "Entity type"
+          },
+          { "$ref": "#/components/parameters/Id" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/JSON" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/curseforge/project/{projectId}": {
+      "get": {
+        "tags": ["CurseForge"],
+        "summary": "Get CurseForge project card",
+        "description": "Returns a rich SVG card showing project stats and versions.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectId" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/ShowProjects" },
+          { "$ref": "#/components/parameters/ShowVersions" },
+          { "$ref": "#/components/parameters/MaxProjects" },
+          { "$ref": "#/components/parameters/MaxVersions" },
+          { "$ref": "#/components/parameters/RelativeTime" },
+          { "$ref": "#/components/parameters/ShowSparklines" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGCard" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/curseforge/project/{projectId}/downloads": {
+      "get": {
+        "tags": ["CurseForge"],
+        "summary": "Get CurseForge project downloads badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectId" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/curseforge/project/{projectId}/rank": {
+      "get": {
+        "tags": ["CurseForge"],
+        "summary": "Get CurseForge project popularity rank badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectId" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/curseforge/project/{projectId}/versions": {
+      "get": {
+        "tags": ["CurseForge"],
+        "summary": "Get CurseForge project files count badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectId" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/curseforge/lookup/{slug}": {
+      "get": {
+        "tags": ["CurseForge"],
+        "summary": "Lookup CurseForge project ID by slug",
+        "description": "Resolves a CurseForge project slug to its numeric ID.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/JSON" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/curseforge/meta/{projectId}": {
+      "get": {
+        "tags": ["CurseForge"],
+        "summary": "Get CurseForge project metadata",
+        "description": "Returns JSON metadata for a CurseForge project.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectId" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/JSON" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/hangar/project/{slug}": {
+      "get": {
+        "tags": ["Hangar"],
+        "summary": "Get Hangar project card",
+        "description": "Returns a rich SVG card showing project stats and versions.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/ShowProjects" },
+          { "$ref": "#/components/parameters/ShowVersions" },
+          { "$ref": "#/components/parameters/MaxProjects" },
+          { "$ref": "#/components/parameters/MaxVersions" },
+          { "$ref": "#/components/parameters/RelativeTime" },
+          { "$ref": "#/components/parameters/ShowSparklines" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGCard" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/hangar/project/{slug}/downloads": {
+      "get": {
+        "tags": ["Hangar"],
+        "summary": "Get Hangar project downloads badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/hangar/project/{slug}/versions": {
+      "get": {
+        "tags": ["Hangar"],
+        "summary": "Get Hangar project versions badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/hangar/project/{slug}/views": {
+      "get": {
+        "tags": ["Hangar"],
+        "summary": "Get Hangar project views badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/hangar/user/{username}": {
+      "get": {
+        "tags": ["Hangar"],
+        "summary": "Get Hangar user card",
+        "description": "Returns a rich SVG card showing user stats and top projects.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Username" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/ShowProjects" },
+          { "$ref": "#/components/parameters/MaxProjects" },
+          { "$ref": "#/components/parameters/RelativeTime" },
+          { "$ref": "#/components/parameters/ShowSparklines" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGCard" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/hangar/user/{username}/downloads": {
+      "get": {
+        "tags": ["Hangar"],
+        "summary": "Get Hangar user total downloads badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Username" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/hangar/user/{username}/projects": {
+      "get": {
+        "tags": ["Hangar"],
+        "summary": "Get Hangar user projects count badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Username" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/hangar/user/{username}/stars": {
+      "get": {
+        "tags": ["Hangar"],
+        "summary": "Get Hangar user stars badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Username" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/hangar/meta/{slug}": {
+      "get": {
+        "tags": ["Hangar"],
+        "summary": "Get Hangar project metadata",
+        "description": "Returns JSON metadata for a Hangar project.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/JSON" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/spigot/resource/{id}": {
+      "get": {
+        "tags": ["Spigot"],
+        "summary": "Get Spigot resource card",
+        "description": "Returns a rich SVG card showing resource stats and versions.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/ShowProjects" },
+          { "$ref": "#/components/parameters/ShowVersions" },
+          { "$ref": "#/components/parameters/MaxProjects" },
+          { "$ref": "#/components/parameters/MaxVersions" },
+          { "$ref": "#/components/parameters/RelativeTime" },
+          { "$ref": "#/components/parameters/ShowSparklines" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGCard" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/spigot/resource/{id}/downloads": {
+      "get": {
+        "tags": ["Spigot"],
+        "summary": "Get Spigot resource downloads badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/spigot/resource/{id}/likes": {
+      "get": {
+        "tags": ["Spigot"],
+        "summary": "Get Spigot resource likes badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/spigot/resource/{id}/rating": {
+      "get": {
+        "tags": ["Spigot"],
+        "summary": "Get Spigot resource rating badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/spigot/resource/{id}/versions": {
+      "get": {
+        "tags": ["Spigot"],
+        "summary": "Get Spigot resource versions badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/spigot/author/{id}": {
+      "get": {
+        "tags": ["Spigot"],
+        "summary": "Get Spigot author card",
+        "description": "Returns a rich SVG card showing author stats and top resources.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/ShowProjects" },
+          { "$ref": "#/components/parameters/MaxProjects" },
+          { "$ref": "#/components/parameters/RelativeTime" },
+          { "$ref": "#/components/parameters/ShowSparklines" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGCard" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/spigot/author/{id}/downloads": {
+      "get": {
+        "tags": ["Spigot"],
+        "summary": "Get Spigot author total downloads badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/spigot/author/{id}/resources": {
+      "get": {
+        "tags": ["Spigot"],
+        "summary": "Get Spigot author resources count badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/spigot/author/{id}/rating": {
+      "get": {
+        "tags": ["Spigot"],
+        "summary": "Get Spigot author average rating badge",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" },
+          { "$ref": "#/components/parameters/Color" },
+          { "$ref": "#/components/parameters/BackgroundColor" },
+          { "$ref": "#/components/parameters/Format" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SVGBadge" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/spigot/meta/{id}": {
+      "get": {
+        "tags": ["Spigot"],
+        "summary": "Get Spigot resource metadata",
+        "description": "Returns JSON metadata for a Spigot resource.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Id" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/JSON" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "Slug": {
+        "name": "slug",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "Project slug or identifier",
+        "example": "modmenu"
+      },
+      "Username": {
+        "name": "username",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "Username",
+        "example": "prospector"
+      },
+      "Id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "Entity ID",
+        "example": "VEgGDFFE"
+      },
+      "ProjectId": {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "CurseForge project ID (numeric)",
+        "example": "394468"
+      },
+      "Color": {
+        "name": "color",
+        "in": "query",
+        "schema": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "description": "Accent color in hex format. Defaults to platform brand color."
+      },
+      "BackgroundColor": {
+        "name": "backgroundColor",
+        "in": "query",
+        "schema": { "type": "string", "default": "transparent" },
+        "description": "Background color in hex format or 'transparent'"
+      },
+      "ShowProjects": {
+        "name": "showProjects",
+        "in": "query",
+        "schema": { "type": "boolean", "default": true },
+        "description": "Show top projects section"
+      },
+      "ShowVersions": {
+        "name": "showVersions",
+        "in": "query",
+        "schema": { "type": "boolean", "default": true },
+        "description": "Show versions section"
+      },
+      "MaxProjects": {
+        "name": "maxProjects",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 10, "default": 5 },
+        "description": "Maximum projects to display (1-10)"
+      },
+      "MaxVersions": {
+        "name": "maxVersions",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 10, "default": 5 },
+        "description": "Maximum versions to display (1-10)"
+      },
+      "RelativeTime": {
+        "name": "relativeTime",
+        "in": "query",
+        "schema": { "type": "boolean", "default": true },
+        "description": "Show relative time for dates (e.g., '2 days ago')"
+      },
+      "ShowSparklines": {
+        "name": "showSparklines",
+        "in": "query",
+        "schema": { "type": "boolean", "default": true },
+        "description": "Display activity sparklines"
+      },
+      "Format": {
+        "name": "format",
+        "in": "query",
+        "schema": { "type": "string", "enum": ["svg", "png"], "default": "svg" },
+        "description": "Output format"
+      }
+    },
+    "responses": {
+      "SVGCard": {
+        "description": "SVG card image",
+        "content": {
+          "image/svg+xml": {
+            "schema": { "type": "string", "format": "binary" }
+          }
+        }
+      },
+      "SVGBadge": {
+        "description": "SVG badge image",
+        "content": {
+          "image/svg+xml": {
+            "schema": { "type": "string", "format": "binary" }
+          }
+        }
+      },
+      "JSON": {
+        "description": "JSON metadata",
+        "content": {
+          "application/json": {
+            "schema": { "type": "object" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

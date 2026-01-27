@@ -8,11 +8,14 @@ import hangarRoutes from "./routes/hangar/index.js";
 import spigotRoutes from "./routes/spigot/index.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { checkCrawlerMiddleware } from "./middleware/checkCrawler.js";
-
+import fs from "fs";
+import swaggerUi from "swagger-ui-express";
 dotenv.config({ quiet: true });
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+const swaggerDocument = JSON.parse(fs.readFileSync(path.join(process.cwd(), "public", "swagger.json"), "utf8"));
 
 app.use(express.static(path.join(process.cwd(), "public")));
 
@@ -22,6 +25,11 @@ app.use(modrinthRoutes);
 app.use(curseforgeRoutes);
 app.use(hangarRoutes);
 app.use(spigotRoutes);
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+    customSiteTitle: "Modfolio API Docs",
+    customCss: ".swagger-ui .topbar { display: none } .swagger-ui .info { margin: 20px 0 }"
+}));
 
 app.use((req, res) =>
 {
