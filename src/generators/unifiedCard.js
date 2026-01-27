@@ -45,7 +45,10 @@ function generateProjectCard(data, options, platformConfig, entityType = "projec
     const latestVersions = showVersions ? versions.slice(0, maxVersions).map(v => ({
         ...v,
         version_number: v.version_number || v.name || v.version || "Unknown",
-        date_published: v.date_published || v.releasedAt || v.createdAt || v.fileDate || new Date().toISOString()
+        date_published: v.date_published || v.releasedAt || v.createdAt || v.fileDate || new Date().toISOString(),
+        // Map Hangar platforms to loaders, and gameVersions to game_versions
+        loaders: v.loaders || v.platforms || [],
+        game_versions: v.game_versions || v.gameVersions || []
     })) : [];
     const hasVersions = showVersions && latestVersions.length > 0;
     const height = hasVersions ? 150 + (latestVersions.length * 50) : 130;
