@@ -211,7 +211,7 @@ export const PLATFORM_CONFIGS = {
         statConfigs: STAT_CONFIGS.spigot,
         terminology: {
             versions: "versions",
-            versionField: "releaseDate"
+            versionField: "date_published"
         }
     }
 };

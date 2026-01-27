@@ -80,10 +80,10 @@ export class CurseforgeClient extends BasePlatformClient
 
         let imageConversionTime = 0;
 
-        // Fetch mod logo if available
+        // Fetch mod logo if available and store as icon_url_base64 for consistency with unified system
         if (mod?.logo?.url) {
             const result = await fetchImageAsBase64(mod.logo.url, convertToPng);
-            mod.logo_url_base64 = result?.data;
+            mod.icon_url_base64 = result?.data;
             if (result?.conversionTime) imageConversionTime += result.conversionTime;
         }
 

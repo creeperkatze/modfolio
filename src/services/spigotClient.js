@@ -127,8 +127,8 @@ export class SpigotClient extends BasePlatformClient
                 .map(version => ({
                     name: version.name,
                     version_number: version.name,
-                    releaseDate: version.releaseDate,
-                    date_published: new Date(version.releaseDate).toISOString(),
+                    releaseDate: version.releaseDate * 1000, // Convert seconds to ms
+                    date_published: new Date(version.releaseDate * 1000).toISOString(),
                     downloads: version.downloads || 0,
                     rating: version.rating?.average || 0,
                     loaders: [], // Spigot doesn't provide loader info in versions
