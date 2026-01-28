@@ -21,22 +21,27 @@ export const getMeta = async (req, res, next) => {
         }
 
         let name = id;
+        let url = null;
 
         if (type === "user") {
             const user = await modrinthClient.getUser(id);
             name = user.username;
+            url = `https://modrinth.com/user/${id}`;
         } else if (type === "project") {
             const project = await modrinthClient.getProject(id);
             name = project.title;
+            url = `https://modrinth.com/${project.project_type}/${id}`;
         } else if (type === "organization") {
             const org = await modrinthClient.getOrganization(id);
             name = org.name;
+            url = `https://modrinth.com/organization/${id}`;
         } else if (type === "collection") {
             const collection = await modrinthClient.getCollection(id);
             name = collection.name;
+            url = `https://modrinth.com/collection/${id}`;
         }
 
-        const result = { name };
+        const result = { name, url };
         apiCache.set(cacheKey, result);
         logger.info(`Showing Modrinth meta for ${type} "${id}"`);
 

@@ -795,6 +795,100 @@
                 updateUrl();
             }
 
+            // Update platform UI elements without calling generate() (for URL auto-detection)
+            function updatePlatformUI(platform) {
+                const config = PLATFORMS[platform];
+                selectedPlatform = platform;
+                selectedColor = config.defaultColor;
+
+                // Base classes for platform buttons
+                const baseClass = "flex flex-1 flex-row items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110";
+                const inactiveClass = `${baseClass} bg-input-bg text-text-bright border border-border-dark`;
+                const activeClass = `${baseClass} text-black border-none`;
+
+                // Helper to add # prefix if needed
+                const withHash = (color) => color.startsWith("#") ? color : `#${color}`;
+
+                // Update button styles with dynamic colors
+                const setActiveStyle = (element, color, isActive) => {
+                    element.className = isActive ? activeClass : inactiveClass;
+                    element.style.backgroundColor = isActive ? withHash(color) : "";
+                };
+
+                setActiveStyle(platformModrinth, PLATFORMS.modrinth.defaultColor, platform === "modrinth");
+                setActiveStyle(platformCurseforge, PLATFORMS.curseforge.defaultColor, platform === "curseforge");
+                setActiveStyle(platformHangar, PLATFORMS.hangar.defaultColor, platform === "hangar");
+                setActiveStyle(platformSpigot, PLATFORMS.spigot.defaultColor, platform === "spigot");
+
+                // Update copy buttons with platform color (only when enabled)
+                const copyBtns = [copyMarkdownBtn, copyHtmlBtn, copyUrlBtn];
+                const platformColor = withHash(config.defaultColor);
+                copyBtns.forEach(btn => {
+                    if (!btn.disabled) {
+                        btn.style.backgroundColor = platformColor;
+                    } else {
+                        btn.style.backgroundColor = "";
+                    }
+                });
+
+                // Update checkboxes with platform color
+                document.querySelectorAll(".dynamic-checkbox").forEach(checkbox => {
+                    checkbox.style.accentColor = platformColor;
+                });
+
+                // Update color value labels with platform color
+                document.querySelectorAll(".dynamic-color").forEach(label => {
+                    label.style.color = platformColor;
+                });
+
+                // Update title color
+                const modfolioTitle = document.getElementById("modfolioTitle");
+                if (modfolioTitle) {
+                    modfolioTitle.style.color = platformColor;
+                }
+
+                // Update footer links color
+                document.querySelectorAll(".dynamic-link").forEach(link => {
+                    link.style.color = platformColor;
+                });
+
+                // Update CSS custom property
+                document.documentElement.style.setProperty("--platform-color", platformColor);
+
+                // Update favicon
+                const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g fill="${platformColor}"><rect width="60" height="20" x="5.62" y="10" ry="10"/><rect width="20" height="20" x="75.62" y="10" ry="10"/><rect width="90" height="20" x="5.62" y="70" ry="10"/><rect width="90" height="20" x="5" y="40" ry="10"/></g></svg>`;
+                const faviconUrl = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
+                let faviconLink = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
+                if (!faviconLink) {
+                    faviconLink = document.querySelector('link[rel="icon"]');
+                }
+                if (faviconLink) {
+                    faviconLink.href = faviconUrl;
+                }
+
+                // Update URL placeholder
+                modrinthUrl.placeholder = `https://www.${config.baseUrl}/${config.projectPath}/example`;
+
+                // Update target type dropdown (but don't reset the value)
+                targetType.innerHTML = config.targets.map(t => `<option value="${t}">${t.charAt(0).toUpperCase() + t.slice(1)}</option>`).join('');
+
+                // Update color picker and regenerate color buttons
+                colors = getColors();
+                colorButtons.innerHTML = "";
+                colors.forEach((color) => {
+                    createColorButton(color, colorButtons);
+                });
+
+                manualColorPicker.value = `#${selectedColor}`;
+                manualColorPickerContainer.style.background = `#${selectedColor}`;
+                document.querySelectorAll("[data-color]").forEach((b) => {
+                    b.classList.toggle("color-btn-selected", b.dataset.color === selectedColor);
+                });
+
+                updateWarningMessages();
+                updateLabels();
+            }
+
             // Reset to defaults for the current platform
             function resetToDefaults() {
                 const config = PLATFORMS[selectedPlatform];
@@ -1153,12 +1247,17 @@
 
                 // Auto-detect platform from URL
                 const platform = Object.values(PLATFORMS).find(p => urlValue.includes(p.baseUrl));
-                if (platform) {
-                    setPlatform(platform.id);
-                }
-
                 const parsed = parseModrinthUrl(urlValue);
-                if (parsed) {
+                if (platform && parsed) {
+                    // Set platform directly without calling setPlatform to avoid premature generate() call
+                    if (selectedPlatform !== platform.id) {
+                        selectedPlatform = platform.id;
+                        const config = PLATFORMS[platform.id];
+                        selectedColor = config.defaultColor;
+                        // Update platform UI elements only (skip updateUI/updateUrl which call generate)
+                        updatePlatformUI(platform.id);
+                    }
+                    // Set the parsed type
                     targetType.value = parsed.type;
 
                     // For CurseForge, silently resolve slug to ID in background
@@ -1186,8 +1285,9 @@
                     } else {
                         curseforgeSlug = null;
                         identifier.value = parsed.id;
-                        updateUrl();
+                        // Now safely call updateUI and updateUrl with correct values
                         updateUI();
+                        updateUrl();
                     }
                 }
             });
@@ -1433,7 +1533,7 @@
                     }
                 }
 
-                const modrinthUrl = selectedPlatform === "curseforge"
+                const fallbackUrl = selectedPlatform === "curseforge"
                     ? `https://www.${config.baseUrl}/${config.projectPath}/${curseforgeSlug || identifierValue}`
                     : selectedPlatform === "hangar"
                     ? type === "user"
@@ -1444,16 +1544,41 @@
                         ? `https://${config.baseUrl}/authors/${identifierValue}`
                         : `https://${config.baseUrl}/${config.projectPath}/${identifierValue}/`
                     : `https://modrinth.com/${type}/${identifierValue}`;
+
+                // Fetch meta endpoint first to get correct name and URL
+                let metaName = identifierValue;
+                let metaUrl = null;
+                try {
+                    const metaPath = selectedPlatform === "curseforge"
+                        ? `/curseforge/meta/${encodeURIComponent(identifierValue)}`
+                        : selectedPlatform === "hangar"
+                        ? `/hangar/meta/${encodeURIComponent(identifierValue)}?type=${type}`
+                        : selectedPlatform === "spigot"
+                        ? `/spigot/meta/${encodeURIComponent(identifierValue)}?type=${type}`
+                        : `/modrinth/meta/${type}/${encodeURIComponent(identifierValue)}`;
+                    const res = await fetch(metaPath);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data?.name) {
+                            metaName = data.name;
+                        }
+                        if (data?.url) {
+                            metaUrl = data.url;
+                        }
+                    }
+                } catch {}
+
+                const targetUrl = metaUrl || fallbackUrl;
                 const cacheBuster = `timestamp=${Date.now()}`;
                 const urlForDiscord = `${url}${url.includes("?") ? "&" : "?"}${cacheBuster}`;
 
                 markdownOutput.classList.remove("text-text-muted");
                 markdownOutput.classList.add("text-text-bright");
-                markdownOutput.textContent = `[![${identifierValue}](${url})](${modrinthUrl})`;
+                markdownOutput.textContent = `[![${metaName}](${url})](${targetUrl})`;
 
                 htmlOutput.classList.remove("text-text-muted");
                 htmlOutput.classList.add("text-text-bright");
-                htmlOutput.textContent = `<a href="${modrinthUrl}"><img src="${url}" alt="${identifierValue}" /></a>`;
+                htmlOutput.textContent = `<a href="${targetUrl}"><img src="${url}" alt="${metaName}" /></a>`;
 
                 urlOutput.classList.remove("text-text-muted");
                 urlOutput.classList.add("text-text-bright");
@@ -1496,31 +1621,10 @@
                     }
 
                     // Show image after load
-                    previewLink.href = modrinthUrl;
+                    previewLink.href = targetUrl;
                     previewContainer.classList.remove("text-text-muted");
                     previewPlaceholder.classList.add("hidden");
                     previewLink.classList.remove("hidden");
-
-                    try {
-                        const config = PLATFORMS[selectedPlatform];
-                        const metaPath = selectedPlatform === "curseforge"
-                            ? `/curseforge/meta/${encodeURIComponent(identifierValue)}`
-                            : selectedPlatform === "hangar"
-                            ? `/hangar/meta/${encodeURIComponent(identifierValue)}?type=${type}`
-                            : selectedPlatform === "spigot"
-                            ? `/spigot/meta/${encodeURIComponent(identifierValue)}`
-                            : `/modrinth/meta/${type}/${encodeURIComponent(identifierValue)}`;
-                        const res = await fetch(metaPath);
-                        if (res.ok) {
-                            const data = await res.json();
-                            if (data?.name) {
-                                const targetUrl = data?.url || modrinthUrl;
-                                markdownOutput.textContent = `[![${data.name}](${url})](${targetUrl})`;
-                                htmlOutput.textContent = `<a href="${targetUrl}"><img src="${url}" alt="${data.name}" /></a>`;
-                                previewLink.href = targetUrl;
-                            }
-                        }
-                    } catch {}
                 };
 
                 previewImg.onerror = () => {

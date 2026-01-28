@@ -85,7 +85,7 @@ Compact badges showing a single metric.
 | Downloads | `/modrinth/<type>/<id>/downloads` | [![Mod Menu](https://modfolio.creeperkatze.de/modrinth/project/modmenu/downloads)](https://modrinth.com/project/modmenu) |
 | Followers | `/modrinth/<type>/<id>/followers` | [![Mod Menu](https://modfolio.creeperkatze.de/modrinth/project/modmenu/followers)](https://modrinth.com/project/modmenu) |
 | Versions | `/modrinth/<type>/<id>/versions` | [![Mod Menu](https://modfolio.creeperkatze.de/modrinth/project/modmenu/versions)](https://modrinth.com/project/modmenu) |
-| Projects | `/modrinth/user|organization/<id>/projects` | [![Prospector](https://modfolio.creeperkatze.de/modrinth/user/prospector/projects)](https://modrinth.com/user/prospector) |
+| Projects | `/modrinth/<type>/<id>/projects` | [![Prospector](https://modfolio.creeperkatze.de/modrinth/user/prospector/projects)](https://modrinth.com/user/prospector) |
 
 #### CurseForge
 

@@ -35,11 +35,20 @@ export const getSpigotMeta = async (req, res, next) => {
         if (entityType === "author") {
             const authorResponse = await spigotClient.getAuthor(id);
             data = authorResponse;
-            result = { name: data?.name || id };
+
+            const authorName = data?.name || id;
+            result = {
+                name: authorName,
+                url: `https://www.spigotmc.org/members/${authorName}.${id}/`
+            };
         } else {
             const resourceResponse = await spigotClient.getResource(id);
             data = resourceResponse;
-            result = { name: data?.name || id };
+            const resourceName = data?.name || id;
+            result = {
+                name: resourceName,
+                url: `https://www.spigotmc.org/resources/${id}/`
+            };
         }
 
         if (!data) {

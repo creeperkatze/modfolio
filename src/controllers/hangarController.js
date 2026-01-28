@@ -30,11 +30,28 @@ export const getHangarMeta = async (req, res, next) => {
         if (entityType === "user") {
             const userResponse = await hangarClient.getUser(slug);
             data = userResponse;
-            result = { name: data?.name || slug };
+            result = {
+                name: data?.name || slug,
+                url: `https://hangar.papermc.io/${slug}/`
+            };
         } else {
             const projectResponse = await hangarClient.getProject(slug);
             data = projectResponse;
-            result = { name: data?.name || slug };
+            const projectName = data?.name || slug;
+
+            // Hangar project URLs: https://hangar.papermc.io/{owner}/{projectSlug}
+            // Try multiple possible fields for the owner/namespace
+            const namespace = data?.namespace?.owner
+                || data?.namespace?.ownerName
+                || data?.owner?.name
+                || data?.owner?.username
+                || data?.author?.name
+                || data?.author?.username
+                || slug;
+            result = {
+                name: projectName,
+                url: `https://hangar.papermc.io/${namespace}/${slug}/`
+            };
         }
 
         if (!data) {
