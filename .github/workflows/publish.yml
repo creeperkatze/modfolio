@@ -18,7 +18,9 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/creeperkatze/modfolio
+            images: ghcr.io/creeperkatze/modfolio
+            labels: |
+                org.opencontainers.image.source=https://github.com/creeperkatze/modfolio
       - name: Login to GitHub Images
         uses: docker/login-action@v3
         with:
