@@ -1,7 +1,10 @@
 import { format, createLogger, transports } from "winston";
+import LokiTransport from "winston-loki";
 import path from "path";
 
 const LOG_DIRECTORY = process.env.LOG_DIRECTORY || "./logs";
+const LOKI_HOST = process.env.LOKI_HOST || "http://localhost:3100";
+
 const isVercel = process.env.VERCEL === "1";
 
 const consoleFormat = isVercel
@@ -23,9 +26,15 @@ const loggerTransports = [
     new transports.Console({ format: consoleFormat })
 ];
 
-// Only add file transports when not running on Vercel
+// Only add file and loki transports when not running on Vercel
 if (!isVercel) {
     loggerTransports.push(
+        new LokiTransport({
+            host: LOKI_HOST,
+            json: true,
+            labels: { job: "modfolio" },
+            format: fileFormat,
+        }),
         new transports.File({
             filename: path.join(LOG_DIRECTORY, "error.log"),
             level: "error",
