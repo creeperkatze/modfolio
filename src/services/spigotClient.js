@@ -108,7 +108,14 @@ export class SpigotClient extends BasePlatformClient
 
         // Fetch resource icon - Spiget API has separate icon endpoint
         const iconUrl = `${SPIGOT_API_URL}/v2/resources/${resourceId}/icon`;
-        const result = await fetchImageAsBase64(iconUrl, convertToPng);
+        let result = await fetchImageAsBase64(iconUrl, convertToPng);
+
+        // If that fails, try the direct SpigotMC URL as fallback
+        if (!result?.data) {
+            const iconUrlFallback = `https://www.spigotmc.org/data/resource_icons/${Math.floor(resourceId / 1000)}/${resourceId}.jpg`;
+            result = await fetchImageAsBase64(iconUrlFallback, convertToPng);
+        }
+
         resource.icon_url_base64 = result?.data;
         if (result?.conversionTime) imageConversionTime += result.conversionTime;
 
@@ -215,7 +222,11 @@ export class SpigotClient extends BasePlatformClient
                     createdAt: r?.releaseDate ? new Date(r.releaseDate * 1000).toISOString() : null,
                     lastUpdated: r?.updateDate ? new Date(r.updateDate * 1000).toISOString() : null,
                     // Construct icon URL manually - Spiget API has separate icon endpoint per resource
+                    // Note: The icon endpoint may return 404 even if the icon exists on the SpigotMC website
+                    // Try both the Spiget API endpoint and the direct SpigotMC URL
                     icon_url: `${SPIGOT_API_URL}/v2/resources/${r.id}/icon`,
+                    // Fallback to direct SpigotMC URL if Spiget API fails
+                    icon_url_fallback: `https://www.spigotmc.org/data/resource_icons/${Math.floor(r.id / 1000)}/${r.id}.jpg`,
                     project_type: "plugin", // Spigot primarily has plugins
                     category: r?.category
                 }));
@@ -364,7 +375,14 @@ export class SpigotClient extends BasePlatformClient
         // Process images for each resource
         for (const resource of resources) {
             if (resource.icon_url) {
-                const result = await fetchImageAsBase64(resource.icon_url, convertToPng);
+                // Try primary Spiget API endpoint first
+                let result = await fetchImageAsBase64(resource.icon_url, convertToPng);
+
+                // If that fails, try the direct SpigotMC URL as fallback
+                if (!result?.data && resource.icon_url_fallback) {
+                    result = await fetchImageAsBase64(resource.icon_url_fallback, convertToPng);
+                }
+
                 resource.icon_url_base64 = result?.data;
                 if (result?.conversionTime) totalConversionTime += result.conversionTime;
             }
