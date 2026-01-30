@@ -10,14 +10,12 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { checkCrawlerMiddleware } from "./middleware/checkCrawler.js";
 import fs from "fs";
 import swaggerUi from "swagger-ui-express";
-import packageJson from "../package.json" with { type: "json" };
 dotenv.config({ quiet: true });
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 const swaggerDocument = JSON.parse(fs.readFileSync(path.join(process.cwd(), "public", "swagger.json"), "utf8"));
-swaggerDocument.info.version = packageJson.version;
 const swaggerCss = fs.readFileSync(path.join(process.cwd(), "public", "swagger.css"), "utf8");
 
 app.use(express.static(path.join(process.cwd(), "public")));
