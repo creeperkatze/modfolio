@@ -130,7 +130,8 @@ export const curseforgeKeys = {
     slugLookup: (slug) => curseforgeKey(ENTITY_TYPE.SLUG, slug),
     user: (id) => curseforgeKey(ENTITY_TYPE.USER, id),
     userBadge: (id) => badgeKey(PLATFORM.CURSEFORGE, ENTITY_TYPE.USER, id),
-    userLookup: (username) => curseforgeKey("userLookup", username)
+    userLookup: (username) => curseforgeKey("userLookup", username),
+    userIdLookup: (userId) => curseforgeKey("userIdLookup", userId)
 };
 
 /**

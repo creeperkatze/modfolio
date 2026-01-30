@@ -215,6 +215,73 @@ export class CurseforgeClient extends BasePlatformClient
         return data[0].id;
     }
 
+    /**
+     * Get CurseForge user ID from username by searching for their projects
+     * @param {string} username - The username to look up
+     * @returns {Promise<string>} The user ID
+     */
+    async getUserIdFromUsername(username)
+    {
+        const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&searchFilter=${encodeURIComponent(username)}&pageSize=50&sortField=2&sortOrder=desc`;
+
+        const response = await this.fetch(searchUrl);
+        const results = response.data || [];
+
+        // Try to find a project where author name matches
+        const matchingProject = results.find(mod => {
+            if (!mod.authors) return false;
+            return mod.authors.some(author =>
+                author.name?.toLowerCase() === username.toLowerCase()
+            );
+        });
+
+        if (matchingProject && matchingProject.authors) {
+            const matchingAuthor = matchingProject.authors.find(author =>
+                author.name?.toLowerCase() === username.toLowerCase()
+            );
+            if (matchingAuthor && matchingAuthor.id) {
+                return String(matchingAuthor.id);
+            }
+        }
+
+        // Fallback: Check for partial name match
+        for (const mod of results) {
+            if (mod.authors) {
+                for (const author of mod.authors) {
+                    if (author.name &&
+                        (author.name.toLowerCase() === username.toLowerCase() ||
+                         author.name.toLowerCase().replace(/[^a-z0-9]/g, "") === username.toLowerCase().replace(/[^a-z0-9]/g, ""))) {
+                        return String(author.id);
+                    }
+                }
+            }
+        }
+
+        throw new Error("User not found");
+    }
+
+    /**
+     * Get username from user ID by searching for their projects
+     * @param {number|string} userId - The user ID
+     * @returns {Promise<string|null>} The username or null if not found
+     */
+    async getUsernameFromUserId(userId)
+    {
+        const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&authorId=${userId}&pageSize=1`;
+
+        const response = await this.fetch(searchUrl);
+        const results = response.data || [];
+
+        if (results.length > 0 && results[0].authors) {
+            const author = results[0].authors.find(a => String(a.id) === String(userId));
+            if (author && author.name) {
+                return author.name;
+            }
+        }
+
+        return null;
+    }
+
     async getUser(userId)
     {
         return this.fetch(`/v1/users/${userId}`);
