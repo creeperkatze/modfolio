@@ -34,6 +34,7 @@ if (!isVercel) {
             json: true,
             labels: { job: "modfolio" },
             format: fileFormat,
+            useWinstonMetaAsLabels: true,
         }),
         new transports.File({
             filename: path.join(LOG_DIRECTORY, "error.log"),
