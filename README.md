@@ -43,7 +43,7 @@ Rich cards showing stats, versions, projects, and activity sparklines.
 | Card Type | Path | Example |
 |-----------|------|---------|
 | Project | `/curseforge/project/<id>` | [![GeckoLib](https://modfolio.creeperkatze.de/curseforge/project/388172)](https://www.curseforge.com/minecraft/mc-mods/geckolib) |
-| User | `/curseforge/user/<id>` | [![Gecko](https://modfolio.creeperkatze.de/curseforge/user/100005756)](https://www.curseforge.com/members/100005756) |
+| User | `/curseforge/user/<id>` | [![Gecko](https://modfolio.creeperkatze.de/curseforge/user/100005756)](https://www.curseforge.com/members/gecko) |
 
 #### Hangar
 

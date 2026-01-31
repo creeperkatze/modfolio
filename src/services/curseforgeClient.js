@@ -55,12 +55,6 @@ export class CurseforgeClient extends BasePlatformClient
         return this.fetch(`/v1/mods/${modId}/files?pageSize=${pageSize}`);
     }
 
-    /**
-     * Get stats for a CurseForge mod (for card generation)
-     * @param {number|string} modId - The mod ID
-     * @param {number} maxFiles - Maximum files to fetch
-     * @param {boolean} convertToPng - Whether to convert images to PNG
-     */
     async getModStats(modId, convertToPng = false)
     {
         // Validate modId is a number
@@ -149,10 +143,6 @@ export class CurseforgeClient extends BasePlatformClient
         };
     }
 
-    /**
-     * Get badge stats for a CurseForge mod
-     * @param {number|string} modId - The mod ID
-     */
     async getModBadgeStats(modId)
     {
         // Validate modId is a number
@@ -194,11 +184,6 @@ export class CurseforgeClient extends BasePlatformClient
         return { stats, timings: { api: apiTime } };
     }
 
-    /**
-     * Search for a mod by slug and return its ID
-     * @param {string} slug - The project slug
-     * @returns {Promise<number>} The project ID
-     */
     async searchModBySlug(slug)
     {
         // CurseForge search API
@@ -214,11 +199,6 @@ export class CurseforgeClient extends BasePlatformClient
         return data[0].id;
     }
 
-    /**
-     * Get CurseForge user ID from username by searching for their projects
-     * @param {string} username - The username to look up
-     * @returns {Promise<string>} The user ID
-     */
     async getUserIdFromUsername(username)
     {
         const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&searchFilter=${encodeURIComponent(username)}&pageSize=50&sortField=2&sortOrder=desc`;
@@ -286,12 +266,6 @@ export class CurseforgeClient extends BasePlatformClient
         return this.fetch(`/v1/users/${userId}`);
     }
 
-    /**
-     * Get stats for a CurseForge user (for card generation)
-     * @param {number|string} userId - The user ID
-     * @param {number} maxProjects - Maximum projects to fetch
-     * @param {boolean} convertToPng - Whether to convert images to PNG
-     */
     async getUserStats(userId, convertToPng = false)
     {
         // Validate userId is a number
@@ -325,7 +299,7 @@ export class CurseforgeClient extends BasePlatformClient
         let projects = [];
         let projectCount = 0;
         try {
-            const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&authorId=${userId}&pageSize=${maxProjects}&sortField=6&sortOrder=desc`;
+            const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&authorId=${userId}&pageSize=${CARD_LIMITS.MAX_COUNT}&sortField=6&sortOrder=desc`;
             const searchResponse = await this.fetch(searchUrl);
             const searchResults = searchResponse.data || [];
 
@@ -427,10 +401,6 @@ export class CurseforgeClient extends BasePlatformClient
         };
     }
 
-    /**
-     * Get badge stats for a CurseForge user
-     * @param {number|string} userId - The user ID
-     */
     async getUserBadgeStats(userId)
     {
         // Validate userId is a number
@@ -471,9 +441,6 @@ export class CurseforgeClient extends BasePlatformClient
         };
     }
 
-    /**
-     * Check if API key is configured
-     */
     isConfigured()
     {
         return !!CURSEFORGE_API_KEY;

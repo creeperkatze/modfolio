@@ -14,10 +14,6 @@ const HANGAR_API_URL = process.env.HANGAR_API_URL || "https://hangar.papermc.io"
 const HANGAR_API_KEY = process.env.HANGAR_API_KEY;
 const USER_AGENT = process.env.USER_AGENT;
 
-/**
- * Hangar API client for fetching project data from Hangar (PaperMC's plugin platform)
- * API Documentation: https://hangar.papermc.io/api-docs
- */
 export class HangarClient extends BasePlatformClient
 {
     constructor()
@@ -39,11 +35,6 @@ export class HangarClient extends BasePlatformClient
         return headers;
     }
 
-    /**
-     * Get project data by slug
-     * @param {string} projectSlug - The project slug
-     * @returns {Promise<Object>} Project data
-     */
     async getProject(projectSlug)
     {
         // Hangar API endpoint for projects: /api/v1/projects/{slug}
@@ -62,12 +53,6 @@ export class HangarClient extends BasePlatformClient
         return this.fetch(`/api/v1/projects/${encodeURIComponent(projectSlug)}/versions?limit=${limit}`);
     }
 
-    /**
-     * Get stats for a Hangar project (for card generation)
-     * @param {string} projectSlug - The project slug
-     * @param {number} maxVersions - Maximum versions to fetch
-     * @param {boolean} convertToPng - Whether to convert images to PNG
-     */
     async getProjectStats(projectSlug, convertToPng = false)
     {
         const apiStart = performance.now();
@@ -154,10 +139,6 @@ export class HangarClient extends BasePlatformClient
         };
     }
 
-    /**
-     * Get badge stats for a Hangar project
-     * @param {string} projectSlug - The project slug
-     */
     async getProjectBadgeStats(projectSlug)
     {
         const apiStart = performance.now();
@@ -183,35 +164,18 @@ export class HangarClient extends BasePlatformClient
         return { stats, timings: { api: apiTime } };
     }
 
-    /**
-     * Get user data by username
-     * @param {string} username - The username
-     * @returns {Promise<Object>} User data
-     */
     async getUser(username)
     {
         // Hangar API endpoint for users: /api/v1/users/{username}
         return this.fetch(`/api/v1/users/${encodeURIComponent(username)}`);
     }
 
-    /**
-     * Get user's projects
-     * @param {string} username - The username
-     * @param {number} limit - Maximum projects to fetch
-     * @returns {Promise<Object>} Projects data
-     */
     async getUserProjects(username, limit = 25)
     {
         // Hangar API endpoint for projects with owner filter: /api/v1/projects?owner={username}
         return this.fetch(`/api/v1/projects?owner=${encodeURIComponent(username)}&limit=${limit}`);
     }
 
-    /**
-     * Get stats for a Hangar user (for card generation)
-     * @param {string} username - The username
-     * @param {number} maxProjects - Maximum projects to fetch
-     * @param {boolean} convertToPng - Whether to convert images to PNG
-     */
     async getUserStats(username, convertToPng = false)
     {
         const apiStart = performance.now();
@@ -310,10 +274,6 @@ export class HangarClient extends BasePlatformClient
         };
     }
 
-    /**
-     * Get badge stats for a Hangar user (lightweight, no project details)
-     * @param {string} username - The username
-     */
     async getUserBadgeStats(username)
     {
         const apiStart = performance.now();
