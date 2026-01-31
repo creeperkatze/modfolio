@@ -277,7 +277,7 @@ export class ModrinthClient extends BasePlatformClient
         return { stats, timings: { api: apiTime } };
     }
 
-    async getProjectBadgeStats(slug, fetchVersions = false)
+    async getProjectBadgeStats(slug)
     {
         const apiStart = performance.now();
 
@@ -296,16 +296,14 @@ export class ModrinthClient extends BasePlatformClient
             versionCount: 0
         };
 
-        // Only fetch versions if specifically requested (for version count badge)
-        if (fetchVersions) {
-            try {
-                const versions = await this.getProjectVersions(slug);
-                stats.versionCount = versions.length;
-            } catch {
-                stats.versionCount = 0;
-            }
-            apiTime = performance.now() - apiStart;
+        // Fetch versions
+        try {
+            const versions = await this.getProjectVersions(slug);
+            stats.versionCount = versions.length;
+        } catch {
+            stats.versionCount = 0;
         }
+        apiTime = performance.now() - apiStart;
 
         return { stats, timings: { api: apiTime } };
     }

@@ -68,7 +68,7 @@ export class HangarClient extends BasePlatformClient
      * @param {number} maxVersions - Maximum versions to fetch
      * @param {boolean} convertToPng - Whether to convert images to PNG
      */
-    async getProjectStats(projectSlug, maxVersions = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
+    async getProjectStats(projectSlug, convertToPng = false)
     {
         const apiStart = performance.now();
 
@@ -155,18 +155,15 @@ export class HangarClient extends BasePlatformClient
     }
 
     /**
-     * Get badge stats for a Hangar project (lightweight, no versions)
+     * Get badge stats for a Hangar project
      * @param {string} projectSlug - The project slug
-     * @param {boolean} fetchVersions - Whether to fetch versions for version count
      */
-    async getProjectBadgeStats(projectSlug, fetchVersions = false)
+    async getProjectBadgeStats(projectSlug)
     {
         const apiStart = performance.now();
 
         const projectResponse = await this.getProject(projectSlug);
         const project = projectResponse;
-
-        let apiTime = performance.now() - apiStart;
 
         const stats = {
             downloads: project?.stats?.downloads || project?.downloads || 0,
@@ -174,17 +171,15 @@ export class HangarClient extends BasePlatformClient
             versionCount: 0
         };
 
-        // Only fetch versions if specifically requested (for version count badge)
-        if (fetchVersions) {
-            try {
-                const versionsResponse = await this.getProjectVersions(projectSlug);
-                stats.versionCount = versionsResponse?.pagination?.count ?? versionsResponse?.result?.length ?? 0;
-            } catch {
-                stats.versionCount = 0;
-            }
-            apiTime = performance.now() - apiStart;
+        // Fetch versions
+        try {
+            const versionsResponse = await this.getProjectVersions(projectSlug);
+            stats.versionCount = versionsResponse?.pagination?.count ?? versionsResponse?.result?.length ?? 0;
+        } catch {
+            stats.versionCount = 0;
         }
 
+        const apiTime = performance.now() - apiStart;
         return { stats, timings: { api: apiTime } };
     }
 
@@ -217,7 +212,7 @@ export class HangarClient extends BasePlatformClient
      * @param {number} maxProjects - Maximum projects to fetch
      * @param {boolean} convertToPng - Whether to convert images to PNG
      */
-    async getUserStats(username, maxProjects = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
+    async getUserStats(username, convertToPng = false)
     {
         const apiStart = performance.now();
 

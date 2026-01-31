@@ -61,7 +61,7 @@ export class CurseforgeClient extends BasePlatformClient
      * @param {number} maxFiles - Maximum files to fetch
      * @param {boolean} convertToPng - Whether to convert images to PNG
      */
-    async getModStats(modId, maxFiles = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
+    async getModStats(modId, convertToPng = false)
     {
         // Validate modId is a number
         if (!/^\d+$/.test(String(modId))) {
@@ -150,11 +150,10 @@ export class CurseforgeClient extends BasePlatformClient
     }
 
     /**
-     * Get badge stats for a CurseForge mod (lightweight, no files)
+     * Get badge stats for a CurseForge mod
      * @param {number|string} modId - The mod ID
-     * @param {boolean} fetchFiles - Whether to fetch files for version count
      */
-    async getModBadgeStats(modId, fetchFiles = false)
+    async getModBadgeStats(modId)
     {
         // Validate modId is a number
         if (!/^\d+$/.test(String(modId))) {
@@ -172,8 +171,6 @@ export class CurseforgeClient extends BasePlatformClient
             return null;
         }
 
-        let apiTime = performance.now() - apiStart;
-
         const stats = {
             downloads: mod?.downloadCount || 0,
             rank: mod?.gamePopularityRank || null,
@@ -181,21 +178,19 @@ export class CurseforgeClient extends BasePlatformClient
             fileCount: 0
         };
 
-        // Only fetch files if specifically requested (for file count badge)
-        if (fetchFiles) {
-            try {
-                const filesResponse = await this.getModFiles(modId);
-                // Use pagination totalCount if available, otherwise use the array length
-                const count = filesResponse.pagination?.totalCount ?? filesResponse.data?.length ?? 0;
-                stats.versionCount = count; // Use versionCount for consistency
-                stats.fileCount = count;
-            } catch {
-                stats.fileCount = 0;
-                stats.versionCount = 0;
-            }
-            apiTime = performance.now() - apiStart;
+        // Fetch files
+        try {
+            const filesResponse = await this.getModFiles(modId);
+            // Use pagination totalCount if available, otherwise use the array length
+            const count = filesResponse.pagination?.totalCount ?? filesResponse.data?.length ?? 0;
+            stats.versionCount = count; // Use versionCount for consistency
+            stats.fileCount = count;
+        } catch {
+            stats.fileCount = 0;
+            stats.versionCount = 0;
         }
 
+        const apiTime = performance.now() - apiStart;
         return { stats, timings: { api: apiTime } };
     }
 
@@ -297,7 +292,7 @@ export class CurseforgeClient extends BasePlatformClient
      * @param {number} maxProjects - Maximum projects to fetch
      * @param {boolean} convertToPng - Whether to convert images to PNG
      */
-    async getUserStats(userId, maxProjects = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
+    async getUserStats(userId, convertToPng = false)
     {
         // Validate userId is a number
         if (!/^\d+$/.test(String(userId))) {
@@ -433,11 +428,10 @@ export class CurseforgeClient extends BasePlatformClient
     }
 
     /**
-     * Get badge stats for a CurseForge user (lightweight)
+     * Get badge stats for a CurseForge user
      * @param {number|string} userId - The user ID
-     * @param {boolean} fetchProjects - Whether to fetch projects for project count
      */
-    async getUserBadgeStats(userId, fetchProjects = false)
+    async getUserBadgeStats(userId)
     {
         // Validate userId is a number
         if (!/^\d+$/.test(String(userId))) {
@@ -455,17 +449,14 @@ export class CurseforgeClient extends BasePlatformClient
             return null;
         }
 
+        // Fetch project count
         let projectCount = 0;
-
-        // Fetch project count if requested
-        if (fetchProjects) {
-            try {
-                const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&authorId=${userId}&pageSize=1`;
-                const searchResponse = await this.fetch(searchUrl);
-                projectCount = searchResponse.pagination?.totalCount || 0;
-            } catch {
-                projectCount = 0;
-            }
+        try {
+            const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&authorId=${userId}&pageSize=1`;
+            const searchResponse = await this.fetch(searchUrl);
+            projectCount = searchResponse.pagination?.totalCount || 0;
+        } catch {
+            projectCount = 0;
         }
 
         const apiTime = performance.now() - apiStart;

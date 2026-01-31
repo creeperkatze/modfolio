@@ -89,16 +89,16 @@ const DATA_FETCHERS = {
 
 // Platform and cache key mapping for each entity type
 const ENTITY_CONFIG = {
-    user: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.userBadge },
-    project: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.projectBadge },
-    organization: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.organizationBadge },
-    collection: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.collectionBadge },
-    curseforge_project: { platform: PLATFORMS.CURSEFORGE.id, platformName: "curseforge", cacheKeyFn: curseforgeKeys.projectBadge },
-    curseforge_user: { platform: PLATFORMS.CURSEFORGE.id, platformName: "curseforge", cacheKeyFn: curseforgeKeys.userBadge },
-    hangar_project: { platform: PLATFORMS.HANGAR.id, platformName: "hangar", cacheKeyFn: hangarKeys.projectBadge },
-    hangar_user: { platform: PLATFORMS.HANGAR.id, platformName: "hangar", cacheKeyFn: hangarKeys.userBadge },
-    spigot_resource: { platform: "spigot", platformName: "spigot", cacheKeyFn: spigotKeys.resourceBadge },
-    spigot_author: { platform: "spigot", platformName: "spigot", cacheKeyFn: spigotKeys.authorBadge }
+    user: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", entityName: "user", cacheKeyFn: modrinthKeys.userBadge },
+    project: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", entityName: "project", cacheKeyFn: modrinthKeys.projectBadge },
+    organization: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", entityName: "organization", cacheKeyFn: modrinthKeys.organizationBadge },
+    collection: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", entityName: "collection", cacheKeyFn: modrinthKeys.collectionBadge },
+    curseforge_project: { platform: PLATFORMS.CURSEFORGE.id, platformName: "curseforge", entityName: "project", cacheKeyFn: curseforgeKeys.projectBadge },
+    curseforge_user: { platform: PLATFORMS.CURSEFORGE.id, platformName: "curseforge", entityName: "user", cacheKeyFn: curseforgeKeys.userBadge },
+    hangar_project: { platform: PLATFORMS.HANGAR.id, platformName: "hangar", entityName: "project", cacheKeyFn: hangarKeys.projectBadge },
+    hangar_user: { platform: PLATFORMS.HANGAR.id, platformName: "hangar", entityName: "user", cacheKeyFn: hangarKeys.userBadge },
+    spigot_resource: { platform: "spigot", platformName: "spigot", entityName: "resource", cacheKeyFn: spigotKeys.resourceBadge },
+    spigot_author: { platform: "spigot", platformName: "spigot", entityName: "author", cacheKeyFn: spigotKeys.authorBadge }
 };
 
 const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
@@ -116,7 +116,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
                     : PLATFORMS.MODRINTH.defaultColor;
         const color = req.query.color ? `#${req.query.color.replace(/^#/, "")}` : defaultColor;
         const backgroundColor = req.query.backgroundColor ? `#${req.query.backgroundColor.replace(/^#/, "")}` : null;
-        const config = BADGE_CONFIGS[entityType][badgeType];
+        const badgeConfig = BADGE_CONFIGS[entityType][badgeType];
 
         // Determine if we need to render the svg as a image
         const renderImage = req.isImageCrawler || format === "png";
@@ -130,11 +130,8 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         let fromCache = !!data;
 
         if (!data) {
-            // Only fetch versions for version count badges
-            const fetchVersions = (entityType === "project" || entityType === "curseforge_project" || entityType === "hangar_project" || entityType === "spigot_resource") && badgeType === "versions";
-            // Fetch projects for project count badges (for CurseForge users)
-            const fetchProjects = entityType === "curseforge_user" && badgeType === "projects";
-            data = await DATA_FETCHERS[entityType](identifier, fetchVersions || fetchProjects);
+            // Fetch from API (badge stats methods always fetch full data now)
+            data = await DATA_FETCHERS[entityType](identifier);
             apiCache.set(apiCacheKey, data);
         }
 
@@ -146,8 +143,8 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         }
 
         // Always regenerate the badge from cached data
-        const value = config.getValue(data.stats);
-        const svg = generateBadge(config.label, value, platform, color, backgroundColor, fromCache);
+        const value = badgeConfig.getValue(data.stats);
+        const svg = generateBadge(badgeConfig.label, value, platform, color, backgroundColor, fromCache);
 
         // Generate PNG for Discord bots or when format=png is requested
         if (renderImage) {
@@ -155,11 +152,10 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 
             const apiTime = fromCache ? `cached (${cacheAge})` : `${Math.round(data.timings.api)}ms`;
             const pngTime = `${Math.round(renderTime)}ms`;
-            const crawlerType = req.crawlerType;
-            const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
+            const crawlerLog = req.crawlerType ? `, crawler: ${req.crawlerType}` : "";
             const size = `${(Buffer.byteLength(pngBuffer) / 1024).toFixed(1)} KB`;
 
-            logger.info(`Showing ${entityConfig.platformName} ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}, render: ${pngTime}${crawlerLog}, size: ${size})`);
+            logger.info(`Showing ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge for "${identifier}" (api: ${apiTime}, render: ${pngTime}${crawlerLog}, size: ${size})`);
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             res.setHeader("X-Cache", fromCache ? "HIT" : "MISS");
@@ -169,10 +165,9 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 
         // Return SVG
         const apiTime = fromCache ? `cached (${cacheAge})` : `${Math.round(data.timings.api)}ms`;
-        const crawlerType = req.crawlerType;
-        const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
+        const crawlerLog = req.crawlerType ? `, crawler: ${req.crawlerType}` : "";
         const size = `${(Buffer.byteLength(svg) / 1024).toFixed(1)} KB`;
-        logger.info(`Showing ${entityConfig.platformName} ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}${crawlerLog}, size: ${size})`);
+        logger.info(`Showing ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge for "${identifier}" (api: ${apiTime}${crawlerLog}, size: ${size})`);
 
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
@@ -182,7 +177,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
     } catch (err) {
         const identifier = req.params.username || req.params.slug || req.params.id || req.params.projectId;
         const entityConfig = ENTITY_CONFIG[entityType];
-        logger.warn(`Error showing ${entityConfig.platformName} ${badgeType} badge for "${identifier}": ${err.message}`);
+        logger.warn(`Error showing ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge for "${identifier}": ${err.message}`);
         next(err);
     }
 };

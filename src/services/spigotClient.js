@@ -49,7 +49,7 @@ export class SpigotClient extends BasePlatformClient
         return this.fetch(`/v2/authors/${authorId}/resources?size=${limit}&sort=-downloads`);
     }
 
-    async getResourceStats(resourceId, maxVersions = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
+    async getResourceStats(resourceId, convertToPng = false)
     {
         // Validate resourceId is a number
         if (!/^\d+$/.test(String(resourceId))) {
@@ -127,7 +127,7 @@ export class SpigotClient extends BasePlatformClient
         };
     }
 
-    async getAuthorStats(authorId, maxResources = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
+    async getAuthorStats(authorId, convertToPng = false)
     {
         // Validate authorId is a number
         if (!/^\d+$/.test(String(authorId))) {
@@ -222,7 +222,7 @@ export class SpigotClient extends BasePlatformClient
         };
     }
 
-    async getResourceBadgeStats(resourceId, fetchVersions = false)
+    async getResourceBadgeStats(resourceId)
     {
         // Validate resourceId is a number
         if (!/^\d+$/.test(String(resourceId))) {
@@ -237,8 +237,6 @@ export class SpigotClient extends BasePlatformClient
         }
         const resource = resourceResponse;
 
-        let apiTime = performance.now() - apiStart;
-
         const stats = {
             downloads: resource?.downloads || 0,
             likes: resource?.likes || 0,
@@ -247,17 +245,15 @@ export class SpigotClient extends BasePlatformClient
             versionCount: 0
         };
 
-        // Only fetch versions if specifically requested (for version count badge)
-        if (fetchVersions) {
-            try {
-                const versionsResponse = await this.getResourceVersions(resourceId);
-                stats.versionCount = versionsResponse?.length || 0;
-            } catch {
-                stats.versionCount = 0;
-            }
-            apiTime = performance.now() - apiStart;
+        // Fetch versions
+        try {
+            const versionsResponse = await this.getResourceVersions(resourceId);
+            stats.versionCount = versionsResponse?.length || 0;
+        } catch {
+            stats.versionCount = 0;
         }
 
+        const apiTime = performance.now() - apiStart;
         return { stats, timings: { api: apiTime } };
     }
 

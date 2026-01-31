@@ -8,7 +8,7 @@ import logger from "../utils/logger.js";
 import { generatePng } from "../utils/generateImage.js";
 import { modrinthKeys, curseforgeKeys, hangarKeys, spigotKeys } from "../utils/cacheKeys.js";
 import { generateErrorCard } from "../middleware/errorHandler.js";
-import { getPlatformConfig, getErrorMessage, CARD_LIMITS } from "../constants/platformConfig.js";
+import { getErrorMessage, CARD_LIMITS } from "../constants/platformConfig.js";
 
 const API_CACHE_TTL = 3600; // 1 hour
 
@@ -29,7 +29,7 @@ const CARD_CLIENTS = {
 const CARD_CONFIGS = {
     modrinth_user: {
         paramKey: "username",
-        dataFetcher: (client, id, options, convertToPng) => client.getUserStats(id, options.maxProjects, convertToPng),
+        dataFetcher: (client, id, convertToPng) => client.getUserStats(id, convertToPng),
         cacheKeyFn: modrinthKeys.user,
         entityName: "user",
         platformId: "modrinth",
@@ -37,7 +37,7 @@ const CARD_CONFIGS = {
     },
     modrinth_project: {
         paramKey: "slug",
-        dataFetcher: (client, id, options, convertToPng) => client.getProjectStats(id, options.maxVersions, convertToPng),
+        dataFetcher: (client, id, convertToPng) => client.getProjectStats(id, convertToPng),
         cacheKeyFn: modrinthKeys.project,
         entityName: "project",
         platformId: "modrinth",
@@ -45,7 +45,7 @@ const CARD_CONFIGS = {
     },
     modrinth_organization: {
         paramKey: "id",
-        dataFetcher: (client, id, options, convertToPng) => client.getOrganizationStats(id, options.maxProjects, convertToPng),
+        dataFetcher: (client, id, convertToPng) => client.getOrganizationStats(id, convertToPng),
         cacheKeyFn: modrinthKeys.organization,
         entityName: "organization",
         platformId: "modrinth",
@@ -53,7 +53,7 @@ const CARD_CONFIGS = {
     },
     modrinth_collection: {
         paramKey: "id",
-        dataFetcher: (client, id, options, convertToPng) => client.getCollectionStats(id, options.maxProjects, convertToPng),
+        dataFetcher: (client, id, convertToPng) => client.getCollectionStats(id, convertToPng),
         cacheKeyFn: modrinthKeys.collection,
         entityName: "collection",
         platformId: "modrinth",
@@ -61,7 +61,7 @@ const CARD_CONFIGS = {
     },
     curseforge_project: {
         paramKey: "projectId",
-        dataFetcher: (client, id, options, convertToPng) => client.getModStats(id, options.maxVersions, convertToPng),
+        dataFetcher: (client, id, convertToPng) => client.getModStats(id, convertToPng),
         cacheKeyFn: curseforgeKeys.project,
         entityName: "project",
         platformId: "curseforge",
@@ -69,7 +69,7 @@ const CARD_CONFIGS = {
     },
     curseforge_user: {
         paramKey: "id",
-        dataFetcher: (client, id, options, convertToPng) => client.getUserStats(id, options.maxProjects, convertToPng),
+        dataFetcher: (client, id, convertToPng) => client.getUserStats(id, convertToPng),
         cacheKeyFn: curseforgeKeys.user,
         entityName: "user",
         platformId: "curseforge",
@@ -77,7 +77,7 @@ const CARD_CONFIGS = {
     },
     hangar_project: {
         paramKey: "slug",
-        dataFetcher: (client, id, options, convertToPng) => client.getProjectStats(id, options.maxVersions, convertToPng),
+        dataFetcher: (client, id, convertToPng) => client.getProjectStats(id, convertToPng),
         cacheKeyFn: hangarKeys.project,
         entityName: "project",
         platformId: "hangar",
@@ -85,7 +85,7 @@ const CARD_CONFIGS = {
     },
     hangar_user: {
         paramKey: "username",
-        dataFetcher: (client, id, options, convertToPng) => client.getUserStats(id, options.maxProjects, convertToPng),
+        dataFetcher: (client, id, convertToPng) => client.getUserStats(id, convertToPng),
         cacheKeyFn: hangarKeys.user,
         entityName: "user",
         platformId: "hangar",
@@ -93,7 +93,7 @@ const CARD_CONFIGS = {
     },
     spigot_resource: {
         paramKey: "id",
-        dataFetcher: (client, id, options, convertToPng) => client.getResourceStats(id, options.maxVersions, convertToPng),
+        dataFetcher: (client, id, convertToPng) => client.getResourceStats(id, convertToPng),
         cacheKeyFn: spigotKeys.resource,
         entityName: "resource",
         platformId: "spigot",
@@ -101,7 +101,7 @@ const CARD_CONFIGS = {
     },
     spigot_author: {
         paramKey: "id",
-        dataFetcher: (client, id, options, convertToPng) => client.getAuthorStats(id, options.maxProjects, convertToPng),
+        dataFetcher: (client, id, convertToPng) => client.getAuthorStats(id, convertToPng),
         cacheKeyFn: spigotKeys.author,
         entityName: "author",
         platformId: "spigot",
@@ -141,7 +141,7 @@ const handleCardRequest = async (req, res, next, cardType) => {
 
         if (!data) {
             // Fetch from API with PNG images (works for both SVG and PNG output)
-            data = await config.dataFetcher(client, identifier, options, true);
+            data = await config.dataFetcher(client, identifier, true);
 
             // Handle not found (null response) without throwing
             if (!data) {
