@@ -1305,8 +1305,8 @@
             function updateUI() {
                 const config = PLATFORMS[selectedPlatform];
                 const placeholders = {
-                    user: "Enter username or id",
-                    project: "Enter project ID or slug",
+                    user: selectedPlatform === "curseforge" ? "Enter user ID" : "Enter username or id",
+                    project: selectedPlatform === "curseforge" ? "Enter project ID" : "Enter project ID or slug",
                     organization: "Enter organization slug or id",
                     collection: "Enter collection id",
                     author: "Enter author ID",
@@ -1314,7 +1314,7 @@
                 };
                 identifier.placeholder = placeholders[targetType.value] || "";
                 const valueLabels = {
-                    user: "Username",
+                    user: selectedPlatform === "curseforge" ? "User ID" : "Username",
                     project: selectedPlatform === "curseforge" || selectedPlatform === "spigot" ? "Project ID" : "Project Slug",
                     organization: "Organization Slug",
                     collection: "Collection ID",
