@@ -55,7 +55,7 @@ const STAT_CONFIGS = {
         ],
         user: [
             { label: "Downloads", field: "totalDownloads" },
-            { label: "Stars", field: "totalFollowers" },
+            { label: "Stars", field: "totalStars" },
             { label: "Projects", field: "projectCount" }
         ]
     },

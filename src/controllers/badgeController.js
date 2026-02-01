@@ -54,7 +54,7 @@ const BADGE_CONFIGS = {
     hangar_user: {
         downloads: { label: "Downloads", getValue: stats => formatNumber(stats.totalDownloads) },
         projects: { label: "Projects", getValue: stats => stats.projectCount.toString() },
-        stars: { label: "Stars", getValue: stats => formatNumber(stats.totalFollowers) }
+        stars: { label: "Stars", getValue: stats => formatNumber(stats.totalStars) }
     },
     // Spigot entities
     spigot_resource: {

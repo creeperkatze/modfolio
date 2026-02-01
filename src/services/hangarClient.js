@@ -193,6 +193,7 @@ export class HangarClient extends BasePlatformClient
         // Fetch user's projects
         let projects = [];
         let totalDownloads = 0;
+        let totalStars = 0;
         let allVersionDates = [];
 
         try {
@@ -221,6 +222,7 @@ export class HangarClient extends BasePlatformClient
 
             // Calculate total downloads across all user's projects
             totalDownloads = allProjects.reduce((sum, p) => sum + (p?.stats?.downloads || 0), 0);
+            totalStars = allProjects.reduce((sum, p) => sum + (p?.stats?.stars || 0), 0);
 
             // Use reusable utilities for image fetching and version dates
             const projectsConversionTime = await fetchImagesForProjects(projects, convertToPng);
@@ -252,7 +254,7 @@ export class HangarClient extends BasePlatformClient
 
         const stats = {
             totalDownloads,
-            totalFollowers: 0, // Hangar doesn't have user followers
+            totalStars,
             projectCount: user?.projectCount || projects.length,
             allVersionDates
         };
@@ -276,13 +278,15 @@ export class HangarClient extends BasePlatformClient
         const user = userResponse;
 
         let totalDownloads = 0;
+        let totalStars = 0;
         let projectCount = user?.projectCount || 0;
 
-        // Fetch all user's projects for download count
+        // Fetch all user's projects for download count and stars
         try {
             const projectsResponse = await this.getUserProjects(username, 100);
             const allProjects = projectsResponse?.result || [];
             totalDownloads = allProjects.reduce((sum, p) => sum + (p?.stats?.downloads || 0), 0);
+            totalStars = allProjects.reduce((sum, p) => sum + (p?.stats?.stars || 0), 0);
             projectCount = projectsResponse?.pagination?.count ?? allProjects.length;
         } catch {
             // Use projectCount from user data if fetch fails
@@ -292,7 +296,8 @@ export class HangarClient extends BasePlatformClient
 
         const stats = {
             totalDownloads,
-            projectCount
+            projectCount,
+            totalStars
         };
 
         return { stats, timings: { api: apiTime } };
