@@ -6,15 +6,14 @@ import { getLoaderColor, getProjectTypeIcon } from "../constants/loaderConfig.js
 import packageJson from "../../package.json" with { type: "json" };
 const VERSION = packageJson.version;
 
-export const ANIMATION_DELAYS = {
-    SECTION_HEADER_DELAY: 0.1,
-    SECTION_HEADER_TO_FIRST_ITEM_DELAY: 0.1,
-    ITEM_DELAY: 0.08,
-    BOTTOM_INFO_DELAY: 0.1,
-};
-
 export function calculateBottomDelay(itemCount)
 {
+    const ANIMATION_DELAYS = {
+        SECTION_HEADER_DELAY: 0.1,
+        SECTION_HEADER_TO_FIRST_ITEM_DELAY: 0.1,
+        ITEM_DELAY: 0.08,
+        BOTTOM_INFO_DELAY: 0.1,
+    };
     const firstItemDelay = ANIMATION_DELAYS.SECTION_HEADER_DELAY + ANIMATION_DELAYS.SECTION_HEADER_TO_FIRST_ITEM_DELAY;
     return firstItemDelay + (itemCount * ANIMATION_DELAYS.ITEM_DELAY) + ANIMATION_DELAYS.BOTTOM_INFO_DELAY;
 }
@@ -57,6 +56,14 @@ export function generateSvgWrapper(width, height, colors, content, showBorder = 
       from { transform: translateX(-10px); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
+    @keyframes slideInFromRightAnimation {
+      from { transform: translateX(10px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideInFromTopAnimation {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
     @keyframes growWidthAnimation {
       from { width: 0; }
       to { width: var(--target-width); }
@@ -75,7 +82,7 @@ export function generateSvgWrapper(width, height, colors, content, showBorder = 
     }
     .section-header {
       opacity: 0;
-      animation: slideInAnimation 0.5s ease-out forwards;
+      animation: fadeInAnimation 0.6s ease-out forwards;
     }
     .fade-in-delayed {
       opacity: 0;
@@ -90,6 +97,18 @@ export function generateSvgWrapper(width, height, colors, content, showBorder = 
     }
     .download-bar {
       animation: growWidthAnimation 0.6s ease-out forwards;
+    }
+    .stat-value {
+      opacity: 0;
+      animation: slideInFromTopAnimation 0.25s ease-out forwards;
+    }
+    .stat-label {
+      opacity: 0;
+      animation: slideInFromTopAnimation 0.2s ease-out forwards;
+    }
+    .profile-image {
+      opacity: 0;
+      animation: slideInFromRightAnimation 0.4s ease-out forwards;
     }
   </style>` : "";
 
@@ -184,7 +203,7 @@ export function generateHeader(entityType, iconName, title, colors, platformIcon
   </text>`;
 }
 
-export function generateProfileImage(imageUrl, clipId, centerX, centerY, radius, colors)
+export function generateProfileImage(imageUrl, clipId, centerX, centerY, radius, colors, animations = true)
 {
     return `
   <defs>
@@ -192,10 +211,12 @@ export function generateProfileImage(imageUrl, clipId, centerX, centerY, radius,
       <circle cx="${centerX}" cy="${centerY}" r="${radius}"/>
     </clipPath>
   </defs>
-  ${imageUrl ? `<image x="${centerX - radius}" y="${centerY - radius}" width="${radius * 2}" height="${radius * 2}" href="${imageUrl}" clip-path="url(#${clipId})"/>` : `<circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="${colors.borderColor}"/>`}`;
+  <g${animations ? ' class="profile-image"' : ""}>
+    ${imageUrl ? `<image x="${centerX - radius}" y="${centerY - radius}" width="${radius * 2}" height="${radius * 2}" href="${imageUrl}" clip-path="url(#${clipId})"/>` : `<circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="${colors.borderColor}"/>`}
+  </g>`;
 }
 
-export function generateRectImage(imageUrl, clipId, x, y, width, height, borderRadius, colors)
+export function generateRectImage(imageUrl, clipId, x, y, width, height, borderRadius, colors, animations = true)
 {
     return `
   <defs>
@@ -203,20 +224,30 @@ export function generateRectImage(imageUrl, clipId, x, y, width, height, borderR
       <rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${borderRadius}"/>
     </clipPath>
   </defs>
-  ${imageUrl ? `<image x="${x}" y="${y}" width="${width}" height="${height}" href="${imageUrl}" clip-path="url(#${clipId})"/>` : `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${borderRadius}" fill="${colors.borderColor}"/>`}`;
+  <g${animations ? ' class="profile-image"' : ""}>
+    ${imageUrl ? `<image x="${x}" y="${y}" width="${width}" height="${height}" href="${imageUrl}" clip-path="url(#${clipId})"/>` : `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${borderRadius}" fill="${colors.borderColor}"/>`}
+  </g>`;
 }
 
-export function generateStatsGrid(stats, colors)
+export function generateStatsGrid(stats, colors, animations = true)
 {
-    return stats.map(({ x, label, value }) => `
+    const valueDelayBase = 0;
+    const labelDelayBase = 0.1;
+    const statDelayGap = 0.1;
+
+    return stats.map(({ x, label, value }, index) => {
+        const valueDelay = valueDelayBase + (index * statDelayGap);
+        const labelDelay = labelDelayBase + (index * statDelayGap);
+        return `
   <g transform="translate(${x}, 70)">
-    <text font-family="Inter, sans-serif" font-size="26" font-weight="bold" fill="${colors.accentColor}">
+    <text font-family="Inter, sans-serif" font-size="26" font-weight="bold" fill="${colors.accentColor}"${animations ? ' class="stat-value"' : ""}${animations ? ` style="animation-delay: ${valueDelay}s"` : ""}>
       ${value}
     </text>
-    <text y="20" font-family="Inter, sans-serif" font-size="12" fill="${colors.textColor}">
+    <text y="20" font-family="Inter, sans-serif" font-size="12" fill="${colors.textColor}"${animations ? ' class="stat-label"' : ""}${animations ? ` style="animation-delay: ${labelDelay}s"` : ""}>
       ${label}
     </text>
-  </g>`).join("");
+  </g>`;
+    }).join("");
 }
 
 export function generateProjectListItem(project, index, totalDownloads, colors, showSparklines = true, showDownloadBars = true, animations = true, baseDelay = 0)
@@ -250,7 +281,7 @@ export function generateProjectListItem(project, index, totalDownloads, colors, 
     }).join("");
 
     const projectIconUrl = project.icon_url_base64 || "";
-    const animationDelay = baseDelay + (index * ANIMATION_DELAYS.ITEM_DELAY);
+    const animationDelay = baseDelay + (index * 0.08);
 
     return `
   <!-- Project ${index + 1} -->
@@ -336,8 +367,8 @@ export function generateProjectList(topProjects, sectionTitle, colors, showSpark
     if (!topProjects || topProjects.length === 0) return "";
 
     const totalDownloads = topProjects.reduce((sum, p) => sum + p.downloads, 0);
-    const sectionDelay = ANIMATION_DELAYS.SECTION_HEADER_DELAY;
-    const firstProjectDelay = sectionDelay + ANIMATION_DELAYS.SECTION_HEADER_TO_FIRST_ITEM_DELAY;
+    const sectionDelay = 0.1;
+    const firstProjectDelay = sectionDelay + 0.1;
 
     const projectsHtml = topProjects.map((project, index) =>
         generateProjectListItem(project, index, totalDownloads, colors, showSparklines, showDownloadBars, animations, firstProjectDelay)

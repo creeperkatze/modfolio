@@ -104,9 +104,10 @@ ${generateRectImage(
         70,
         70,
         14,
-        colors
+        colors,
+        animations
     )}
-${generateStatsGrid(statsData, colors)}
+${generateStatsGrid(statsData, colors, animations)}
 ${generateDivider(colors, animations)}
 ${generateVersionList(latestVersions, colors, relativeTime, platformConfig.labels.sections.latestVersions, animations)}
 ${generateInfo(height, colors, fromCache, animations, bottomDelay)}

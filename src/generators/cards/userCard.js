@@ -76,8 +76,8 @@ export function generateUserCard(data, options, platformConfig)
     const content = `
 ${showSparklines ? generateActivitySparkline(allVersionDates, colors, animations) : ""}
 ${generateHeader("user", "user", title, colors, platformConfig.icon(colors.accentColor), platformConfig.iconViewBox)}
-${generateProfileImage(user.avatar_url_base64 || user.avatarUrl || null, "profile-clip", 400, 60, 35, colors)}
-${generateStatsGrid(statsData, colors)}
+${generateProfileImage(user.avatar_url_base64 || user.avatarUrl || null, "profile-clip", 400, 60, 35, colors, animations)}
+${generateStatsGrid(statsData, colors, animations)}
 ${generateDivider(colors, animations)}
 ${generateProjectList(mappedProjects, platformConfig.labels.sections.topProjects, colors, showSparklines, showDownloadBars, animations)}
 ${generateInfo(height, colors, fromCache, animations, bottomDelay)}
