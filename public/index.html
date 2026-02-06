@@ -351,6 +351,14 @@
                                         </svg>
                                     </div>
                                 </div>
+                                <div id="bgDisclaimer" class="bg-yellow/10 border border-yellow/30 rounded-lg px-3 py-2 text-sm text-yellow flex items-center gap-2 mt-2 hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+                                        <path d="M12 9v4" />
+                                        <path d="M12 17h.01" />
+                                    </svg>
+                                    <span>Transparent works best in most situations, as it blends in with the background without changing its style.</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -722,6 +730,12 @@
                         b.classList.toggle("color-btn-selected", b.dataset.bgColor === String(selectedBgColor));
                     });
 
+                    // Update disclaimer visibility
+                    const bgDisclaimer = document.getElementById("bgDisclaimer");
+                    if (bgDisclaimer) {
+                        bgDisclaimer.classList.toggle("hidden", selectedBgColor === null);
+                    }
+
                     generate();
                     updateUrl();
                 };
@@ -935,6 +949,12 @@
                     b.classList.toggle("color-btn-selected", b.dataset.bgColor === "null");
                 });
 
+                // Hide disclaimer (transparent is default)
+                const bgDisclaimer = document.getElementById("bgDisclaimer");
+                if (bgDisclaimer) {
+                    bgDisclaimer.classList.add("hidden");
+                }
+
                 // Reset URL
                 modrinthUrl.value = "";
 
@@ -1016,6 +1036,12 @@
 
                 // select manual picker
                 manualBgColorPickerContainer.classList.add("color-btn-selected");
+
+                // Update disclaimer visibility
+                const bgDisclaimer = document.getElementById("bgDisclaimer");
+                if (bgDisclaimer) {
+                    bgDisclaimer.classList.remove("hidden");
+                }
 
                 generate();
                 updateUrl();
@@ -1144,6 +1170,12 @@
                     document.querySelectorAll("[data-bg-color]").forEach((b) => {
                         b.classList.toggle("color-btn-selected", b.dataset.bgColor === String(selectedBgColor));
                     });
+                }
+
+                // Update disclaimer visibility based on background color
+                const bgDisclaimer = document.getElementById("bgDisclaimer");
+                if (bgDisclaimer) {
+                    bgDisclaimer.classList.toggle("hidden", selectedBgColor === null);
                 }
 
                 // Expand customization if needed
