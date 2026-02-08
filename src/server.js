@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import logger from "./utils/logger.js";
 import path from "path";
+import os from "os";
 import modrinthRoutes from "./routes/modrinth/index.js";
 import curseforgeRoutes from "./routes/curseforge/index.js";
 import hangarRoutes from "./routes/hangar/index.js";
@@ -33,6 +34,31 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
     customSiteTitle: "Modfolio API Docs",
     customCss: swaggerCss
 }));
+
+app.get("/health", (req, res) =>
+{
+    const cpus = os.cpus();
+    let totalIdle = 0;
+    let totalTick = 0;
+
+    cpus.forEach((cpu) =>
+    {
+        for (const type in cpu.times)
+        {
+            totalTick += cpu.times[type];
+        }
+        totalIdle += cpu.times.idle;
+    });
+
+    const idle = totalIdle / cpus.length;
+    const total = totalTick / cpus.length;
+    const usage = 100 - ~~(100 * idle / total);
+
+    res.json({
+        status: "ok",
+        cpu: usage
+    });
+});
 
 app.use((req, res) =>
 {
