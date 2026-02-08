@@ -156,7 +156,8 @@ export async function errorHandler(err, req, res)
     {
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        res.status(statusCode).send(generateBadge("error", message, "#f38ba8"));
+
+        return res.status(statusCode).send(generateBadge("error", message, "#f38ba8"));
     } else if (useImage)
     {
         const svg = generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget);
@@ -168,11 +169,11 @@ export async function errorHandler(err, req, res)
         // Use Code 200 for image crawlers since they dont like error codes
         if (req.isImageCrawler)
         {
-            res.status(200).send(pngBuffer);
+            return res.status(200).send(pngBuffer);
         }
         else
         {
-            res.status(statusCode).send(pngBuffer);
+            return res.status(statusCode).send(pngBuffer);
         }
     } else
     {
@@ -184,11 +185,11 @@ export async function errorHandler(err, req, res)
         // Use Code 200 for image crawlers since they dont like error codes
         if (req.isImageCrawler)
         {
-            res.status(200).send(generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget));
+            return res.status(200).send(generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget));
         }
         else
         {
-            res.status(statusCode).send(generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget));
+            return res.status(statusCode).send(generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget));
         }
     }
 }
