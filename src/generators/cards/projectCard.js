@@ -51,8 +51,14 @@ export function generateProjectCard(data, options, platformConfig, entityType = 
 
     // Get stat configs from platform config
     const statConfigs = getStatConfigs(platformConfig.id, entityType);
-    const statsData = statConfigs ? statConfigs.map((config, index) => {
-        const xPositions = [15, 155, 270];
+    const xPositions = [15, 155, 270];
+    const statsData = statConfigs ? statConfigs.filter(config => {
+        if (config.field === "rank") {
+            const value = stats[config.field];
+            return value == null || value <= 10000;
+        }
+        return true;
+    }).map((config, index) => {
         const value = stats[config.field];
         let displayValue;
         if (config.field === "rank" && value != null) {
