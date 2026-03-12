@@ -1106,6 +1106,14 @@
             }
 
             function loadFromUrl() {
+                const rawParams = new URLSearchParams(window.location.search);
+                const urlParam = rawParams.get("url");
+                if (urlParam) {
+                    modrinthUrl.value = urlParam;
+                    modrinthUrl.dispatchEvent(new Event("input"));
+                    return;
+                }
+
                 const params = getUrlParams();
 
                 // Set platform theme and dropdown first
