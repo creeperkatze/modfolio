@@ -333,6 +333,13 @@
                                 </label>
                             </div>
 
+                            <div class="mb-2 hidden" id="showIconSection">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="showIcon" checked class="dynamic-checkbox !w-[18px] h-[18px] min-w-[18px] flex-shrink-0 appearance-none bg-input-bg border-2 border-text-muted rounded cursor-pointer relative transition-all duration-200 p-0" />
+                                    <span class="text-base text-text-secondary">Show Platform Icon</span>
+                                </label>
+                            </div>
+
                             <div class="mb-2">
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" id="showBorder" checked class="dynamic-checkbox !w-[18px] h-[18px] min-w-[18px] flex-shrink-0 appearance-none bg-input-bg border-2 border-text-muted rounded cursor-pointer relative transition-all duration-200 p-0" />
@@ -536,6 +543,8 @@
             const showSparklinesSection = document.getElementById("showSparklinesSection");
             const showDownloadBars = document.getElementById("showDownloadBars");
             const showDownloadBarsSection = document.getElementById("showDownloadBarsSection");
+            const showIcon = document.getElementById("showIcon");
+            const showIconSection = document.getElementById("showIconSection");
             const showBorder = document.getElementById("showBorder");
             const animations = document.getElementById("animations");
             const platformModrinth = document.getElementById("platformModrinth");
@@ -909,6 +918,7 @@
                 relativeTime.checked = true;
                 showSparklines.checked = true;
                 showDownloadBars.checked = true;
+                showIcon.checked = true;
                 showBorder.checked = true;
                 animations.checked = true;
 
@@ -1060,6 +1070,7 @@
                     animations: params.get("animations") !== "false",
                     color: params.get("color") || config.defaultColor,
                     backgroundColor: params.get("backgroundColor") || null,
+                    showIcon: params.get("showIcon") !== "false",
                 };
             }
 
@@ -1099,6 +1110,8 @@
                 } else {
                     if (selectedColor !== config.defaultColor) params.set("color", selectedColor);
                     if (selectedBgColor !== null) params.set("backgroundColor", selectedBgColor);
+                    if (!showIcon.checked) params.set("showIcon", "false");
+                    if (!showBorder.checked) params.set("showBorder", "false");
                 }
 
                 const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
@@ -1141,6 +1154,7 @@
                 relativeTime.checked = params.relativeTime;
                 showSparklines.checked = params.showSparklines;
                 showDownloadBars.checked = params.showDownloadBars;
+                showIcon.checked = params.showIcon;
                 showBorder.checked = params.showBorder;
                 animations.checked = params.animations;
                 selectedColor = params.color;
@@ -1442,6 +1456,7 @@
                 relativeTimeSection.classList.toggle("hidden", !(isCard && isProject && showVersions.checked));
                 showSparklinesSection.classList.toggle("hidden", !(isCard && (isUserOrgOrCollection || isHangarUser || isSpigotAuthor)));
                 showDownloadBarsSection.classList.toggle("hidden", !(isCard && (isUserOrgOrCollection || isHangarUser || isSpigotAuthor)));
+                showIconSection.classList.toggle("hidden", !isBadge);
             }
 
             async function generate() {
@@ -1672,6 +1687,12 @@
                     if (selectedBgColor !== null) {
                         badgeParams.set("backgroundColor", selectedBgColor);
                     }
+                    if (!showIcon.checked) {
+                        badgeParams.set("showIcon", "false");
+                    }
+                    if (!showBorder.checked) {
+                        badgeParams.set("showBorder", "false");
+                    }
                     const badgeQuery = badgeParams.toString();
                     if (selectedPlatform === "curseforge") {
                         url = `${window.location.origin}/curseforge/${type}/${identifierValue}/${badgeMetric.value}${badgeQuery ? "?" + badgeQuery : ""}`;
@@ -1882,6 +1903,10 @@
                 generate();
                 updateUrl();
             });
+            showIcon.addEventListener("change", () => {
+                generate();
+                updateUrl();
+            });
             showBorder.addEventListener("change", () => {
                 generate();
                 updateUrl();
@@ -1936,7 +1961,7 @@
             function hasCustomizationFromUrl(params) {
                 const config = PLATFORMS[params.platform];
                 const relevantPlatform = params.platform === "modrinth" || params.platform === "curseforge" || params.platform === "hangar" || params.platform === "spigot";
-                return (relevantPlatform && params.showProjects === false) || (relevantPlatform && params.maxProjects !== CARD_LIMITS.DEFAULT_COUNT) || params.showVersions === false || params.maxVersions !== CARD_LIMITS.DEFAULT_COUNT || params.relativeTime === false || params.showSparklines === false || params.showDownloadBars === false || params.showBorder === false || params.animations === false || params.color !== config.defaultColor || params.backgroundColor !== null;
+                return (relevantPlatform && params.showProjects === false) || (relevantPlatform && params.maxProjects !== CARD_LIMITS.DEFAULT_COUNT) || params.showVersions === false || params.maxVersions !== CARD_LIMITS.DEFAULT_COUNT || params.relativeTime === false || params.showSparklines === false || params.showDownloadBars === false || params.showIcon === false || params.showBorder === false || params.animations === false || params.color !== config.defaultColor || params.backgroundColor !== null;
             }
 
             // Initialize input attributes from CARD_LIMITS

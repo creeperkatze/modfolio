@@ -117,6 +117,8 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
                     : PLATFORMS.MODRINTH.defaultColor;
         const color = req.query.color ? `#${req.query.color.replace(/^#/, "")}` : defaultColor;
         const backgroundColor = req.query.backgroundColor ? `#${req.query.backgroundColor.replace(/^#/, "")}` : null;
+        const showIcon = req.query.showIcon !== "false";
+        const showBorder = req.query.showBorder !== "false";
         const badgeConfig = BADGE_CONFIGS[entityType][badgeType];
 
         // Determine if we need to render the svg as a image
@@ -139,7 +141,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 
                 logger.warn(`Error showing ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge for "${identifier}": ${errorMessage}`);
 
-                const notFoundSvg = generateBadge(badgeConfig.label, "Not found", entityConfig.platformName, defaultColor, null, "#f38ba8");
+                const notFoundSvg = generateBadge(badgeConfig.label, "Not found", entityConfig.platformName, defaultColor, null, "#f38ba8", showIcon, showBorder);
 
                 if (renderImage) {
                     const { buffer: pngBuffer } = await generatePng(notFoundSvg);
@@ -166,7 +168,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 
         // Always regenerate the badge from cached data
         const value = badgeConfig.getValue(data.stats);
-        const svg = generateBadge(badgeConfig.label, value, platform, color, backgroundColor);
+        const svg = generateBadge(badgeConfig.label, value, platform, color, backgroundColor, null, showIcon, showBorder);
 
         // Generate PNG for Discord bots or when format=png is requested
         if (renderImage) {

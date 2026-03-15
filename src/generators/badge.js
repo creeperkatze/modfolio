@@ -19,13 +19,13 @@ function estimateTextWidth(text, fontSize)
     return Math.ceil(width);
 }
 
-export function generateBadge(label, value, platformId, color = null, backgroundColor = null, valueColor = null)
+export function generateBadge(label, value, platformId, color = null, backgroundColor = null, valueColor = null, showIcon = true, showBorder = true)
 {
     const platform = getPlatform(platformId) || PLATFORMS.MODRINTH;
     const badgeColor = color || platform.defaultColor;
-    const icon = platform.icon(badgeColor);
+    const icon = showIcon ? platform.icon(badgeColor) : null;
 
-    const iconWidth = 30;
+    const iconWidth = showIcon ? 30 : 0;
     const paddingX = 10;
     const labelWidth = estimateTextWidth(label, 14)  + paddingX * 2;
     const valueWidth = estimateTextWidth(value, 16) + paddingX * 2;
@@ -50,16 +50,14 @@ export function generateBadge(label, value, platformId, color = null, background
     </clipPath>
   </defs>
   <g clip-path="url(#badge_clip)">
-    <rect stroke="${borderColor}" fill="${bgColor}" rx="4.5" x="0.5" y="0.5" width="${totalWidth - 1}" height="${height - 1}" vector-effect="non-scaling-stroke"/>
-    <line x1="${iconWidth}" y1="1" x2="${iconWidth}" y2="${height - 1}" stroke="${borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>
-    <line x1="${iconWidth + labelWidth}" y1="1" x2="${iconWidth + labelWidth}" y2="${height - 1}" stroke="${borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <rect ${showBorder ? `stroke="${borderColor}"` : ""} fill="${bgColor}" rx="4.5" x="0.5" y="0.5" width="${totalWidth - 1}" height="${height - 1}" vector-effect="non-scaling-stroke"/>
+    ${showBorder && !!showIcon ? `<line x1="${iconWidth}" y1="1" x2="${iconWidth}" y2="${height - 1}" stroke="${borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>` : ""}
+    ${showBorder ? `<line x1="${iconWidth + labelWidth}" y1="1" x2="${iconWidth + labelWidth}" y2="${height - 1}" stroke="${borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>` : ""}
   </g>
-
-  <!-- Platform Icon -->
+  ${!!showIcon ? `<!-- Platform Icon -->
   <svg x="${(iconWidth - 18) / 2}" y="${(height - 18) / 2}" width="18" height="18" viewBox="${iconViewBox}">
     ${icon}
-  </svg>
-
+  </svg>` : ""}
   <g font-family="Inter, sans-serif" font-size="14" font-weight="500">
     <text x="${iconWidth + labelWidth / 2}" y="20" text-anchor="middle" fill="${labelTextColor}">${escapeXml(label)}</text>
     <text x="${iconWidth + labelWidth + valueWidth / 2}" y="21" text-anchor="middle" font-size="16" font-weight="700" letter-spacing="-1" fill="${valueTextColor}">${escapeXml(value)}</text>
