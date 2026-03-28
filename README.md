@@ -3,9 +3,11 @@
 Generate fast, beautiful and consistent embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content.
 
 [![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/2d89t.svg)](https://status.creeperkatze.de)
+![GitHub Branch Check Runs](https://img.shields.io/github/check-runs/creeperkatze/modfolio/main?labelColor=0d143c)
 ![GitHub Issues](https://img.shields.io/github/issues/creeperkatze/modfolio?labelColor=0d143c)
 ![GitHub Pull Requests](https://img.shields.io/github/issues-pr/creeperkatze/modfolio?labelColor=0d143c)
 ![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modfolio?style=flat&labelColor=0d143c)
+[![Crowdin](https://badges.crowdin.net/modfolio/localized.svg)](https://crowdin.com/project/modfolio)
 
 ## 🚀 Quick Start
 
@@ -165,6 +167,18 @@ pnpm dev
 ### Environment Variables
 
 Copy `apps/backend/.env.example` and rename it to `apps/backend/.env`.
+
+## 🌐 Translating
+
+Translations are managed on [Crowdin](https://crowdin.com/project/modfolio). You can contribute without any technical knowledge, just pick your language and start translating.
+
+New translations are automatically pulled every Monday.
+
+### Contributors ❤️
+
+| Language | Translators |
+|----------|------------|
+| Italian | emanuelplaysofficial |
 
 ## 🤝 Contributing
 

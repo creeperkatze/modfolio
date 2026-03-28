@@ -126,10 +126,10 @@
     "message": "Enter author ID"
   },
   "placeholder.collection": {
-    "message": "Enter collection id"
+    "message": "Enter collection ID"
   },
   "placeholder.organization": {
-    "message": "Enter organization slug or id"
+    "message": "Enter organization slug or ID"
   },
   "placeholder.project.curseforge": {
     "message": "Enter project ID"
@@ -147,7 +147,7 @@
     "message": "Enter user ID"
   },
   "placeholder.user.default": {
-    "message": "Enter username or id"
+    "message": "Enter username or ID"
   },
   "preview.imageAlt": {
     "message": "Preview"

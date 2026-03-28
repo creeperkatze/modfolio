@@ -558,7 +558,7 @@ const m = defineMessages({
 	placeholderUserCurseforge: { id: 'placeholder.user.curseforge', defaultMessage: 'Enter user ID' },
 	placeholderUserDefault: {
 		id: 'placeholder.user.default',
-		defaultMessage: 'Enter username or id',
+		defaultMessage: 'Enter username or ID',
 	},
 	placeholderProjectCurseforge: {
 		id: 'placeholder.project.curseforge',
@@ -570,9 +570,9 @@ const m = defineMessages({
 	},
 	placeholderOrganization: {
 		id: 'placeholder.organization',
-		defaultMessage: 'Enter organization slug or id',
+		defaultMessage: 'Enter organization slug or ID',
 	},
-	placeholderCollection: { id: 'placeholder.collection', defaultMessage: 'Enter collection id' },
+	placeholderCollection: { id: 'placeholder.collection', defaultMessage: 'Enter collection ID' },
 	placeholderAuthor: { id: 'placeholder.author', defaultMessage: 'Enter author ID' },
 	placeholderResource: { id: 'placeholder.resource', defaultMessage: 'Enter resource ID' },
 	placeholderServer: { id: 'placeholder.server', defaultMessage: 'Enter server slug' },
