@@ -8,19 +8,29 @@
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
 				<!-- Left column: Configuration -->
 				<div>
-					<a href="/" class="inline-flex items-center gap-2 no-underline mb-2">
-						<svg class="h-10 w-10" viewBox="0 0 110 100" xmlns="http://www.w3.org/2000/svg">
-							<g class="dynamic-fill" transform="translate(-195.12051,-249.04304)">
-								<g transform="matrix(1.2138597,0,0,1.2138597,-53.114434,-63.81136)">
-									<rect width="60" height="20" x="205.12053" y="259.04303" ry="10" />
-									<rect width="20" height="20" x="275.12051" y="259.04303" ry="10" />
-									<rect width="90" height="20" x="205.12053" y="319.04303" ry="10" />
-									<rect width="90" height="20" x="204.50052" y="289.04303" ry="10" />
+					<div class="flex items-start justify-between mb-2">
+						<a href="/" class="inline-flex items-center gap-2 no-underline">
+							<svg class="h-10 w-10" viewBox="0 0 110 100" xmlns="http://www.w3.org/2000/svg">
+								<g class="dynamic-fill" transform="translate(-195.12051,-249.04304)">
+									<g transform="matrix(1.2138597,0,0,1.2138597,-53.114434,-63.81136)">
+										<rect width="60" height="20" x="205.12053" y="259.04303" ry="10" />
+										<rect width="20" height="20" x="275.12051" y="259.04303" ry="10" />
+										<rect width="90" height="20" x="205.12053" y="319.04303" ry="10" />
+										<rect width="90" height="20" x="204.50052" y="289.04303" ry="10" />
+									</g>
 								</g>
-							</g>
-						</svg>
-						<h1 class="dynamic-color text-5xl font-black leading-none">Modfolio</h1>
-					</a>
+							</svg>
+							<h1 class="dynamic-color text-5xl font-black leading-none">Modfolio</h1>
+						</a>
+						<select
+							v-model="locale"
+							class="py-2 px-3 bg-input-bg border-2 border-transparent rounded-xl text-text-bright text-sm font-medium transition-[border-color] duration-100 focus:outline-none"
+						>
+							<option v-for="loc in LOCALES" :key="loc.code" :value="loc.code">
+								{{ loc.name }}
+							</option>
+						</select>
+					</div>
 					<p class="mb-4 text-sm opacity-80">{{ t(m.appSubtitle.id) }}</p>
 
 					<!-- Configuration Section -->
@@ -498,11 +508,11 @@ import PlatformSelector from './components/PlatformSelector.vue'
 import RangeSlider from './components/RangeSlider.vue'
 import ToggleCheckbox from './components/ToggleCheckbox.vue'
 import { defineMessages } from './helpers/i18n.js'
+import { LOCALES } from './helpers/locales.js'
 import { BG_COLORS, CARD_LIMITS, getAccentColors, parseUrl, PLATFORMS } from './platforms.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
-// ── Messages (extracted by @formatjs/cli) ──
 const m = defineMessages({
 	appSubtitle: {
 		id: 'app.subtitle',
