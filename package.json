@@ -9,8 +9,10 @@
 		"dev": "concurrently -n backend,frontend -c blue,green \"pnpm --filter ./apps/backend dev\" \"pnpm --filter ./apps/frontend dev\"",
 		"frontend:dev": "pnpm --filter ./apps/frontend dev",
 		"frontend:build": "pnpm --filter ./apps/frontend build",
+		"frontend:intl:extract": "pnpm --filter ./apps/frontend intl:extract",
 		"backend:dev": "pnpm --filter ./apps/backend dev",
 		"backend:start": "pnpm --filter ./apps/backend start",
+		"test": "pnpm -r test",
 		"lint": "pnpm -r lint",
 		"lint:fix": "pnpm -r lint:fix"
 	},

@@ -455,33 +455,35 @@
 		</div>
 
 		<footer class="text-center py-8 px-5 pt-8 text-base text-text-muted font-semibold">
-			Made with &hearts; by
+			{{ t(m.footerMadeBy.id) }}
 			<a href="https://github.com/creeperkatze" target="_blank" class="dynamic-link no-underline"
 				>Creeperkatze</a
 			>
-			&middot; View
+			&middot;
 			<a
 				href="https://github.com/creeperkatze/modfolio"
 				target="_blank"
 				class="dynamic-link no-underline"
-				>Source</a
+				>{{ t(m.footerViewSource.id) }}</a
 			>
-			&middot; View <a href="/docs" class="dynamic-link no-underline">API Docs</a> &middot;
+			&middot;
+			<a href="/docs" class="dynamic-link no-underline">{{ t(m.footerViewApiDocs.id) }}</a>
+			&middot;
 			<a
 				href="https://github.com/creeperkatze/modfolio"
 				target="_blank"
 				class="no-underline"
 				style="color: #fbbf24"
-				>&starf; On Github</a
+				>{{ t(m.footerStarOnGithub.id) }}</a
 			>
 			&middot;
 			<a
 				href="https://crowdin.com/project/modfolio"
 				target="_blank"
 				class="dynamic-link no-underline"
-				>Help Translate</a
+				>{{ t(m.footerHelpTranslate.id) }}</a
 			>
-			&middot; Not affiliated with Modrinth, CurseForge, Hangar or Spigot
+			&middot; {{ t(m.footerNotAffiliated.id) }}
 		</footer>
 	</div>
 </template>
@@ -638,6 +640,16 @@ const m = defineMessages({
 	actionCopyUrl: { id: 'action.copyUrl', defaultMessage: 'Copy URL' },
 	actionCopied: { id: 'action.copied', defaultMessage: 'Copied!' },
 	actionReset: { id: 'action.reset', defaultMessage: 'Reset' },
+
+	footerMadeBy: { id: 'footer.madeBy', defaultMessage: 'Made with ♥ by' },
+	footerViewSource: { id: 'footer.viewSource', defaultMessage: 'Source' },
+	footerViewApiDocs: { id: 'footer.viewApiDocs', defaultMessage: 'API Docs' },
+	footerStarOnGithub: { id: 'footer.starOnGithub', defaultMessage: '★ On Github' },
+	footerHelpTranslate: { id: 'footer.helpTranslate', defaultMessage: 'Help Translate' },
+	footerNotAffiliated: {
+		id: 'footer.notAffiliated',
+		defaultMessage: 'Not affiliated with Modrinth, CurseForge, Hangar or Spigot',
+	},
 })
 
 // ── Helpers ──

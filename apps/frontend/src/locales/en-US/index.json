@@ -35,6 +35,24 @@
   "field.url": {
     "message": "URL"
   },
+  "footer.helpTranslate": {
+    "message": "Help Translate"
+  },
+  "footer.madeBy": {
+    "message": "Made with ♥ by"
+  },
+  "footer.notAffiliated": {
+    "message": "Not affiliated with Modrinth, CurseForge, Hangar or Spigot"
+  },
+  "footer.starOnGithub": {
+    "message": "★ On Github"
+  },
+  "footer.viewApiDocs": {
+    "message": "API Docs"
+  },
+  "footer.viewSource": {
+    "message": "Source"
+  },
   "hint.transparentBg": {
     "message": "Transparent works best in most situations, as it blends in with the background without changing its style."
   },
