@@ -25,7 +25,6 @@ export function generateUserCard(data, options, platformConfig)
         color = null,
         backgroundColor = null,
         fromCache = false,
-        relativeTime = false,
         showBorder = true,
         animations = true
     } = options;
