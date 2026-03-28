@@ -1,0 +1,27 @@
+name: i18n Pull
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'  # Every Monday at 07:00 UTC
+  workflow_dispatch:
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download translations from Crowdin
+        uses: crowdin/github-action@v2
+        with:
+          config: frontend/crowdin.yml
+          download_translations: true
+          upload_sources: false
+          create_pull_request: true
+          pull_request_title: 'chore: update translations'
+          pull_request_body: 'New translations from Crowdin.'
+          pull_request_base_branch_name: main
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

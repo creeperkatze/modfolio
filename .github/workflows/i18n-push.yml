@@ -1,0 +1,25 @@
+name: i18n Push
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/src/locales/en-US/**'
+  workflow_dispatch:
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Upload source files to Crowdin
+        uses: crowdin/github-action@v2
+        with:
+          config: frontend/crowdin.yml
+          upload_sources: true
+          upload_translations: false
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
