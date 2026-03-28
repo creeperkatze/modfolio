@@ -475,13 +475,13 @@
 				>&starf; On Github</a
 			>
 			&middot;
-				<a
-					href="https://crowdin.com/project/modfolio"
-					target="_blank"
-					class="dynamic-link no-underline"
-					>Help Translate</a
-				>
-				&middot; Not affiliated with Modrinth, CurseForge, Hangar or Spigot
+			<a
+				href="https://crowdin.com/project/modfolio"
+				target="_blank"
+				class="dynamic-link no-underline"
+				>Help Translate</a
+			>
+			&middot; Not affiliated with Modrinth, CurseForge, Hangar or Spigot
 		</footer>
 	</div>
 </template>
