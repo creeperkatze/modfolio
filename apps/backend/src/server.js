@@ -16,13 +16,17 @@ dotenv.config({ quiet: true });
 const app = express();
 const port = process.env.PORT || 3000;
 
-const swaggerDocument = JSON.parse(fs.readFileSync(path.join(process.cwd(), "public", "swagger.json"), "utf8"));
+const root = import.meta.dirname; // apps/backend/src
+const publicDir = path.resolve(root, "..", "public");
+const frontendDist = path.resolve(root, "..", "..", "frontend", "dist");
+
+const swaggerDocument = JSON.parse(fs.readFileSync(path.join(publicDir, "swagger.json"), "utf8"));
 swaggerDocument.info.version = packageJson.version;
-const swaggerCss = fs.readFileSync(path.join(process.cwd(), "public", "swagger.css"), "utf8");
+const swaggerCss = fs.readFileSync(path.join(publicDir, "swagger.css"), "utf8");
 
 // Serve Vue frontend build output first, then fallback to public/ for swagger assets etc.
-app.use(express.static(path.join(process.cwd(), "frontend", "dist")));
-app.use(express.static(path.join(process.cwd(), "public")));
+app.use(express.static(frontendDist));
+app.use(express.static(publicDir));
 
 app.use(checkCrawlerMiddleware);
 

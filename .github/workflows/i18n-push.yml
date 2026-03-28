@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'frontend/src/locales/en-US/**'
+      - 'apps/frontend/src/locales/en-US/**'
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
       - name: Upload source files to Crowdin
         uses: crowdin/github-action@v2
         with:
-          config: frontend/crowdin.yml
+          config: apps/frontend/crowdin.yml
           upload_sources: true
           upload_translations: false
         env:

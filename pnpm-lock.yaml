@@ -7,6 +7,12 @@ settings:
 importers:
 
   .:
+    devDependencies:
+      concurrently:
+        specifier: ^9.2.1
+        version: 9.2.1
+
+  apps/backend:
     dependencies:
       '@resvg/resvg-js':
         specifier: ^2.6.2
@@ -36,9 +42,6 @@ importers:
         specifier: ^6.1.4
         version: 6.1.4
     devDependencies:
-      concurrently:
-        specifier: ^9.2.1
-        version: 9.2.1
       eslint:
         specifier: ^10.0.2
         version: 10.0.2(jiti@2.6.1)
@@ -46,7 +49,7 @@ importers:
         specifier: ^3.1.14
         version: 3.1.14
 
-  frontend:
+  apps/frontend:
     dependencies:
       vue:
         specifier: ^3.5.13

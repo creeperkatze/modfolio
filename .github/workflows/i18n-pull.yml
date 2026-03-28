@@ -14,7 +14,7 @@ jobs:
       - name: Download translations from Crowdin
         uses: crowdin/github-action@v2
         with:
-          config: frontend/crowdin.yml
+          config: apps/frontend/crowdin.yml
           download_translations: true
           upload_sources: false
           create_pull_request: true

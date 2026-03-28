@@ -152,8 +152,8 @@ Compact badges showing a single metric.
 
 ```bash
 # Clone the repository
-git clone https://github.com/creeperkatze/modrinth-embeds.git
-cd modrinth-embeds
+git clone https://github.com/creeperkatze/modfolio.git
+cd modfolio
 
 # Install dependencies
 pnpm install
@@ -164,7 +164,7 @@ pnpm dev
 
 ### Environment Variables
 
-Copy the `.env.example` file and rename it to `.env`.
+Copy `apps/backend/.env.example` and rename it to `apps/backend/.env`.
 
 ## 🤝 Contributing
 

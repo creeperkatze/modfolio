@@ -4,19 +4,21 @@ LABEL org.opencontainers.image.source=https://github.com/creeperkatze/modfolio
 
 WORKDIR /app
 
-COPY package*.json pnpm-lock*.yaml ./
-
 RUN npm install -g pnpm
 
-RUN pnpm install --prod --frozen-lockfile
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY apps/backend/package.json ./apps/backend/
+COPY apps/frontend/package.json ./apps/frontend/
+
+RUN pnpm --filter ./apps/backend install --prod --frozen-lockfile
 
 COPY . .
 
 ENV CI=true
-RUN cd frontend && pnpm install --frozen-lockfile && pnpm run build
+RUN pnpm --filter ./apps/frontend install --frozen-lockfile && pnpm --filter ./apps/frontend build
 
 RUN chown -R node:node /app
 
 USER node
 
-CMD ["pnpm", "start"]
+CMD ["pnpm", "backend:start"]
