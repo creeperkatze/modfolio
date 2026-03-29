@@ -67,7 +67,7 @@ const BADGE_CONFIGS = {
     spigot_author: {
         downloads: { label: "Downloads", getValue: stats => formatNumber(stats.totalDownloads) },
         resources: { label: "Resources", getValue: stats => stats.resourceCount.toString() },
-        rating: { label: "Rating", getValue: stats => stats.avgRating ? stats.avgRating.toString() : "N/A" }
+        rating: { label: "Rating", getValue: stats => stats.avgRating ? stats.avgRating.toFixed(1) : "N/A" }
     }
 };
 
