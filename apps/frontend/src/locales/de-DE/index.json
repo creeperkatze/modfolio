@@ -125,6 +125,9 @@
   "option.showProjects": {
     "message": "Projekte anzeigen"
   },
+  "option.showSummary": {
+    "message": "Zusammenfassung anzeigen"
+  },
   "option.showVersions": {
     "message": "Versionen anzeigen"
   },
