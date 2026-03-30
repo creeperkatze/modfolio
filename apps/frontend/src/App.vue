@@ -985,6 +985,9 @@ function onConfigChange() {
 
 function onTargetChange() {
 	projectTypeFilter.value = ''
+	if (!availableMetrics.value.includes(badgeMetric.value)) {
+		badgeMetric.value = availableMetrics.value[0]
+	}
 	onConfigChange()
 }
 
