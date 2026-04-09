@@ -1,4 +1,4 @@
-# <a href="https://modfolio.creeperkatze.de"><img src=".github/assets/logo.png" alt="Logo" width="400"></a>
+# <a href="https://modfolio.creeperkatze.dev"><img src=".github/assets/logo.png" alt="Logo" width="400"></a>
 
 Generate fast, beautiful and consistent embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content.
 
