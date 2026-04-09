@@ -13,7 +13,7 @@ Generate fast, beautiful and consistent embeddable cards and badges for Modrinth
 
 ## 🚀 Quick Start
 
-Use the **[Website](https://modfolio.creeperkatze.de)** to visually configure and preview your embeds.
+Use the **[Website](https://modfolio.creeperkatze.dev)** to visually configure and preview your embeds.
 The api docs can be found at **[here](https://modfolio.creeperkatze.dev/docs)**.
 
 Examples:
