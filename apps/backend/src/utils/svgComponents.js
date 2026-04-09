@@ -534,7 +534,7 @@ export function generateAttribution(height, colors, animations, animationDelay)
     return `
   <!-- Bottom right attribution -->
   <text x="435" y="${height - 5}" font-family="Inter, sans-serif" font-size="10" fill="${colors.textColor}" text-anchor="end"${animations ? ` class="fade-in-delayed" style="animation-delay: ${animationDelay}s"` : ""}>
-    modfolio.creeperkatze.de
+    modfolio.creeperkatze.dev
   </text>`;
 }
 

@@ -19,7 +19,7 @@
   },
   "servers": [
     {
-      "url": "https://modfolio.creeperkatze.de",
+      "url": "https://modfolio.creeperkatze.dev",
       "description": "Production server"
     }
   ],
