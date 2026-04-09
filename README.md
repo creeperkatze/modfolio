@@ -9,6 +9,8 @@ Generate fast, beautiful and consistent embeddable cards and badges for Modrinth
 ![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modfolio?style=flat&labelColor=0d143c)
 [![Crowdin](https://badges.crowdin.net/modfolio/localized.svg)](https://crowdin.com/project/modfolio)
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F11WYJU3)
+
 ## 🚀 Quick Start
 
 Use the **[Website](https://modfolio.creeperkatze.de)** to visually configure and preview your embeds.
