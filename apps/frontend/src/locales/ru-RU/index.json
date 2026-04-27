@@ -1,1 +1,176 @@
-{}
+{
+  "action.copied": {
+    "message": "Скопировано!"
+  },
+  "action.copyHtml": {
+    "message": "Скопировать HTML"
+  },
+  "action.copyMarkdown": {
+    "message": "Скопировать Markdown"
+  },
+  "action.copyUrl": {
+    "message": "Скопировать URL"
+  },
+  "action.reset": {
+    "message": "Сброс"
+  },
+  "app.subtitle": {
+    "message": "Создавай быстрые, красивые и унифицированные встраиваемые карточки и значки для контента Modrinth, CurseForge, Hangar и Spigot."
+  },
+  "error.apiDown": {
+    "message": "API {platform} в настоящее время недоступен."
+  },
+  "field.projectType": {
+    "message": "Тип проекта"
+  },
+  "field.type": {
+    "message": "Тип"
+  },
+  "field.url": {
+    "message": "URL"
+  },
+  "footer.helpTranslate": {
+    "message": "Помоги с переводом"
+  },
+  "footer.madeBy": {
+    "message": "Сделано с ♥ ими"
+  },
+  "footer.notAffiliated": {
+    "message": "Не связаны с Modrinth, CurseForge, Hangar или Spigot"
+  },
+  "footer.starOnGithub": {
+    "message": "★ На Github"
+  },
+  "footer.viewApiDocs": {
+    "message": "Документация по API"
+  },
+  "footer.viewSource": {
+    "message": "Источник"
+  },
+  "metric.downloads": {
+    "message": "Скачиваний"
+  },
+  "metric.followers": {
+    "message": "Подписчики"
+  },
+  "metric.likes": {
+    "message": "Лайки"
+  },
+  "metric.players": {
+    "message": "Игроков в сети"
+  },
+  "metric.projects": {
+    "message": "Проекты"
+  },
+  "metric.rating": {
+    "message": "Рейтинг"
+  },
+  "metric.stars": {
+    "message": "Звёзды"
+  },
+  "metric.versions": {
+    "message": "Версии"
+  },
+  "metric.views": {
+    "message": "Просмотры"
+  },
+  "option.animations": {
+    "message": "Анимации"
+  },
+  "option.bgColor": {
+    "message": "Цвет фона"
+  },
+  "option.showVersions": {
+    "message": "Показать версии"
+  },
+  "preview.imageAlt": {
+    "message": "Предпросмотр"
+  },
+  "projectType.all": {
+    "message": "Все типы"
+  },
+  "projectType.bukkitPlugin": {
+    "message": "Плагины Bukkit"
+  },
+  "projectType.datapack": {
+    "message": "Наборы данных (датапаки)"
+  },
+  "projectType.mod": {
+    "message": "Моды"
+  },
+  "projectType.modpack": {
+    "message": "Сборки модов"
+  },
+  "projectType.plugin": {
+    "message": "Плагины"
+  },
+  "projectType.resourcepack": {
+    "message": "Наборы ресурсов (ресурспаки)"
+  },
+  "projectType.shader": {
+    "message": "Шейдеры"
+  },
+  "projectType.texturePack": {
+    "message": "Пакеты текстур (текстурпаки)"
+  },
+  "section.configuration": {
+    "message": "Конфигурация"
+  },
+  "section.customization": {
+    "message": "Кастомизация"
+  },
+  "section.html": {
+    "message": "HTML"
+  },
+  "section.preview": {
+    "message": "Предпросмотр"
+  },
+  "section.url": {
+    "message": "URL"
+  },
+  "target.author": {
+    "message": "Автор"
+  },
+  "target.collection": {
+    "message": "Коллекция"
+  },
+  "target.organization": {
+    "message": "Организация"
+  },
+  "target.project": {
+    "message": "Проект"
+  },
+  "target.resource": {
+    "message": "Ресурс"
+  },
+  "target.server": {
+    "message": "Сервер"
+  },
+  "target.user": {
+    "message": "Пользователь"
+  },
+  "type.card": {
+    "message": "Карточка"
+  },
+  "valueLabel.author": {
+    "message": "ID автора"
+  },
+  "valueLabel.collection": {
+    "message": "ID коллекции"
+  },
+  "valueLabel.project.curseforge": {
+    "message": "ID проекта"
+  },
+  "valueLabel.project.spigot": {
+    "message": "ID проекта"
+  },
+  "valueLabel.resource": {
+    "message": "ID ресурса"
+  },
+  "valueLabel.user.curseforge": {
+    "message": "ID пользователя"
+  },
+  "warning.apiSlow": {
+    "message": "API {platform} работает медленно. Загрузка элемента может занять некоторое время."
+  }
+}
