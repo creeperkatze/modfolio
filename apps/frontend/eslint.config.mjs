@@ -5,6 +5,13 @@ import pluginVue from 'eslint-plugin-vue'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
+	{
+		languageOptions: {
+			parserOptions: {
+				tsconfigRootDir: import.meta.dirname,
+			},
+		},
+	},
 	eslint.configs.recommended,
 	...tseslint.configs.recommended,
 	...pluginVue.configs['flat/recommended'],
@@ -14,7 +21,6 @@ export default tseslint.config(
 		languageOptions: {
 			parserOptions: {
 				parser: tseslint.parser,
-				tsconfigRootDir: import.meta.dirname,
 			},
 			globals: {
 				window: 'readonly',

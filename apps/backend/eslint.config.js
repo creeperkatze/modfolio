@@ -4,6 +4,13 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
+	{
+		languageOptions: {
+			parserOptions: {
+				tsconfigRootDir: import.meta.dirname,
+			},
+		},
+	},
 	eslint.configs.recommended,
 	...tseslint.configs.recommended,
 	prettierPlugin,
@@ -12,9 +19,6 @@ export default tseslint.config(
 		languageOptions: {
 			ecmaVersion: 'latest',
 			sourceType: 'module',
-			parserOptions: {
-				tsconfigRootDir: import.meta.dirname,
-			},
 			globals: {
 				console: 'readonly',
 				process: 'readonly',
