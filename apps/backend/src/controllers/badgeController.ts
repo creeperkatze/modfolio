@@ -139,13 +139,17 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
             if (!data) {
                 const errorMessage = getErrorMessage(entityConfig.platformName, entityConfig.entityName);
 
+                const message = `Could not show ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge`;
                 logger.warn({
-                    platform: entityConfig.platformName,
-                    entity: entityConfig.entityName,
-                    badge: badgeType,
-                    identifier,
-                    errorMessage
-                }, "Error fetching badge data");
+                    target: {
+                        platform: entityConfig.platformName,
+                        entity: entityConfig.entityName,
+                        identifier,
+                        type: "badge",
+                        badge: badgeType
+                    },
+                    error: { message: errorMessage }
+                }, message);
 
                 const notFoundSvg = generateBadge(badgeConfig.label, "Not found", entityConfig.platformName, defaultColor, null, "#f38ba8", showIcon, showBorder);
 
@@ -161,11 +165,25 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
                 res.setHeader("X-Error-Status", "404");
                 return req.isImageCrawler ? res.status(200).send(notFoundSvg) : res.status(404).send(notFoundSvg);
             }
-
             apiCache.set(apiCacheKey, data);
         }
 
         // Always regenerate the badge from cached data
+        const message = `Showing ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge`;
+        const cacheAgeMs = fromCache ? Date.now() - cached.cachedAt : null;
+        logger.info({
+            target: {
+                platform: entityConfig.platformName,
+                entity: entityConfig.entityName,
+                identifier,
+                type: "badge",
+                badge: badgeType
+            },
+            cache: fromCache
+                ? { hit: true, cachedAt: cached.cachedAt, ageMs: cacheAgeMs, ageSeconds: Math.round(cacheAgeMs / 1000) }
+                : { hit: false },
+            timing: fromCache ? undefined : { apiMs: data.timings?.api }
+        }, message);
         const value = badgeConfig.getValue(data.stats);
         const svg = generateBadge(badgeConfig.label, value, platform, color, backgroundColor, null, showIcon, showBorder);
 
@@ -193,13 +211,17 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
     } catch (err) {
         const identifier = req.params.username || req.params.slug || req.params.id || req.params.projectId;
         const entityConfig = ENTITY_CONFIG[entityType];
+        const message = `Could not show ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge`;
         logger.warn({
-            err,
-            platform: entityConfig.platformName,
-            entity: entityConfig.entityName,
-            badge: badgeType,
-            identifier
-        }, "Error rendering badge");
+            target: {
+                platform: entityConfig.platformName,
+                entity: entityConfig.entityName,
+                identifier,
+                type: "badge",
+                badge: badgeType
+            },
+            error: { err }
+        }, message);
         next(err);
     }
 };

@@ -153,12 +153,16 @@ const handleCardRequest = async (req, res, next, cardType) => {
             if (!data) {
                 const errorMessage = getErrorMessage(config.platformId, config.entityName);
 
+                const message = `Could not show ${config.platformId} ${config.entityName} card`;
                 logger.warn({
-                    platform: config.platformId,
-                    entity: config.entityName,
-                    identifier,
-                    errorMessage
-                }, "Error fetching card data");
+                    target: {
+                        platform: config.platformId,
+                        entity: config.entityName,
+                        identifier,
+                        type: "card"
+                    },
+                    error: { message: errorMessage }
+                }, message);
 
                 // Generate error card with platform-specific branding
                 const errorSvg = generateErrorCard(
@@ -181,12 +185,25 @@ const handleCardRequest = async (req, res, next, cardType) => {
                 res.setHeader("X-Error-Status", "404");
                 return req.isImageCrawler ? res.status(200).send(errorSvg) : res.status(404).send(errorSvg);
             }
-
             apiCache.set(apiCacheKey, data);
         }
 
         // Always regenerate the output from cached data
         options.fromCache = fromCache;
+        const message = `Showing ${config.platformId} ${config.entityName} card`;
+        const cacheAgeMs = fromCache ? Date.now() - cached.cachedAt : null;
+        logger.info({
+            target: {
+                platform: config.platformId,
+                entity: config.entityName,
+                identifier,
+                type: "card"
+            },
+            cache: fromCache
+                ? { hit: true, cachedAt: cached.cachedAt, ageMs: cacheAgeMs, ageSeconds: Math.round(cacheAgeMs / 1000) }
+                : { hit: false },
+            timing: fromCache ? undefined : { apiMs: data.timings?.api }
+        }, message);
 
         // Use unified card generator for all platforms
         const svg = generateCard(data, config.platformId, data.entityType || config.entityName, options);
@@ -214,12 +231,16 @@ const handleCardRequest = async (req, res, next, cardType) => {
     } catch (err) {
         const config = CARD_CONFIGS[cardType];
         const identifier = req.params[config.paramKey];
+        const message = `Could not show ${config.platformId} ${config.entityName} card`;
         logger.warn({
-            err,
-            platform: config.platformId,
-            entity: config.entityName,
-            identifier
-        }, "Error rendering card");
+            target: {
+                platform: config.platformId,
+                entity: config.entityName,
+                identifier,
+                type: "card"
+            },
+            error: { err }
+        }, message);
         next(err);
     }
 };

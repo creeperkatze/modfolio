@@ -17,6 +17,12 @@ export const getHangarMeta = async (req, res, next) => {
         const cachedResult = cached?.value;
 
         if (cachedResult) {
+            const message = `Showing ${PLATFORM.HANGAR} ${entityType} meta`;
+            const cacheAgeMs = Date.now() - cached.cachedAt;
+            logger.info({
+                target: { platform: PLATFORM.HANGAR, entity: entityType, identifier: slug, surface: "meta" },
+                cache: { hit: true, cachedAt: cached.cachedAt, ageMs: cacheAgeMs, ageSeconds: Math.round(cacheAgeMs / 1000) }
+            }, message);
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             return res.json(cachedResult);
         }
@@ -56,16 +62,21 @@ export const getHangarMeta = async (req, res, next) => {
         }
 
         apiCache.set(cacheKey, result);
+        const message = `Showing ${PLATFORM.HANGAR} ${entityType} meta`;
+        logger.info({
+            target: { platform: PLATFORM.HANGAR, entity: entityType, identifier: slug, surface: "meta" },
+            cache: { hit: false }
+        }, message);
 
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);
     } catch (err) {
+        const entity = req.query.type === "user" ? "user" : "project";
+        const message = `Could not show ${PLATFORM.HANGAR} ${entity} meta`;
         logger.warn({
-            err,
-            platform: PLATFORM.HANGAR,
-            slug: req.params.slug,
-            entity: req.query.type === "user" ? "user" : "project"
-        }, "Error fetching meta");
+            target: { platform: PLATFORM.HANGAR, entity, identifier: req.params.slug, surface: "meta" },
+            error: { err }
+        }, message);
         next(err);
     }
 };

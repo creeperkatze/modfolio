@@ -19,6 +19,12 @@ export const getModrinthMeta = async (req, res, next) => {
         const cachedResult = cached?.value;
 
         if (cachedResult) {
+            const message = `Showing ${PLATFORM.MODRINTH} ${type} meta`;
+            const cacheAgeMs = Date.now() - cached.cachedAt;
+            logger.info({
+                target: { platform: PLATFORM.MODRINTH, entity: type, identifier: id, surface: "meta" },
+                cache: { hit: true, cachedAt: cached.cachedAt, ageMs: cacheAgeMs, ageSeconds: Math.round(cacheAgeMs / 1000) }
+            }, message);
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             return res.json(cachedResult);
         }
@@ -65,16 +71,20 @@ export const getModrinthMeta = async (req, res, next) => {
 
         const result = { name, url };
         apiCache.set(cacheKey, result);
+        const message = `Showing ${PLATFORM.MODRINTH} ${type} meta`;
+        logger.info({
+            target: { platform: PLATFORM.MODRINTH, entity: type, identifier: id, surface: "meta" },
+            cache: { hit: false }
+        }, message);
 
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);
     } catch (err) {
+        const message = `Could not show ${PLATFORM.MODRINTH} ${req.params.type} meta`;
         logger.warn({
-            err,
-            platform: PLATFORM.MODRINTH,
-            entity: req.params.type,
-            identifier: req.params.id
-        }, "Error fetching meta");
+            target: { platform: PLATFORM.MODRINTH, entity: req.params.type, identifier: req.params.id, surface: "meta" },
+            error: { err }
+        }, message);
         next(err);
     }
 };

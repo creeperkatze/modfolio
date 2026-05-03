@@ -41,11 +41,22 @@ export const getCfUserLookup = async (req, res) => {
         const cached = apiCache.getWithMeta(cacheKey);
 
         if (cached?.value) {
+            const message = `Showing ${PLATFORM.CURSEFORGE} user lookup`;
+            const cacheAgeMs = Date.now() - cached.cachedAt;
+            logger.info({
+                target: { platform: PLATFORM.CURSEFORGE, entity: "user", identifier: username, surface: "lookup" },
+                cache: { hit: true, cachedAt: cached.cachedAt, ageMs: cacheAgeMs, ageSeconds: Math.round(cacheAgeMs / 1000) }
+            }, message);
             return res.json({ id: cached.value });
         }
 
         const userId = await curseforgeClient.getUserIdFromUsername(username);
         apiCache.set(cacheKey, userId);
+        const message = `Showing ${PLATFORM.CURSEFORGE} user lookup`;
+        logger.info({
+            target: { platform: PLATFORM.CURSEFORGE, entity: "user", identifier: username, surface: "lookup" },
+            cache: { hit: false }
+        }, message);
 
         // Cache reverse mapping (ID -> username) for profile URL generation
         const reverseCacheKey = curseforgeKeys.userIdLookup(userId);
@@ -53,11 +64,11 @@ export const getCfUserLookup = async (req, res) => {
 
         res.json({ id: userId });
     } catch (err) {
+        const message = `Could not show ${PLATFORM.CURSEFORGE} user lookup`;
         logger.warn({
-            err,
-            platform: PLATFORM.CURSEFORGE,
-            username: req.params.username
-        }, "Error looking up CurseForge user");
+            target: { platform: PLATFORM.CURSEFORGE, entity: "user", identifier: req.params.username, surface: "lookup" },
+            error: { err }
+        }, message);
         res.status(404).json({ error: "User not found", message: err.message });
     }
 };
@@ -74,19 +85,30 @@ export const getCfSlugLookup = async (req, res) => {
         const cached = apiCache.getWithMeta(cacheKey);
 
         if (cached?.value) {
+            const message = `Showing ${PLATFORM.CURSEFORGE} project lookup`;
+            const cacheAgeMs = Date.now() - cached.cachedAt;
+            logger.info({
+                target: { platform: PLATFORM.CURSEFORGE, entity: "project", identifier: slug, surface: "lookup" },
+                cache: { hit: true, cachedAt: cached.cachedAt, ageMs: cacheAgeMs, ageSeconds: Math.round(cacheAgeMs / 1000) }
+            }, message);
             return res.json({ id: cached.value });
         }
 
         const modId = await curseforgeClient.searchModBySlug(slug);
         apiCache.set(cacheKey, modId);
+        const message = `Showing ${PLATFORM.CURSEFORGE} project lookup`;
+        logger.info({
+            target: { platform: PLATFORM.CURSEFORGE, entity: "project", identifier: slug, surface: "lookup" },
+            cache: { hit: false }
+        }, message);
 
         res.json({ id: modId });
     } catch (err) {
+        const message = `Could not show ${PLATFORM.CURSEFORGE} project lookup`;
         logger.warn({
-            err,
-            platform: PLATFORM.CURSEFORGE,
-            slug: req.params.slug
-        }, "Error looking up CurseForge slug");
+            target: { platform: PLATFORM.CURSEFORGE, entity: "project", identifier: req.params.slug, surface: "lookup" },
+            error: { err }
+        }, message);
         res.status(404).json({ error: "Project not found", message: err.message });
     }
 };
@@ -105,6 +127,12 @@ export const getCurseforgeMeta = async (req, res, next) => {
         const cachedResult = cached?.value;
 
         if (cachedResult) {
+            const message = `Showing ${PLATFORM.CURSEFORGE} ${type} meta`;
+            const cacheAgeMs = Date.now() - cached.cachedAt;
+            logger.info({
+                target: { platform: PLATFORM.CURSEFORGE, entity: type, identifier: id, surface: "meta" },
+                cache: { hit: true, cachedAt: cached.cachedAt, ageMs: cacheAgeMs, ageSeconds: Math.round(cacheAgeMs / 1000) }
+            }, message);
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             return res.json(cachedResult);
         }
@@ -143,16 +171,20 @@ export const getCurseforgeMeta = async (req, res, next) => {
 
         const result = { name, url };
         apiCache.set(cacheKey, result);
+        const message = `Showing ${PLATFORM.CURSEFORGE} ${type} meta`;
+        logger.info({
+            target: { platform: PLATFORM.CURSEFORGE, entity: type, identifier: id, surface: "meta" },
+            cache: { hit: false }
+        }, message);
 
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);
     } catch (err) {
+        const message = `Could not show ${PLATFORM.CURSEFORGE} ${req.params.type} meta`;
         logger.warn({
-            err,
-            platform: PLATFORM.CURSEFORGE,
-            entity: req.params.type,
-            identifier: req.params.id
-        }, "Error fetching meta");
+            target: { platform: PLATFORM.CURSEFORGE, entity: req.params.type, identifier: req.params.id, surface: "meta" },
+            error: { err }
+        }, message);
         next(err);
     }
 };
