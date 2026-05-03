@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { pLimit, requestDeduplicator } from "../../utils/asyncUtils.js";
 
 describe("pLimit", () => {

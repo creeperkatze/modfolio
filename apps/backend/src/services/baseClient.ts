@@ -1,6 +1,12 @@
 import packageJson from "../../package.json" with { type: "json" };
 const VERSION = packageJson.version;
 
+type ClientConfig = {
+    baseUrl?: string;
+    apiKey?: string;
+    userAgent?: string;
+};
+
 function getDefaultUserAgent() {
     const envUserAgent = process.env.USER_AGENT;
     if (envUserAgent) {
@@ -11,7 +17,12 @@ function getDefaultUserAgent() {
 }
 
 export class BasePlatformClient {
-    constructor(platformName, config = {}) {
+    platformName: string;
+    baseUrl?: string;
+    apiKey?: string;
+    userAgent: string;
+
+    constructor(platformName: string, config: ClientConfig = {}) {
         this.platformName = platformName;
         this.baseUrl = config.baseUrl;
         this.apiKey = config.apiKey;
@@ -28,7 +39,7 @@ export class BasePlatformClient {
         };
     }
 
-    async fetch(endpoint, options = {}) {
+    async fetch(endpoint: string, options: RequestInit = {}): Promise<any> {
         // Handle full URLs vs relative endpoints
         const url = endpoint.startsWith("http") ? endpoint : `${this.baseUrl}${endpoint}`;
 

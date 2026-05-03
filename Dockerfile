@@ -16,6 +16,7 @@ COPY . .
 
 ENV CI=true
 RUN pnpm --filter ./apps/frontend build
+RUN pnpm --filter ./apps/backend build
 
 RUN chown -R node:node /app
 

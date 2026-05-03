@@ -18,6 +18,8 @@ const isServerProjectType = (type) => type === "minecraft_java_server" || type =
 
 export class ModrinthClient extends BasePlatformClient
 {
+    v3BaseUrl?: string;
+
     constructor()
     {
         super("Modrinth", {
@@ -140,7 +142,7 @@ export class ModrinthClient extends BasePlatformClient
         }
 
         const latestVersions = [...versions]
-            .sort((a, b) => new Date(b.date_published) - new Date(a.date_published))
+            .sort((a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime())
             .slice(0, CARD_LIMITS.MAX_COUNT);
 
         let stats;

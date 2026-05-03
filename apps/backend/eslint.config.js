@@ -1,5 +1,9 @@
+import tseslint from "typescript-eslint";
+
 export default [
+    ...tseslint.configs.recommended,
     {
+        files: ["src/**/*.ts"],
         languageOptions: {
             ecmaVersion: "latest",
             sourceType: "module",
@@ -21,8 +25,10 @@ export default [
             }
         },
         rules: {
-            "no-unused-vars": "warn",
-            "no-undef": "error",
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-unused-vars": "warn",
+            "no-unused-vars": "off",
+            "no-undef": "off",
             "no-console": "off",
             "semi": ["error", "always"],
             "quotes": ["error", "double", { avoidEscape: true }],

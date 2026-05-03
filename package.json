@@ -1,22 +1,23 @@
 {
-	"name": "modfolio",
-	"private": true,
-	"type": "module",
-	"packageManager": "pnpm@10.27.0",
-	"author": "Creeperkatze",
-	"license": "AGPL-3.0-only",
-	"scripts": {
-		"dev": "concurrently -n backend,frontend -c blue,green \"pnpm --filter ./apps/backend dev\" \"pnpm --filter ./apps/frontend dev\"",
-		"frontend:dev": "pnpm --filter ./apps/frontend dev",
-		"frontend:build": "pnpm --filter ./apps/frontend build",
-		"frontend:intl:extract": "pnpm --filter ./apps/frontend intl:extract",
-		"backend:dev": "pnpm --filter ./apps/backend dev",
-		"backend:start": "pnpm --filter ./apps/backend start",
-		"test": "pnpm -r test",
-		"lint": "pnpm -r lint",
-		"lint:fix": "pnpm -r lint:fix"
-	},
-	"devDependencies": {
-		"concurrently": "^9.2.1"
-	}
+    "name": "modfolio",
+    "private": true,
+    "type": "module",
+    "packageManager": "pnpm@10.27.0",
+    "author": "Creeperkatze",
+    "license": "AGPL-3.0-only",
+    "scripts": {
+        "dev": "concurrently -n backend,frontend -c blue,green \"pnpm --filter ./apps/backend dev\" \"pnpm --filter ./apps/frontend dev\"",
+        "frontend:dev": "pnpm --filter ./apps/frontend dev",
+        "frontend:build": "pnpm --filter ./apps/frontend build",
+        "frontend:intl:extract": "pnpm --filter ./apps/frontend intl:extract",
+        "backend:dev": "pnpm --filter ./apps/backend dev",
+        "backend:build": "pnpm --filter ./apps/backend build",
+        "backend:start": "pnpm --filter ./apps/backend start",
+        "test": "pnpm -r test",
+        "lint": "pnpm -r lint",
+        "lint:fix": "pnpm -r lint:fix"
+    },
+    "devDependencies": {
+        "concurrently": "^9.2.1"
+    }
 }

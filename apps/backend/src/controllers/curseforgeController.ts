@@ -41,8 +41,6 @@ export const getCfUserLookup = async (req, res) => {
         const cached = apiCache.getWithMeta(cacheKey);
 
         if (cached?.value) {
-            const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
-            logger.info(`Curseforge user lookup for "${username}": ${cached.value} (cached ${minutesAgo}m ago)`);
             return res.json({ id: cached.value });
         }
 
@@ -52,8 +50,6 @@ export const getCfUserLookup = async (req, res) => {
         // Cache reverse mapping (ID -> username) for profile URL generation
         const reverseCacheKey = curseforgeKeys.userIdLookup(userId);
         apiCache.set(reverseCacheKey, username);
-
-        logger.info(`Curseforge user lookup for "${username}": ${userId}`);
 
         res.json({ id: userId });
     } catch (err) {
@@ -74,14 +70,11 @@ export const getCfSlugLookup = async (req, res) => {
         const cached = apiCache.getWithMeta(cacheKey);
 
         if (cached?.value) {
-            const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
-            logger.info(`Curseforge slug lookup for "${slug}": ${cached.value} (cached ${minutesAgo}m ago)`);
             return res.json({ id: cached.value });
         }
 
         const modId = await curseforgeClient.searchModBySlug(slug);
         apiCache.set(cacheKey, modId);
-        logger.info(`Curseforge slug lookup for "${slug}": ${modId}`);
 
         res.json({ id: modId });
     } catch (err) {
@@ -104,8 +97,6 @@ export const getCurseforgeMeta = async (req, res, next) => {
         const cachedResult = cached?.value;
 
         if (cachedResult) {
-            const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
-            logger.info(`Showing curseforge meta for ${type} "${id}" (cached ${minutesAgo}m ago)`);
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             return res.json(cachedResult);
         }
@@ -144,7 +135,6 @@ export const getCurseforgeMeta = async (req, res, next) => {
 
         const result = { name, url };
         apiCache.set(cacheKey, result);
-        logger.info(`Showing curseforge meta for ${type} "${id}"`);
 
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);

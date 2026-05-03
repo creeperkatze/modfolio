@@ -529,7 +529,7 @@ export function generateVersionList(versions, colors, relativeTime, headerText =
   ${versionsHtml}`;
 }
 
-export function generateAttribution(height, colors, animations, animationDelay)
+export function generateAttribution(height, colors, animations = true, animationDelay = 0)
 {
     return `
   <!-- Bottom right attribution -->
@@ -538,7 +538,7 @@ export function generateAttribution(height, colors, animations, animationDelay)
   </text>`;
 }
 
-export function generateInfo(height, colors, fromCache = false, animations, animationDelay)
+export function generateInfo(height, colors, fromCache = false, animations = true, animationDelay = 0)
 {
     const now = new Date();
     const dateTimeStr = now.toLocaleString("en-US", {

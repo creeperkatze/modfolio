@@ -26,7 +26,7 @@ export async function fetchImageAsBase64(url, convertToPng = false)
             // Use file-type library for bulletproof file type detection
             const detectedType = await fileTypeFromBuffer(buffer);
 
-            let finalBuffer = buffer;
+            let finalBuffer: Buffer<ArrayBufferLike> = buffer;
             let mimeType = detectedType?.mime || "image/png";
             let conversionTime = 0;
 

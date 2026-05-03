@@ -17,8 +17,6 @@ export const getHangarMeta = async (req, res, next) => {
         const cachedResult = cached?.value;
 
         if (cachedResult) {
-            const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
-            logger.info(`Showing hangar meta for ${entityType} "${slug}" (cached ${minutesAgo}m ago)`);
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             return res.json(cachedResult);
         }
@@ -58,7 +56,6 @@ export const getHangarMeta = async (req, res, next) => {
         }
 
         apiCache.set(cacheKey, result);
-        logger.info(`Showing hangar meta for ${entityType} "${slug}"`);
 
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);

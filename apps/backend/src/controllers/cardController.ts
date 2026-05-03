@@ -120,7 +120,7 @@ const handleCardRequest = async (req, res, next, cardType) => {
         const renderImage = req.isImageCrawler || format === "png";
 
         // Parse customization options
-        const options = {
+        const options: any = {
             showProjects: req.query.showProjects !== "false",
             showVersions: req.query.showVersions !== "false",
             maxProjects: Math.min(Math.max(parseInt(req.query.maxProjects) || CARD_LIMITS.DEFAULT_COUNT, 1), CARD_LIMITS.MAX_COUNT),
@@ -141,9 +141,9 @@ const handleCardRequest = async (req, res, next, cardType) => {
         const apiCacheKey = config.cacheKeyFn(identifier) + filterSuffix;
 
         // Check for cached API data
-        let cached = apiCache.getWithMeta(apiCacheKey);
+        const cached = apiCache.getWithMeta(apiCacheKey);
         let data = cached?.value;
-        let fromCache = !!data;
+        const fromCache = !!data;
 
         if (!data) {
             // Fetch from API with PNG images (works for both SVG and PNG output)
@@ -180,13 +180,6 @@ const handleCardRequest = async (req, res, next, cardType) => {
             apiCache.set(apiCacheKey, data);
         }
 
-        // Calculate cache age
-        let cacheAge = null;
-        if (fromCache && cached?.cachedAt) {
-            const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
-            cacheAge = `${minutesAgo}m ago`;
-        }
-
         // Always regenerate the output from cached data
         options.fromCache = fromCache;
 
@@ -195,17 +188,10 @@ const handleCardRequest = async (req, res, next, cardType) => {
 
         // Generate PNG for bots or when format=png is requested
         if (renderImage) {
-            const { buffer: pngBuffer, renderTime } = await generatePng(svg);
+            const { buffer: pngBuffer } = await generatePng(svg);
 
-            const apiTimeLog = fromCache ? `cached (${cacheAge})` : `${Math.round(data.timings.api)}ms`;
             const apiTimeHeader = fromCache ? "-1" : `${Math.round(data.timings.api)}ms`;
-            const conversionTime = fromCache ? "cached" : `${Math.round(data.timings.imageConversion)}ms`;
-            const pngTime = `${Math.round(renderTime)}ms`;
-            const crawlerType = req.crawlerType;
-            const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
-            const size = `${(Buffer.byteLength(pngBuffer) / 1024).toFixed(1)} KB`;
 
-            logger.info(`Showing ${config.platformId} ${config.entityName} card for "${identifier}" (api: ${apiTimeLog}, image conversion: ${conversionTime}, render: ${pngTime}${crawlerLog}, size: ${size})`);
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             res.setHeader("X-Cache", fromCache ? "HIT" : "MISS");
@@ -214,12 +200,7 @@ const handleCardRequest = async (req, res, next, cardType) => {
         }
 
         // Return SVG
-        const apiTimeLog = fromCache ? `cached (${cacheAge})` : `${Math.round(data.timings.api)}ms`;
         const apiTimeHeader = fromCache ? "-1" : `${Math.round(data.timings.api)}ms`;
-        const crawlerType = req.crawlerType;
-        const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
-        const size = `${(Buffer.byteLength(svg) / 1024).toFixed(1)} KB`;
-        logger.info(`Showing ${config.platformId} ${config.entityName} card for "${identifier}" (api: ${apiTimeLog}${crawlerLog}, size: ${size})`);
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.setHeader("X-Cache", fromCache ? "HIT" : "MISS");

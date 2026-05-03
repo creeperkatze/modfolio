@@ -1,6 +1,6 @@
 import path from "path";
 import { readdirSync } from "fs";
-import { Resvg } from "@resvg/resvg-js";
+import { Resvg, type ResvgRenderOptions } from "@resvg/resvg-js";
 import { performance } from "perf_hooks";
 
 // Load font files
@@ -10,11 +10,11 @@ const fontFiles = readdirSync(fontsDir)
     .filter(file => /\.(ttf|otf|woff2)$/i.test(file))
     .map(file => path.join(fontsDir, file));
 
-export async function generatePng(svgString)
+export async function generatePng(svgString: string)
 {
     const startTime = performance.now();
 
-    const options = {
+    const options: ResvgRenderOptions = {
         fitTo: {
             mode: "width",
             value: 800

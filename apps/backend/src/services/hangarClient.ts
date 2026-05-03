@@ -79,7 +79,7 @@ export class HangarClient extends BasePlatformClient
 
             // Sort by date (newest first)
             versions = allVersions
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                 .map(version => {
                     // Extract platform data from downloads keys (Paper, Velocity, Waterfall, etc.)
                     const platforms = Object.keys(version.downloads || {});
@@ -90,7 +90,7 @@ export class HangarClient extends BasePlatformClient
                     // Extract all unique Minecraft versions from platformDependencies
                     const gameVersions = new Set();
                     if (version.platformDependencies) {
-                        Object.values(version.platformDependencies).forEach(versionList => {
+                        Object.values(version.platformDependencies).forEach((versionList: any) => {
                             versionList.forEach(v => gameVersions.add(v));
                         });
                     }

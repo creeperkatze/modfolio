@@ -92,7 +92,7 @@ export class CurseforgeClient extends BasePlatformClient
 
             // Sort by date (newest first) and take max (card generator will slice to maxVersions)
             versions = allFiles
-                .sort((a, b) => new Date(b.fileDate) - new Date(a.fileDate))
+                .sort((a, b) => new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime())
                 .slice(0, CARD_LIMITS.MAX_COUNT)
                 .map(file => {
                     // Extract loaders from sortableGameVersions based on gameVersionTypeId

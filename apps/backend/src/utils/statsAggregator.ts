@@ -1,4 +1,4 @@
-export function aggregateProjectStats(projects, topCount = 5)
+export function aggregateProjectStats(projects: any[], topCount = 5)
 {
     const totalDownloads = projects.reduce((sum, project) => sum + (project.downloads || 0), 0);
     const totalFollowers = projects.reduce((sum, project) => sum + (project.followers || 0), 0);
@@ -26,7 +26,7 @@ export function aggregateProjectStats(projects, topCount = 5)
     };
 }
 
-export function aggregateProjectTypes(projects)
+export function aggregateProjectTypes(projects: any[])
 {
     return projects.reduce((acc, project) =>
     {
@@ -39,12 +39,12 @@ export function aggregateProjectTypes(projects)
             acc[type] = (acc[type] || 0) + 1;
         });
         return acc;
-    }, {});
+    }, {} as Record<string, number>);
 }
 
-export function aggregateGameVersions(projects, limit = 3)
+export function aggregateGameVersions(projects: any[], limit = 3)
 {
-    const gameVersions = {};
+    const gameVersions: Record<string, number> = {};
     projects.forEach(project =>
     {
         if (project.game_versions && Array.isArray(project.game_versions))
@@ -62,9 +62,9 @@ export function aggregateGameVersions(projects, limit = 3)
         .map(([version]) => version);
 }
 
-export function aggregateLoaders(projects)
+export function aggregateLoaders(projects: any[])
 {
-    const loaders = {};
+    const loaders: Record<string, number> = {};
     projects.forEach(project =>
     {
         if (project.loaders && Array.isArray(project.loaders))
@@ -78,9 +78,9 @@ export function aggregateLoaders(projects)
     return loaders;
 }
 
-export function aggregateCategories(projects, limit = 3)
+export function aggregateCategories(projects: any[], limit = 3)
 {
-    const categories = {};
+    const categories: Record<string, number> = {};
     projects.forEach(project =>
     {
         if (project.categories && Array.isArray(project.categories))
@@ -98,14 +98,14 @@ export function aggregateCategories(projects, limit = 3)
         .map(([category]) => category);
 }
 
-export function findRecentProject(projects)
+export function findRecentProject(projects: any[])
 {
     return projects
         .filter(p => p.published)
-        .sort((a, b) => new Date(b.published) - new Date(a.published))[0];
+        .sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime())[0];
 }
 
-export function normalizeV3ProjectFields(projects)
+export function normalizeV3ProjectFields(projects: any[])
 {
     return projects.map(project => ({
         ...project,
@@ -117,12 +117,12 @@ export function normalizeV3ProjectFields(projects)
 }
 
 // Combined aggregation - does all aggregations in a single pass for performance
-export function aggregateAllStats(projects, topCount = 5)
+export function aggregateAllStats(projects: any[], topCount = 5)
 {
-    const projectTypes = {};
-    const gameVersions = {};
-    const loaders = {};
-    const categories = {};
+    const projectTypes: Record<string, number> = {};
+    const gameVersions: Record<string, number> = {};
+    const loaders: Record<string, number> = {};
+    const categories: Record<string, number> = {};
     let totalDownloads = 0;
     let totalFollowers = 0;
     let mostPopular = projects[0] || null;

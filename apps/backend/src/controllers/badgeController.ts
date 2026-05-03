@@ -128,9 +128,9 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         const apiCacheKey = entityConfig.cacheKeyFn(identifier);
 
         // Check for cached stats data
-        let cached = apiCache.getWithMeta(apiCacheKey);
+        const cached = apiCache.getWithMeta(apiCacheKey);
         let data = cached?.value;
-        let fromCache = !!data;
+        const fromCache = !!data;
 
         if (!data) {
             // Fetch from API (badge stats methods always fetch full data now)
@@ -159,28 +159,16 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
             apiCache.set(apiCacheKey, data);
         }
 
-        // Calculate cache age
-        let cacheAge = null;
-        if (fromCache && cached?.cachedAt) {
-            const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
-            cacheAge = `${minutesAgo}m ago`;
-        }
-
         // Always regenerate the badge from cached data
         const value = badgeConfig.getValue(data.stats);
         const svg = generateBadge(badgeConfig.label, value, platform, color, backgroundColor, null, showIcon, showBorder);
 
         // Generate PNG for Discord bots or when format=png is requested
         if (renderImage) {
-            const { buffer: pngBuffer, renderTime } = await generatePng(svg);
+            const { buffer: pngBuffer } = await generatePng(svg);
 
-            const apiTimeLog = fromCache ? `cached (${cacheAge})` : `${Math.round(data.timings.api)}ms`;
             const apiTimeHeader = fromCache ? "-1" : `${Math.round(data.timings.api)}ms`;
-            const pngTime = `${Math.round(renderTime)}ms`;
-            const crawlerLog = req.crawlerType ? `, crawler: ${req.crawlerType}` : "";
-            const size = `${(Buffer.byteLength(pngBuffer) / 1024).toFixed(1)} KB`;
 
-            logger.info(`Showing ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge for "${identifier}" (api: ${apiTimeLog}, render: ${pngTime}${crawlerLog}, size: ${size})`);
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             res.setHeader("X-Cache", fromCache ? "HIT" : "MISS");
@@ -189,11 +177,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         }
 
         // Return SVG
-        const apiTimeLog = fromCache ? `cached (${cacheAge})` : `${Math.round(data.timings.api)}ms`;
         const apiTimeHeader = fromCache ? "-1" : `${Math.round(data.timings.api)}ms`;
-        const crawlerLog = req.crawlerType ? `, crawler: ${req.crawlerType}` : "";
-        const size = `${(Buffer.byteLength(svg) / 1024).toFixed(1)} KB`;
-        logger.info(`Showing ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge for "${identifier}" (api: ${apiTimeLog}${crawlerLog}, size: ${size})`);
 
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);

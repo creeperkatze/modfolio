@@ -1,5 +1,5 @@
 // Limit concurrent promise execution
-export async function pLimit(promises, limit)
+export async function pLimit(promises: Array<() => Promise<any>>, limit: number)
 {
     const results = [];
     const executing = [];
@@ -26,12 +26,14 @@ export async function pLimit(promises, limit)
 // Request deduplication - prevents multiple identical requests
 class RequestDeduplicator
 {
+    pending: Map<string, Promise<any>>;
+
     constructor()
     {
         this.pending = new Map();
     }
 
-    async dedupe(key, fetcher)
+    async dedupe(key: string, fetcher: () => Promise<any>)
     {
         // If already pending, return existing promise
         if (this.pending.has(key))

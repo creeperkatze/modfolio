@@ -1,10 +1,13 @@
 export class Cache {
+    cache: Map<string, { value: any; cachedAt: number; expiry: number; }>;
+    ttl: number;
+
     constructor(ttlMinutes = 10) {
         this.cache = new Map();
         this.ttl = ttlMinutes * 60 * 1000; // Convert to milliseconds
     }
 
-    get(key) {
+    get(key: string) {
         const item = this.cache.get(key);
 
         if (!item) {
@@ -21,7 +24,7 @@ export class Cache {
     }
 
     // Get cached value with metadata (cachedAt timestamp)
-    getWithMeta(key) {
+    getWithMeta(key: string) {
         const item = this.cache.get(key);
 
         if (!item) {
@@ -37,7 +40,7 @@ export class Cache {
         return { value: item.value, cachedAt: item.cachedAt };
     }
 
-    set(key, value) {
+    set(key: string, value: any) {
         this.cache.set(key, {
             value,
             cachedAt: Date.now(),

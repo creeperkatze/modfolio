@@ -22,8 +22,6 @@ export const getSpigotMeta = async (req, res, next) => {
         const cachedResult = cached?.value;
 
         if (cachedResult) {
-            const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
-            logger.info(`Showing spigot meta for ${entityType} "${id}" (cached ${minutesAgo}m ago)`);
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             return res.json(cachedResult);
         }
@@ -55,7 +53,6 @@ export const getSpigotMeta = async (req, res, next) => {
         }
 
         apiCache.set(cacheKey, result);
-        logger.info(`Showing spigot meta for ${entityType} "${id}"`);
 
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);
