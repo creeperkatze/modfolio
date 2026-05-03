@@ -1,8 +1,9 @@
-import express from "express";
-import { getSpigotMeta } from "../../controllers/spigotController.js";
+import express from 'express'
 
-const router = express.Router();
+import { getSpigotMeta } from '../../controllers/spigotController.js'
 
-router.get("/spigot/meta/:id", getSpigotMeta);
+const router = express.Router()
 
-export default router;
+router.get('/spigot/meta/:id', getSpigotMeta)
+
+export default router

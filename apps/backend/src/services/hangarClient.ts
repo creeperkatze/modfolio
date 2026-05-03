@@ -1,323 +1,320 @@
-import dotenv from "dotenv";
-import { performance } from "perf_hooks";
-import { fetchImageAsBase64, fetchImagesForProjects, fetchVersionDatesForProjects } from "../utils/imageFetcher.js";
-import { BasePlatformClient } from "./baseClient.js";
-import logger from "../utils/logger.js";
-import { CARD_LIMITS } from "../constants/platformConfig.js";
+import dotenv from 'dotenv'
+import { performance } from 'perf_hooks'
 
-dotenv.config({ quiet: true });
+import { CARD_LIMITS } from '../constants/platformConfig.js'
+import {
+	fetchImageAsBase64,
+	fetchImagesForProjects,
+	fetchVersionDatesForProjects,
+} from '../utils/imageFetcher.js'
+import logger from '../utils/logger.js'
+import { BasePlatformClient } from './baseClient.js'
 
-import packageJson from "../../package.json" with { type: "json" };
-const VERSION = packageJson.version;
+dotenv.config({ quiet: true })
 
-const HANGAR_API_URL = process.env.HANGAR_API_URL || "https://hangar.papermc.io";
-const HANGAR_API_KEY = process.env.HANGAR_API_KEY;
-const USER_AGENT = process.env.USER_AGENT;
+import packageJson from '../../package.json' with { type: 'json' }
+const VERSION = packageJson.version
 
-export class HangarClient extends BasePlatformClient
-{
-    constructor()
-    {
-        super("Hangar", {
-            baseUrl: HANGAR_API_URL,
-            apiKey: HANGAR_API_KEY,
-            userAgent: USER_AGENT ? USER_AGENT.replace("{version}", VERSION) : undefined
-        });
-    }
+const HANGAR_API_URL = process.env.HANGAR_API_URL || 'https://hangar.papermc.io'
+const HANGAR_API_KEY = process.env.HANGAR_API_KEY
+const USER_AGENT = process.env.USER_AGENT
 
-    getHeaders()
-    {
-        const headers = super.getHeaders();
-        if (this.apiKey) {
-            // Hangar uses Authorization header with Bearer token or API key
-            headers["Authorization"] = `Bearer ${this.apiKey}`;
-        }
-        return headers;
-    }
+export class HangarClient extends BasePlatformClient {
+	constructor() {
+		super('Hangar', {
+			baseUrl: HANGAR_API_URL,
+			apiKey: HANGAR_API_KEY,
+			userAgent: USER_AGENT ? USER_AGENT.replace('{version}', VERSION) : undefined,
+		})
+	}
 
-    async getProject(projectSlug)
-    {
-        // Hangar API endpoint for projects: /api/v1/projects/{slug}
-        return this.fetch(`/api/v1/projects/${encodeURIComponent(projectSlug)}`);
-    }
+	getHeaders() {
+		const headers = super.getHeaders()
+		if (this.apiKey) {
+			// Hangar uses Authorization header with Bearer token or API key
+			headers['Authorization'] = `Bearer ${this.apiKey}`
+		}
+		return headers
+	}
 
-    async getProjectVersions(projectSlug, limit = 10)
-    {
-        // Hangar API endpoint for versions: /api/v1/projects/{slug}/versions
-        return this.fetch(`/api/v1/projects/${encodeURIComponent(projectSlug)}/versions?limit=${limit}`);
-    }
+	async getProject(projectSlug) {
+		// Hangar API endpoint for projects: /api/v1/projects/{slug}
+		return this.fetch(`/api/v1/projects/${encodeURIComponent(projectSlug)}`)
+	}
 
-    async getProjectStats(projectSlug, convertToPng = false)
-    {
-        const apiStart = performance.now();
+	async getProjectVersions(projectSlug, limit = 10) {
+		// Hangar API endpoint for versions: /api/v1/projects/{slug}/versions
+		return this.fetch(`/api/v1/projects/${encodeURIComponent(projectSlug)}/versions?limit=${limit}`)
+	}
 
-        const projectResponse = await this.getProject(projectSlug);
-        if (!projectResponse) {
-            return null; // Return null instead of throwing to avoid stack trace
-        }
-        const project = projectResponse;
+	async getProjectStats(projectSlug, convertToPng = false) {
+		const apiStart = performance.now()
 
-        let imageConversionTime = 0;
+		const projectResponse = await this.getProject(projectSlug)
+		if (!projectResponse) {
+			return null // Return null instead of throwing to avoid stack trace
+		}
+		const project = projectResponse
 
-        // Fetch project icon if available
-        // Check multiple possible icon fields
-        const iconUrl = project?.iconUrl || project?.icon || project?.avatarUrl;
-        if (iconUrl) {
-            const result = await fetchImageAsBase64(iconUrl, convertToPng);
-            project.icon_url_base64 = result?.data;
-            if (result?.conversionTime) imageConversionTime += result.conversionTime;
-        }
+		let imageConversionTime = 0
 
-        // Fetch versions for the project
-        let versions = [];
-        let totalVersionCount = 0;
-        try {
-            // Always fetch max for caching (card generator slices to maxVersions)
-            const versionsResponse = await this.getProjectVersions(projectSlug, CARD_LIMITS.MAX_COUNT);
-            const allVersions = versionsResponse?.result || [];
-            totalVersionCount = versionsResponse?.pagination?.count ?? allVersions.length;
+		// Fetch project icon if available
+		// Check multiple possible icon fields
+		const iconUrl = project?.iconUrl || project?.icon || project?.avatarUrl
+		if (iconUrl) {
+			const result = await fetchImageAsBase64(iconUrl, convertToPng)
+			project.icon_url_base64 = result?.data
+			if (result?.conversionTime) imageConversionTime += result.conversionTime
+		}
 
-            // Sort by date (newest first)
-            versions = allVersions
-                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                .map(version => {
-                    // Extract platform data from downloads keys (Paper, Velocity, Waterfall, etc.)
-                    const platforms = Object.keys(version.downloads || {});
+		// Fetch versions for the project
+		let versions = []
+		let totalVersionCount = 0
+		try {
+			// Always fetch max for caching (card generator slices to maxVersions)
+			const versionsResponse = await this.getProjectVersions(projectSlug, CARD_LIMITS.MAX_COUNT)
+			const allVersions = versionsResponse?.result || []
+			totalVersionCount = versionsResponse?.pagination?.count ?? allVersions.length
 
-                    // Get version download count from stats.totalDownloads
-                    const downloads = version?.stats?.totalDownloads || 0;
+			// Sort by date (newest first)
+			versions = allVersions
+				.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+				.map((version) => {
+					// Extract platform data from downloads keys (Paper, Velocity, Waterfall, etc.)
+					const platforms = Object.keys(version.downloads || {})
 
-                    // Extract all unique Minecraft versions from platformDependencies
-                    const gameVersions = new Set();
-                    if (version.platformDependencies) {
-                        Object.values(version.platformDependencies).forEach((versionList: any) => {
-                            versionList.forEach(v => gameVersions.add(v));
-                        });
-                    }
+					// Get version download count from stats.totalDownloads
+					const downloads = version?.stats?.totalDownloads || 0
 
-                    return {
-                        name: version.name,
-                        version: version.name,
-                        createdAt: version.createdAt,
-                        releasedAt: version.createdAt,
-                        description: version.description,
-                        downloads: downloads,
-                        platforms: platforms,
-                        gameVersions: Array.from(gameVersions),
-                        channel: version.channel?.name || "Release",
-                        externalUrl: version.externalUrl || null
-                    };
-                });
-        } catch {
-            // If versions fetch fails, continue with empty versions array
-            versions = [];
-        }
+					// Extract all unique Minecraft versions from platformDependencies
+					const gameVersions = new Set()
+					if (version.platformDependencies) {
+						Object.values(version.platformDependencies).forEach((versionList: any) => {
+							versionList.forEach((v) => gameVersions.add(v))
+						})
+					}
 
-        const apiTime = performance.now() - apiStart;
+					return {
+						name: version.name,
+						version: version.name,
+						createdAt: version.createdAt,
+						releasedAt: version.createdAt,
+						description: version.description,
+						downloads: downloads,
+						platforms: platforms,
+						gameVersions: Array.from(gameVersions),
+						channel: version.channel?.name || 'Release',
+						externalUrl: version.externalUrl || null,
+					}
+				})
+		} catch {
+			// If versions fetch fails, continue with empty versions array
+			versions = []
+		}
 
-        // Get stats from project
-        const stats = {
-            downloads: project?.stats?.downloads || project?.downloads || 0,
-            stars: project?.stats?.stars || 0,
-            versionCount: totalVersionCount
-        };
+		const apiTime = performance.now() - apiStart
 
-        return {
-            project,
-            versions,
-            stats,
-            timings: {
-                api: apiTime,
-                imageConversion: imageConversionTime
-            }
-        };
-    }
+		// Get stats from project
+		const stats = {
+			downloads: project?.stats?.downloads || project?.downloads || 0,
+			stars: project?.stats?.stars || 0,
+			versionCount: totalVersionCount,
+		}
 
-    async getProjectBadgeStats(projectSlug)
-    {
-        const apiStart = performance.now();
+		return {
+			project,
+			versions,
+			stats,
+			timings: {
+				api: apiTime,
+				imageConversion: imageConversionTime,
+			},
+		}
+	}
 
-        const projectResponse = await this.getProject(projectSlug);
-        if (!projectResponse) {
-            return null;
-        }
-        const project = projectResponse;
+	async getProjectBadgeStats(projectSlug) {
+		const apiStart = performance.now()
 
-        const stats = {
-            downloads: project?.stats?.downloads || project?.downloads || 0,
-            views: project?.stats?.views || project?.views || 0,
-            versionCount: 0
-        };
+		const projectResponse = await this.getProject(projectSlug)
+		if (!projectResponse) {
+			return null
+		}
+		const project = projectResponse
 
-        // Fetch versions
-        try {
-            const versionsResponse = await this.getProjectVersions(projectSlug);
-            stats.versionCount = versionsResponse?.pagination?.count ?? versionsResponse?.result?.length ?? 0;
-        } catch {
-            stats.versionCount = 0;
-        }
+		const stats = {
+			downloads: project?.stats?.downloads || project?.downloads || 0,
+			views: project?.stats?.views || project?.views || 0,
+			versionCount: 0,
+		}
 
-        const apiTime = performance.now() - apiStart;
-        return { stats, timings: { api: apiTime } };
-    }
+		// Fetch versions
+		try {
+			const versionsResponse = await this.getProjectVersions(projectSlug)
+			stats.versionCount =
+				versionsResponse?.pagination?.count ?? versionsResponse?.result?.length ?? 0
+		} catch {
+			stats.versionCount = 0
+		}
 
-    async getUser(username)
-    {
-        // Hangar API endpoint for users: /api/v1/users/{username}
-        return this.fetch(`/api/v1/users/${encodeURIComponent(username)}`);
-    }
+		const apiTime = performance.now() - apiStart
+		return { stats, timings: { api: apiTime } }
+	}
 
-    async getUserProjects(username, limit = 25)
-    {
-        // Hangar API endpoint for projects with owner filter: /api/v1/projects?owner={username}
-        return this.fetch(`/api/v1/projects?owner=${encodeURIComponent(username)}&limit=${limit}`);
-    }
+	async getUser(username) {
+		// Hangar API endpoint for users: /api/v1/users/{username}
+		return this.fetch(`/api/v1/users/${encodeURIComponent(username)}`)
+	}
 
-    async getUserStats(username, convertToPng = false)
-    {
-        const apiStart = performance.now();
+	async getUserProjects(username, limit = 25) {
+		// Hangar API endpoint for projects with owner filter: /api/v1/projects?owner={username}
+		return this.fetch(`/api/v1/projects?owner=${encodeURIComponent(username)}&limit=${limit}`)
+	}
 
-        const userResponse = await this.getUser(username);
-        if (!userResponse) {
-            return null; // Return null instead of throwing to avoid stack trace
-        }
-        const user = userResponse;
+	async getUserStats(username, convertToPng = false) {
+		const apiStart = performance.now()
 
-        let imageConversionTime = 0;
+		const userResponse = await this.getUser(username)
+		if (!userResponse) {
+			return null // Return null instead of throwing to avoid stack trace
+		}
+		const user = userResponse
 
-        // Fetch user avatar if available
-        const avatarUrl = user?.avatarUrl;
-        if (avatarUrl) {
-            const result = await fetchImageAsBase64(avatarUrl, convertToPng);
-            user.avatar_url_base64 = result?.data;
-            if (result?.conversionTime) imageConversionTime += result.conversionTime;
-        }
+		let imageConversionTime = 0
 
-        // Fetch user's projects
-        let projects = [];
-        let totalDownloads = 0;
-        let totalStars = 0;
-        let allVersionDates = [];
+		// Fetch user avatar if available
+		const avatarUrl = user?.avatarUrl
+		if (avatarUrl) {
+			const result = await fetchImageAsBase64(avatarUrl, convertToPng)
+			user.avatar_url_base64 = result?.data
+			if (result?.conversionTime) imageConversionTime += result.conversionTime
+		}
 
-        try {
-            const projectsResponse = await this.getUserProjects(username, 50); // Fetch more for sorting
-            const allProjects = projectsResponse?.result || [];
+		// Fetch user's projects
+		let projects = []
+		let totalDownloads = 0
+		let totalStars = 0
+		let allVersionDates = []
 
-            // Sort by downloads and take max (for caching, card generator slices to maxProjects)
-            projects = allProjects
-                .sort((a, b) => (b?.stats?.downloads || 0) - (a?.stats?.downloads || 0))
-                .slice(0, CARD_LIMITS.MAX_COUNT)
-                .map(project => ({
-                    slug: project.namespace?.slug,
-                    id: project.namespace?.slug, // For fetchVersionDatesForProjects
-                    name: project.name,
-                    description: project.description,
-                    downloads: project?.stats?.downloads || 0,
-                    views: project?.stats?.views || 0,
-                    stars: project?.stats?.stars || 0,
-                    category: project.category,
-                    createdAt: project.createdAt,
-                    lastUpdated: project.lastUpdated,
-                    // Normalize icon_url for fetchImagesForProjects utility
-                    // Hangar API returns avatarUrl at root level
-                    icon_url: project.avatarUrl || null
-                }));
+		try {
+			const projectsResponse = await this.getUserProjects(username, 50) // Fetch more for sorting
+			const allProjects = projectsResponse?.result || []
 
-            // Calculate total downloads across all user's projects
-            totalDownloads = allProjects.reduce((sum, p) => sum + (p?.stats?.downloads || 0), 0);
-            totalStars = allProjects.reduce((sum, p) => sum + (p?.stats?.stars || 0), 0);
+			// Sort by downloads and take max (for caching, card generator slices to maxProjects)
+			projects = allProjects
+				.sort((a, b) => (b?.stats?.downloads || 0) - (a?.stats?.downloads || 0))
+				.slice(0, CARD_LIMITS.MAX_COUNT)
+				.map((project) => ({
+					slug: project.namespace?.slug,
+					id: project.namespace?.slug, // For fetchVersionDatesForProjects
+					name: project.name,
+					description: project.description,
+					downloads: project?.stats?.downloads || 0,
+					views: project?.stats?.views || 0,
+					stars: project?.stats?.stars || 0,
+					category: project.category,
+					createdAt: project.createdAt,
+					lastUpdated: project.lastUpdated,
+					// Normalize icon_url for fetchImagesForProjects utility
+					// Hangar API returns avatarUrl at root level
+					icon_url: project.avatarUrl || null,
+				}))
 
-            // Use reusable utilities for image fetching and version dates
-            const projectsConversionTime = await fetchImagesForProjects(projects, convertToPng);
-            imageConversionTime += projectsConversionTime;
+			// Calculate total downloads across all user's projects
+			totalDownloads = allProjects.reduce((sum, p) => sum + (p?.stats?.downloads || 0), 0)
+			totalStars = allProjects.reduce((sum, p) => sum + (p?.stats?.stars || 0), 0)
 
-            // Custom version fetcher that transforms Hangar versions to match expected format
-            const getVersionsForSparkline = async (slug) => {
-                const versionsResponse = await this.getProjectVersions(slug, 10);
-                const versions = versionsResponse?.result || [];
-                // Transform Hangar versions to match Modrinth format (date_published)
-                return versions.map(v => ({
-                    date_published: v.createdAt
-                }));
-            };
+			// Use reusable utilities for image fetching and version dates
+			const projectsConversionTime = await fetchImagesForProjects(projects, convertToPng)
+			imageConversionTime += projectsConversionTime
 
-            try {
-                await fetchVersionDatesForProjects(projects, getVersionsForSparkline);
-                allVersionDates = projects.flatMap(p => p.versionDates || []);
-            } catch (err) {
-                logger.warn({
-                    err,
-                    platform: "hangar",
-                    entity: "user",
-                    username
-                }, "Error fetching version dates");
-                allVersionDates = [];
-            }
-        } catch {
-            // If projects fetch fails, continue with empty projects array
-            projects = [];
-        }
+			// Custom version fetcher that transforms Hangar versions to match expected format
+			const getVersionsForSparkline = async (slug) => {
+				const versionsResponse = await this.getProjectVersions(slug, 10)
+				const versions = versionsResponse?.result || []
+				// Transform Hangar versions to match Modrinth format (date_published)
+				return versions.map((v) => ({
+					date_published: v.createdAt,
+				}))
+			}
 
-        const apiTime = performance.now() - apiStart;
+			try {
+				await fetchVersionDatesForProjects(projects, getVersionsForSparkline)
+				allVersionDates = projects.flatMap((p) => p.versionDates || [])
+			} catch (err) {
+				logger.warn(
+					{
+						err,
+						platform: 'hangar',
+						entity: 'user',
+						username,
+					},
+					'Error fetching version dates',
+				)
+				allVersionDates = []
+			}
+		} catch {
+			// If projects fetch fails, continue with empty projects array
+			projects = []
+		}
 
-        const stats = {
-            totalDownloads,
-            totalStars,
-            projectCount: user?.projectCount || projects.length,
-            allVersionDates
-        };
+		const apiTime = performance.now() - apiStart
 
-        return {
-            user,
-            projects,
-            stats,
-            timings: {
-                api: apiTime,
-                imageConversion: imageConversionTime
-            }
-        };
-    }
+		const stats = {
+			totalDownloads,
+			totalStars,
+			projectCount: user?.projectCount || projects.length,
+			allVersionDates,
+		}
 
-    async getUserBadgeStats(username)
-    {
-        const apiStart = performance.now();
+		return {
+			user,
+			projects,
+			stats,
+			timings: {
+				api: apiTime,
+				imageConversion: imageConversionTime,
+			},
+		}
+	}
 
-        const userResponse = await this.getUser(username);
-        if (!userResponse) {
-            return null;
-        }
-        const user = userResponse;
+	async getUserBadgeStats(username) {
+		const apiStart = performance.now()
 
-        let totalDownloads = 0;
-        let totalStars = 0;
-        let projectCount = user?.projectCount || 0;
+		const userResponse = await this.getUser(username)
+		if (!userResponse) {
+			return null
+		}
+		const user = userResponse
 
-        // Fetch all user's projects for download count and stars
-        try {
-            const projectsResponse = await this.getUserProjects(username, 100);
-            const allProjects = projectsResponse?.result || [];
-            totalDownloads = allProjects.reduce((sum, p) => sum + (p?.stats?.downloads || 0), 0);
-            totalStars = allProjects.reduce((sum, p) => sum + (p?.stats?.stars || 0), 0);
-            projectCount = projectsResponse?.pagination?.count ?? allProjects.length;
-        } catch {
-            // Use projectCount from user data if fetch fails
-        }
+		let totalDownloads = 0
+		let totalStars = 0
+		let projectCount = user?.projectCount || 0
 
-        const apiTime = performance.now() - apiStart;
+		// Fetch all user's projects for download count and stars
+		try {
+			const projectsResponse = await this.getUserProjects(username, 100)
+			const allProjects = projectsResponse?.result || []
+			totalDownloads = allProjects.reduce((sum, p) => sum + (p?.stats?.downloads || 0), 0)
+			totalStars = allProjects.reduce((sum, p) => sum + (p?.stats?.stars || 0), 0)
+			projectCount = projectsResponse?.pagination?.count ?? allProjects.length
+		} catch {
+			// Use projectCount from user data if fetch fails
+		}
 
-        const stats = {
-            totalDownloads,
-            projectCount,
-            totalStars
-        };
+		const apiTime = performance.now() - apiStart
 
-        return { stats, timings: { api: apiTime } };
-    }
+		const stats = {
+			totalDownloads,
+			projectCount,
+			totalStars,
+		}
 
-    isConfigured()
-    {
-        return !!HANGAR_API_KEY;
-    }
+		return { stats, timings: { api: apiTime } }
+	}
+
+	isConfigured() {
+		return !!HANGAR_API_KEY
+	}
 }
 
-export default new HangarClient();
+export default new HangarClient()

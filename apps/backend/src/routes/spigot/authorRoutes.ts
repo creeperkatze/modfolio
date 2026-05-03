@@ -1,15 +1,16 @@
-import express from "express";
-import * as cardController from "../../controllers/cardController.js";
-import * as badgeController from "../../controllers/badgeController.js";
+import express from 'express'
 
-const router = express.Router();
+import * as badgeController from '../../controllers/badgeController.js'
+import * as cardController from '../../controllers/cardController.js'
+
+const router = express.Router()
 
 // Card routes
-router.get("/spigot/author/:id", cardController.getSpigotAuthor);
+router.get('/spigot/author/:id', cardController.getSpigotAuthor)
 
 // Badge routes
-router.get("/spigot/author/:id/downloads", badgeController.getSpigotAuthorDownloads);
-router.get("/spigot/author/:id/resources", badgeController.getSpigotAuthorResources);
-router.get("/spigot/author/:id/rating", badgeController.getSpigotAuthorRating);
+router.get('/spigot/author/:id/downloads', badgeController.getSpigotAuthorDownloads)
+router.get('/spigot/author/:id/resources', badgeController.getSpigotAuthorResources)
+router.get('/spigot/author/:id/rating', badgeController.getSpigotAuthorRating)
 
-export default router;
+export default router

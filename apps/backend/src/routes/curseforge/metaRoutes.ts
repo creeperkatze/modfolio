@@ -1,8 +1,9 @@
-import express from "express";
-import { getCurseforgeMeta } from "../../controllers/curseforgeController.js";
+import express from 'express'
 
-const router = express.Router();
+import { getCurseforgeMeta } from '../../controllers/curseforgeController.js'
 
-router.get("/curseforge/meta/:type/:id", getCurseforgeMeta);
+const router = express.Router()
 
-export default router;
+router.get('/curseforge/meta/:type/:id', getCurseforgeMeta)
+
+export default router

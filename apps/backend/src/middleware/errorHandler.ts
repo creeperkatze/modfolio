@@ -1,43 +1,55 @@
-import { generateBadge } from "../generators/badge.js";
-import { generateAttribution, generateInfo } from "../utils/svgComponents.js";
-import { generatePng } from "../utils/generateImage.js";
-import { ICONS } from "../constants/icons.js";
-import { PlatformApiError } from "../services/baseClient.js";
+import { ICONS } from '../constants/icons.js'
+import { generateBadge } from '../generators/badge.js'
+import { PlatformApiError } from '../services/baseClient.js'
+import { generatePng } from '../utils/generateImage.js'
+import { generateAttribution, generateInfo } from '../utils/svgComponents.js'
 
-export function generateErrorCard(message, detailText = "", isCurseforge = false, isHangar = false, isSpiget = false)
-{
-    const bgColor = "transparent";
-    const errorTextColor = "#f38ba8";
-    const detailTextColor = "#a6adc8";
-    const accentColor = isSpiget ? "#E8A838" : isCurseforge ? "#F16436" : isHangar ? "#3371ED" : "#1bd96a";
-    const borderColor = "#E4E2E2";
+export function generateErrorCard(
+	message,
+	detailText = '',
+	isCurseforge = false,
+	isHangar = false,
+	isSpiget = false,
+) {
+	const bgColor = 'transparent'
+	const errorTextColor = '#f38ba8'
+	const detailTextColor = '#a6adc8'
+	const accentColor = isSpiget
+		? '#E8A838'
+		: isCurseforge
+			? '#F16436'
+			: isHangar
+				? '#3371ED'
+				: '#1bd96a'
+	const borderColor = '#E4E2E2'
 
-    // Truncate detail text if too long
-    const maxDetailLength = 60;
-    const truncatedDetail = detailText.length > maxDetailLength
-        ? detailText.substring(0, maxDetailLength) + "..."
-        : detailText;
+	// Truncate detail text if too long
+	const maxDetailLength = 60
+	const truncatedDetail =
+		detailText.length > maxDetailLength
+			? detailText.substring(0, maxDetailLength) + '...'
+			: detailText
 
-    // Get the correct icon based on platform
-    let icon;
-    let viewBox;
-    if (isSpiget) {
-        icon = ICONS.spigotPlatform(accentColor);
-        viewBox = "0 0 100 100";
-    } else if (isCurseforge) {
-        icon = ICONS.curseforge(accentColor);
-        viewBox = "0 0 32 32";
-    } else if (isHangar) {
-        icon = ICONS.hangar(accentColor);
-        viewBox = "0 0 100 100";
-    } else {
-        icon = ICONS.modrinth(accentColor);
-        viewBox = "0 0 512 514";
-    }
+	// Get the correct icon based on platform
+	let icon
+	let viewBox
+	if (isSpiget) {
+		icon = ICONS.spigotPlatform(accentColor)
+		viewBox = '0 0 100 100'
+	} else if (isCurseforge) {
+		icon = ICONS.curseforge(accentColor)
+		viewBox = '0 0 32 32'
+	} else if (isHangar) {
+		icon = ICONS.hangar(accentColor)
+		viewBox = '0 0 100 100'
+	} else {
+		icon = ICONS.modrinth(accentColor)
+		viewBox = '0 0 512 514'
+	}
 
-    const logo = `<svg x="15" y="15" width="24" height="24" viewBox="${viewBox}">${icon}</svg>`;
+	const logo = `<svg x="15" y="15" width="24" height="24" viewBox="${viewBox}">${icon}</svg>`
 
-    return `
+	return `
 <svg width="450" height="120" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <clipPath id="error_rectangle">
@@ -51,161 +63,160 @@ export function generateErrorCard(message, detailText = "", isCurseforge = false
     ${logo}
 
     <!-- Error Text -->
-    <text x="225" y="${detailText ? "55" : "65"}" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="${errorTextColor}">
+    <text x="225" y="${detailText ? '55' : '65'}" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="${errorTextColor}">
       ${message}
     </text>
-    ${detailText ? `<text x="225" y="75" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="${detailTextColor}">
+    ${
+			detailText
+				? `<text x="225" y="75" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="${detailTextColor}">
       ${truncatedDetail}
-    </text>` : ""}
+    </text>`
+				: ''
+		}
 
     ${generateInfo(120, { textColor: detailTextColor })}
     ${generateAttribution(120, { textColor: detailTextColor })}
   </g>
-</svg>`.trim();
+</svg>`.trim()
 }
 
 // Map status codes to user-friendly messages
-function getStatusMessage(statusCode)
-{
-    const statusMessages = {
-        400: "Bad Request",
-        401: "Unauthorized",
-        403: "Forbidden",
-        404: "Not Found",
-        429: "Rate Limit Exceeded",
-        500: "Internal Server Error",
-        502: "API Unavailable",
-        503: "Service Unavailable",
-        504: "Gateway Timeout"
-    };
-    return statusMessages[statusCode] || `Error ${statusCode}`;
+function getStatusMessage(statusCode) {
+	const statusMessages = {
+		400: 'Bad Request',
+		401: 'Unauthorized',
+		403: 'Forbidden',
+		404: 'Not Found',
+		429: 'Rate Limit Exceeded',
+		500: 'Internal Server Error',
+		502: 'API Unavailable',
+		503: 'Service Unavailable',
+		504: 'Gateway Timeout',
+	}
+	return statusMessages[statusCode] || `Error ${statusCode}`
 }
 
-export async function errorHandler(err, req, res)
-{
-    const format = req.query.format;
-    const isCurseforge = req.path.includes("/curseforge/");
-    const isHangar = req.path.includes("/hangar/");
-    const isSpiget = req.path.includes("/spigot/");
+export async function errorHandler(err, req, res) {
+	const format = req.query.format
+	const isCurseforge = req.path.includes('/curseforge/')
+	const isHangar = req.path.includes('/hangar/')
+	const isSpiget = req.path.includes('/spigot/')
 
-    let statusCode = 500;
-    let message = "Internal Server Error";
-    let detailText = "";
+	let statusCode = 500
+	let message = 'Internal Server Error'
+	let detailText = ''
 
-    if (err.message.includes("not found"))
-    {
-        statusCode = 404;
-        if (isCurseforge) {
-            message = "Project not found";
-        } else if (isHangar) {
-            // Determine if this is a project or user request
-            const isProjectRequest = req.path.includes("/project/");
-            const isUserRequest = req.path.includes("/user/");
-            message = isProjectRequest ? "Project not found" :
-                isUserRequest ? "User not found" :
-                    "Project not found";
-        } else if (isSpiget) {
-            // Determine if this is a resource or author request
-            const isResourceRequest = req.path.includes("/resource/");
-            const isAuthorRequest = req.path.includes("/author/");
-            message = isResourceRequest ? "Resource not found" :
-                isAuthorRequest ? "Author not found" :
-                    "Resource not found";
-        } else {
-            // Determine if this is a project, user, organization, or collection request
-            const isProjectRequest = req.path.includes("/project/");
-            const isOrganizationRequest = req.path.includes("/organization/");
-            const isCollectionRequest = req.path.includes("/collection/");
-            message = isProjectRequest ? "Project not found" :
-                isOrganizationRequest ? "Organization not found" :
-                    isCollectionRequest ? "Collection not found" :
-                        "User not found";
-        }
-    } else if (err instanceof PlatformApiError)
-    {
-        statusCode = err.statusCode;
-        message = getStatusMessage(statusCode);
-        detailText = err.detailText;
-    } else if (err.message.includes("CurseForge API"))
-    {
-        // Extract status code and error text from error message (format: "CurseForge API error: STATUS: TEXT")
-        const errorMatch = err.message.match(/CurseForge API error: (\d+):?\s*(.*)/);
-        const apiStatusCode = errorMatch ? parseInt(errorMatch[1]) : 502;
-        const apiErrorText = errorMatch && errorMatch[2] ? errorMatch[2].trim() : "";
+	if (err.message.includes('not found')) {
+		statusCode = 404
+		if (isCurseforge) {
+			message = 'Project not found'
+		} else if (isHangar) {
+			// Determine if this is a project or user request
+			const isProjectRequest = req.path.includes('/project/')
+			const isUserRequest = req.path.includes('/user/')
+			message = isProjectRequest
+				? 'Project not found'
+				: isUserRequest
+					? 'User not found'
+					: 'Project not found'
+		} else if (isSpiget) {
+			// Determine if this is a resource or author request
+			const isResourceRequest = req.path.includes('/resource/')
+			const isAuthorRequest = req.path.includes('/author/')
+			message = isResourceRequest
+				? 'Resource not found'
+				: isAuthorRequest
+					? 'Author not found'
+					: 'Resource not found'
+		} else {
+			// Determine if this is a project, user, organization, or collection request
+			const isProjectRequest = req.path.includes('/project/')
+			const isOrganizationRequest = req.path.includes('/organization/')
+			const isCollectionRequest = req.path.includes('/collection/')
+			message = isProjectRequest
+				? 'Project not found'
+				: isOrganizationRequest
+					? 'Organization not found'
+					: isCollectionRequest
+						? 'Collection not found'
+						: 'User not found'
+		}
+	} else if (err instanceof PlatformApiError) {
+		statusCode = err.statusCode
+		message = getStatusMessage(statusCode)
+		detailText = err.detailText
+	} else if (err.message.includes('CurseForge API')) {
+		// Extract status code and error text from error message (format: "CurseForge API error: STATUS: TEXT")
+		const errorMatch = err.message.match(/CurseForge API error: (\d+):?\s*(.*)/)
+		const apiStatusCode = errorMatch ? parseInt(errorMatch[1]) : 502
+		const apiErrorText = errorMatch && errorMatch[2] ? errorMatch[2].trim() : ''
 
-        statusCode = apiStatusCode >= 500 ? 502 : apiStatusCode;
-        message = getStatusMessage(statusCode);
-        detailText = apiErrorText;
-    } else if (err.message.includes("Modrinth API"))
-    {
-        // Extract status code and error text from error message (format: "Modrinth API error: STATUS: TEXT")
-        const errorMatch = err.message.match(/Modrinth API error: (\d+):?\s*(.*)/);
-        const apiStatusCode = errorMatch ? parseInt(errorMatch[1]) : 502;
-        const apiErrorText = errorMatch && errorMatch[2] ? errorMatch[2].trim() : "";
+		statusCode = apiStatusCode >= 500 ? 502 : apiStatusCode
+		message = getStatusMessage(statusCode)
+		detailText = apiErrorText
+	} else if (err.message.includes('Modrinth API')) {
+		// Extract status code and error text from error message (format: "Modrinth API error: STATUS: TEXT")
+		const errorMatch = err.message.match(/Modrinth API error: (\d+):?\s*(.*)/)
+		const apiStatusCode = errorMatch ? parseInt(errorMatch[1]) : 502
+		const apiErrorText = errorMatch && errorMatch[2] ? errorMatch[2].trim() : ''
 
-        statusCode = apiStatusCode >= 500 ? 502 : apiStatusCode;
-        message = getStatusMessage(statusCode);
-        detailText = apiErrorText;
-    } else if (err.message.includes("Rate limit"))
-    {
-        statusCode = 429;
-        message = "Rate limit exceeded";
-    }
+		statusCode = apiStatusCode >= 500 ? 502 : apiStatusCode
+		message = getStatusMessage(statusCode)
+		detailText = apiErrorText
+	} else if (err.message.includes('Rate limit')) {
+		statusCode = 429
+		message = 'Rate limit exceeded'
+	}
 
-    // Check if this is a badge request
-    const isBadge = req.path.includes("/badge");
+	// Check if this is a badge request
+	const isBadge = req.path.includes('/badge')
 
-    // Check if image format is requested or if it's an image crawler
-    const useImage = req.isImageCrawler || format === "png" || format === "image";
+	// Check if image format is requested or if it's an image crawler
+	const useImage = req.isImageCrawler || format === 'png' || format === 'image'
 
-    if (isBadge)
-    {
-        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+	if (isBadge) {
+		res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
 
-        const svg = generateBadge("error", message, "#f38ba8");
+		const svg = generateBadge('error', message, '#f38ba8')
 
-        if (useImage) {
-            const { buffer: pngBuffer } = await generatePng(svg);
-            res.setHeader("Content-Type", "image/png");
-            return res.status(req.isImageCrawler ? 200 : statusCode).send(pngBuffer);
-        }
+		if (useImage) {
+			const { buffer: pngBuffer } = await generatePng(svg)
+			res.setHeader('Content-Type', 'image/png')
+			return res.status(req.isImageCrawler ? 200 : statusCode).send(pngBuffer)
+		}
 
-        res.setHeader("Content-Type", "image/svg+xml");
-        res.setHeader("X-Error-Status", statusCode.toString());
+		res.setHeader('Content-Type', 'image/svg+xml')
+		res.setHeader('X-Error-Status', statusCode.toString())
 
-        return res.status(statusCode).send(svg);
-    } else if (useImage)
-    {
-        const svg = generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget);
-        const { buffer: pngBuffer } = await generatePng(svg);
+		return res.status(statusCode).send(svg)
+	} else if (useImage) {
+		const svg = generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget)
+		const { buffer: pngBuffer } = await generatePng(svg)
 
-        res.setHeader("Content-Type", "image/png");
-        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+		res.setHeader('Content-Type', 'image/png')
+		res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
 
-        // Use Code 200 for image crawlers since they dont like error codes
-        if (req.isImageCrawler)
-        {
-            return res.status(200).send(pngBuffer);
-        }
-        else
-        {
-            return res.status(statusCode).send(pngBuffer);
-        }
-    } else
-    {
-        // Return SVG
-        res.setHeader("Content-Type", "image/svg+xml");
-        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        res.setHeader("X-Error-Status", statusCode.toString());
+		// Use Code 200 for image crawlers since they dont like error codes
+		if (req.isImageCrawler) {
+			return res.status(200).send(pngBuffer)
+		} else {
+			return res.status(statusCode).send(pngBuffer)
+		}
+	} else {
+		// Return SVG
+		res.setHeader('Content-Type', 'image/svg+xml')
+		res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+		res.setHeader('X-Error-Status', statusCode.toString())
 
-        // Use Code 200 for image crawlers since they dont like error codes
-        if (req.isImageCrawler)
-        {
-            return res.status(200).send(generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget));
-        }
-        else
-        {
-            return res.status(statusCode).send(generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget));
-        }
-    }
+		// Use Code 200 for image crawlers since they dont like error codes
+		if (req.isImageCrawler) {
+			return res
+				.status(200)
+				.send(generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget))
+		} else {
+			return res
+				.status(statusCode)
+				.send(generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget))
+		}
+	}
 }

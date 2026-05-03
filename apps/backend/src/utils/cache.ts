@@ -1,61 +1,61 @@
 export class Cache {
-    cache: Map<string, { value: any; cachedAt: number; expiry: number; }>;
-    ttl: number;
+	cache: Map<string, { value: any; cachedAt: number; expiry: number }>
+	ttl: number
 
-    constructor(ttlMinutes = 10) {
-        this.cache = new Map();
-        this.ttl = ttlMinutes * 60 * 1000; // Convert to milliseconds
-    }
+	constructor(ttlMinutes = 10) {
+		this.cache = new Map()
+		this.ttl = ttlMinutes * 60 * 1000 // Convert to milliseconds
+	}
 
-    get(key: string) {
-        const item = this.cache.get(key);
+	get(key: string) {
+		const item = this.cache.get(key)
 
-        if (!item) {
-            return null;
-        }
+		if (!item) {
+			return null
+		}
 
-        // Check if expired
-        if (Date.now() > item.expiry) {
-            this.cache.delete(key);
-            return null;
-        }
+		// Check if expired
+		if (Date.now() > item.expiry) {
+			this.cache.delete(key)
+			return null
+		}
 
-        return item.value;
-    }
+		return item.value
+	}
 
-    // Get cached value with metadata (cachedAt timestamp)
-    getWithMeta(key: string) {
-        const item = this.cache.get(key);
+	// Get cached value with metadata (cachedAt timestamp)
+	getWithMeta(key: string) {
+		const item = this.cache.get(key)
 
-        if (!item) {
-            return null;
-        }
+		if (!item) {
+			return null
+		}
 
-        // Check if expired
-        if (Date.now() > item.expiry) {
-            this.cache.delete(key);
-            return null;
-        }
+		// Check if expired
+		if (Date.now() > item.expiry) {
+			this.cache.delete(key)
+			return null
+		}
 
-        return { value: item.value, cachedAt: item.cachedAt };
-    }
+		return { value: item.value, cachedAt: item.cachedAt }
+	}
 
-    set(key: string, value: any) {
-        this.cache.set(key, {
-            value,
-            cachedAt: Date.now(),
-            expiry: Date.now() + this.ttl
-        });
-    }
+	set(key: string, value: any) {
+		this.cache.set(key, {
+			value,
+			cachedAt: Date.now(),
+			expiry: Date.now() + this.ttl,
+		})
+	}
 
-    clear() {
-        this.cache.clear();
-    }
+	clear() {
+		this.cache.clear()
+	}
 
-    size() {
-        return this.cache.size;
-    }
+	size() {
+		return this.cache.size
+	}
 }
 
 // Cache for API data (1 hour TTL)
-export const apiCache = new Cache(60);
+export const apiCache = new Cache(60)

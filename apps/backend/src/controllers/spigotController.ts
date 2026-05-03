@@ -1,79 +1,98 @@
-import spigotClient from "../services/spigotClient.js";
-import { apiCache } from "../utils/cache.js";
-import logger from "../utils/logger.js";
-import { metaKey, PLATFORM } from "../utils/cacheKeys.js";
+import spigotClient from '../services/spigotClient.js'
+import { apiCache } from '../utils/cache.js'
+import { metaKey, PLATFORM } from '../utils/cacheKeys.js'
+import logger from '../utils/logger.js'
 
-const API_CACHE_TTL = 3600; // 1 hour
+const API_CACHE_TTL = 3600 // 1 hour
 
 export const getSpigotMeta = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { type = "resource" } = req.query;
+	try {
+		const { id } = req.params
+		const { type = 'resource' } = req.query
 
-        // Validate id is a number
-        if (!/^\d+$/.test(String(id))) {
-            return res.status(400).json({ error: "Invalid spigot id: must be a number" });
-        }
+		// Validate id is a number
+		if (!/^\d+$/.test(String(id))) {
+			return res.status(400).json({ error: 'Invalid spigot id: must be a number' })
+		}
 
-        const entityType = type === "author" ? "author" : "resource";
-        const cacheKey = metaKey(PLATFORM.SPIGOT, entityType, id);
+		const entityType = type === 'author' ? 'author' : 'resource'
+		const cacheKey = metaKey(PLATFORM.SPIGOT, entityType, id)
 
-        const cached = apiCache.getWithMeta(cacheKey);
-        const cachedResult = cached?.value;
+		const cached = apiCache.getWithMeta(cacheKey)
+		const cachedResult = cached?.value
 
-        if (cachedResult) {
-            const message = `Showing ${PLATFORM.SPIGOT} ${entityType} meta`;
-            const cacheAgeMs = Date.now() - cached.cachedAt;
-            logger.info({
-                target: { platform: PLATFORM.SPIGOT, entity: entityType, identifier: id, surface: "meta" },
-                cache: { hit: true, cachedAt: cached.cachedAt, ageMs: cacheAgeMs, ageSeconds: Math.round(cacheAgeMs / 1000) }
-            }, message);
-            res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
-            return res.json(cachedResult);
-        }
+		if (cachedResult) {
+			const message = `Showing ${PLATFORM.SPIGOT} ${entityType} meta`
+			const cacheAgeMs = Date.now() - cached.cachedAt
+			logger.info(
+				{
+					target: {
+						platform: PLATFORM.SPIGOT,
+						entity: entityType,
+						identifier: id,
+						surface: 'meta',
+					},
+					cache: {
+						hit: true,
+						cachedAt: cached.cachedAt,
+						ageMs: cacheAgeMs,
+						ageSeconds: Math.round(cacheAgeMs / 1000),
+					},
+				},
+				message,
+			)
+			res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+			return res.json(cachedResult)
+		}
 
-        let data;
-        let result;
+		let data
+		let result
 
-        if (entityType === "author") {
-            const authorResponse = await spigotClient.getAuthor(id);
-            data = authorResponse;
+		if (entityType === 'author') {
+			const authorResponse = await spigotClient.getAuthor(id)
+			data = authorResponse
 
-            const authorName = data?.name || id;
-            result = {
-                name: authorName,
-                url: `https://www.spigotmc.org/resources/authors/${authorName}.${id}/`
-            };
-        } else {
-            const resourceResponse = await spigotClient.getResource(id);
-            data = resourceResponse;
-            const resourceName = data?.name || id;
-            result = {
-                name: resourceName,
-                url: `https://www.spigotmc.org/resources/${id}/`
-            };
-        }
+			const authorName = data?.name || id
+			result = {
+				name: authorName,
+				url: `https://www.spigotmc.org/resources/authors/${authorName}.${id}/`,
+			}
+		} else {
+			const resourceResponse = await spigotClient.getResource(id)
+			data = resourceResponse
+			const resourceName = data?.name || id
+			result = {
+				name: resourceName,
+				url: `https://www.spigotmc.org/resources/${id}/`,
+			}
+		}
 
-        if (!data) {
-            return res.status(404).json({ error: `${entityType} not found` });
-        }
+		if (!data) {
+			return res.status(404).json({ error: `${entityType} not found` })
+		}
 
-        apiCache.set(cacheKey, result);
-        const message = `Showing ${PLATFORM.SPIGOT} ${entityType} meta`;
-        logger.info({
-            target: { platform: PLATFORM.SPIGOT, entity: entityType, identifier: id, surface: "meta" },
-            cache: { hit: false }
-        }, message);
+		apiCache.set(cacheKey, result)
+		const message = `Showing ${PLATFORM.SPIGOT} ${entityType} meta`
+		logger.info(
+			{
+				target: { platform: PLATFORM.SPIGOT, entity: entityType, identifier: id, surface: 'meta' },
+				cache: { hit: false },
+			},
+			message,
+		)
 
-        res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
-        res.json(result);
-    } catch (err) {
-        const entity = req.query.type === "author" ? "author" : "resource";
-        const message = `Could not show ${PLATFORM.SPIGOT} ${entity} meta`;
-        logger.warn({
-            target: { platform: PLATFORM.SPIGOT, entity, identifier: req.params.id, surface: "meta" },
-            err
-        }, message);
-        next(err);
-    }
-};
+		res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+		res.json(result)
+	} catch (err) {
+		const entity = req.query.type === 'author' ? 'author' : 'resource'
+		const message = `Could not show ${PLATFORM.SPIGOT} ${entity} meta`
+		logger.warn(
+			{
+				target: { platform: PLATFORM.SPIGOT, entity, identifier: req.params.id, surface: 'meta' },
+				err,
+			},
+			message,
+		)
+		next(err)
+	}
+}

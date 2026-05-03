@@ -1,74 +1,75 @@
-import { describe, it, expect } from "vitest";
-import { pLimit, requestDeduplicator } from "../../utils/asyncUtils.js";
+import { describe, expect, it } from 'vitest'
 
-describe("pLimit", () => {
-    it("resolves all promises", async () => {
-        const tasks = [1, 2, 3].map((n) => () => Promise.resolve(n * 2));
-        const results = await pLimit(tasks, 2);
-        expect(results).toEqual([2, 4, 6]);
-    });
+import { pLimit, requestDeduplicator } from '../../utils/asyncUtils.js'
 
-    it("respects concurrency limit", async () => {
-        let concurrent = 0;
-        let maxConcurrent = 0;
+describe('pLimit', () => {
+	it('resolves all promises', async () => {
+		const tasks = [1, 2, 3].map((n) => () => Promise.resolve(n * 2))
+		const results = await pLimit(tasks, 2)
+		expect(results).toEqual([2, 4, 6])
+	})
 
-        const tasks = Array.from({ length: 6 }, () => async () => {
-            concurrent++;
-            maxConcurrent = Math.max(maxConcurrent, concurrent);
-            await new Promise((r) => setTimeout(r, 10));
-            concurrent--;
-        });
+	it('respects concurrency limit', async () => {
+		let concurrent = 0
+		let maxConcurrent = 0
 
-        await pLimit(tasks, 3);
-        expect(maxConcurrent).toBeLessThanOrEqual(3);
-    });
+		const tasks = Array.from({ length: 6 }, () => async () => {
+			concurrent++
+			maxConcurrent = Math.max(maxConcurrent, concurrent)
+			await new Promise((r) => setTimeout(r, 10))
+			concurrent--
+		})
 
-    it("handles empty array", async () => {
-        const results = await pLimit([], 2);
-        expect(results).toEqual([]);
-    });
-});
+		await pLimit(tasks, 3)
+		expect(maxConcurrent).toBeLessThanOrEqual(3)
+	})
 
-describe("RequestDeduplicator", () => {
-    it("returns the same promise for duplicate concurrent requests", async () => {
-        let callCount = 0;
-        const fetcher = () =>
-            new Promise((r) => {
-                callCount++;
-                setTimeout(() => r("data"), 10);
-            });
+	it('handles empty array', async () => {
+		const results = await pLimit([], 2)
+		expect(results).toEqual([])
+	})
+})
 
-        const p1 = requestDeduplicator.dedupe("key", fetcher);
-        const p2 = requestDeduplicator.dedupe("key", fetcher);
+describe('RequestDeduplicator', () => {
+	it('returns the same promise for duplicate concurrent requests', async () => {
+		let callCount = 0
+		const fetcher = () =>
+			new Promise((r) => {
+				callCount++
+				setTimeout(() => r('data'), 10)
+			})
 
-        const [r1, r2] = await Promise.all([p1, p2]);
-        expect(callCount).toBe(1);
-        expect(r1).toBe(r2);
-    });
+		const p1 = requestDeduplicator.dedupe('key', fetcher)
+		const p2 = requestDeduplicator.dedupe('key', fetcher)
 
-    it("allows a new request after previous one resolves", async () => {
-        let callCount = 0;
-        const fetcher = () =>
-            new Promise((r) => {
-                callCount++;
-                r("data");
-            });
+		const [r1, r2] = await Promise.all([p1, p2])
+		expect(callCount).toBe(1)
+		expect(r1).toBe(r2)
+	})
 
-        await requestDeduplicator.dedupe("key2", fetcher);
-        await requestDeduplicator.dedupe("key2", fetcher);
-        expect(callCount).toBe(2);
-    });
+	it('allows a new request after previous one resolves', async () => {
+		let callCount = 0
+		const fetcher = () =>
+			new Promise((r) => {
+				callCount++
+				r('data')
+			})
 
-    it("clear removes pending entries", () => {
-        const fetcher = () => new Promise(() => {}); // never resolves
-        requestDeduplicator.dedupe("key3", fetcher);
-        requestDeduplicator.clear();
-        // After clear, a new call should invoke fetcher again
-        let called = false;
-        requestDeduplicator.dedupe("key3", () => {
-            called = true;
-            return Promise.resolve();
-        });
-        expect(called).toBe(true);
-    });
-});
+		await requestDeduplicator.dedupe('key2', fetcher)
+		await requestDeduplicator.dedupe('key2', fetcher)
+		expect(callCount).toBe(2)
+	})
+
+	it('clear removes pending entries', () => {
+		const fetcher = () => new Promise(() => {}) // never resolves
+		requestDeduplicator.dedupe('key3', fetcher)
+		requestDeduplicator.clear()
+		// After clear, a new call should invoke fetcher again
+		let called = false
+		requestDeduplicator.dedupe('key3', () => {
+			called = true
+			return Promise.resolve()
+		})
+		expect(called).toBe(true)
+	})
+})

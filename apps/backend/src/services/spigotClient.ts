@@ -1,347 +1,333 @@
-import dotenv from "dotenv";
-import { performance } from "perf_hooks";
-import { fetchImageAsBase64 } from "../utils/imageFetcher.js";
-import { BasePlatformClient } from "./baseClient.js";
-import { CARD_LIMITS } from "../constants/platformConfig.js";
+import dotenv from 'dotenv'
+import { performance } from 'perf_hooks'
 
-dotenv.config({ quiet: true });
+import { CARD_LIMITS } from '../constants/platformConfig.js'
+import { fetchImageAsBase64 } from '../utils/imageFetcher.js'
+import { BasePlatformClient } from './baseClient.js'
 
-import packageJson from "../../package.json" with { type: "json" };
-const VERSION = packageJson.version;
+dotenv.config({ quiet: true })
 
-const SPIGOT_API_URL = process.env.SPIGOT_API_URL || "https://api.spiget.org";
-const USER_AGENT = process.env.USER_AGENT;
+import packageJson from '../../package.json' with { type: 'json' }
+const VERSION = packageJson.version
 
-export class SpigotClient extends BasePlatformClient
-{
-    constructor()
-    {
-        super("Spigot", {
-            baseUrl: SPIGOT_API_URL,
-            userAgent: USER_AGENT ? USER_AGENT.replace("{version}", VERSION) : undefined
-        });
-    }
+const SPIGOT_API_URL = process.env.SPIGOT_API_URL || 'https://api.spiget.org'
+const USER_AGENT = process.env.USER_AGENT
 
-    getHeaders()
-    {
-        const headers = super.getHeaders();
-        return headers;
-    }
+export class SpigotClient extends BasePlatformClient {
+	constructor() {
+		super('Spigot', {
+			baseUrl: SPIGOT_API_URL,
+			userAgent: USER_AGENT ? USER_AGENT.replace('{version}', VERSION) : undefined,
+		})
+	}
 
-    async getResource(resourceId)
-    {
-        return this.fetch(`/v2/resources/${resourceId}`);
-    }
+	getHeaders() {
+		const headers = super.getHeaders()
+		return headers
+	}
 
-    async getResourceVersions(resourceId, limit = 10)
-    {
-        return this.fetch(`/v2/resources/${resourceId}/versions?size=${limit}&sort=-releaseDate`);
-    }
+	async getResource(resourceId) {
+		return this.fetch(`/v2/resources/${resourceId}`)
+	}
 
-    async getAuthor(authorId)
-    {
-        return this.fetch(`/v2/authors/${authorId}`);
-    }
+	async getResourceVersions(resourceId, limit = 10) {
+		return this.fetch(`/v2/resources/${resourceId}/versions?size=${limit}&sort=-releaseDate`)
+	}
 
-    async getAuthorResources(authorId, limit = 25)
-    {
+	async getAuthor(authorId) {
+		return this.fetch(`/v2/authors/${authorId}`)
+	}
 
-        return this.fetch(`/v2/authors/${authorId}/resources?size=${limit}&sort=-downloads`);
-    }
+	async getAuthorResources(authorId, limit = 25) {
+		return this.fetch(`/v2/authors/${authorId}/resources?size=${limit}&sort=-downloads`)
+	}
 
-    async getResourceStats(resourceId, convertToPng = false)
-    {
-        // Validate resourceId is a number
-        if (!/^\d+$/.test(String(resourceId))) {
-            return null;
-        }
+	async getResourceStats(resourceId, convertToPng = false) {
+		// Validate resourceId is a number
+		if (!/^\d+$/.test(String(resourceId))) {
+			return null
+		}
 
-        const apiStart = performance.now();
+		const apiStart = performance.now()
 
-        const resourceResponse = await this.getResource(resourceId);
-        if (!resourceResponse) {
-            return null;
-        }
-        const resource = resourceResponse;
+		const resourceResponse = await this.getResource(resourceId)
+		if (!resourceResponse) {
+			return null
+		}
+		const resource = resourceResponse
 
-        let imageConversionTime = 0;
+		let imageConversionTime = 0
 
-        // Fetch resource icon - Spiget API has separate icon endpoint
-        const iconUrl = `${SPIGOT_API_URL}/v2/resources/${resourceId}/icon`;
-        let result = await fetchImageAsBase64(iconUrl, convertToPng);
+		// Fetch resource icon - Spiget API has separate icon endpoint
+		const iconUrl = `${SPIGOT_API_URL}/v2/resources/${resourceId}/icon`
+		let result = await fetchImageAsBase64(iconUrl, convertToPng)
 
-        // If that fails, try the direct SpigotMC URL as fallback
-        if (!result?.data) {
-            const iconUrlFallback = `https://www.spigotmc.org/data/resource_icons/${Math.floor(resourceId / 1000)}/${resourceId}.jpg`;
-            result = await fetchImageAsBase64(iconUrlFallback, convertToPng);
-        }
+		// If that fails, try the direct SpigotMC URL as fallback
+		if (!result?.data) {
+			const iconUrlFallback = `https://www.spigotmc.org/data/resource_icons/${Math.floor(resourceId / 1000)}/${resourceId}.jpg`
+			result = await fetchImageAsBase64(iconUrlFallback, convertToPng)
+		}
 
-        resource.icon_url_base64 = result?.data;
-        if (result?.conversionTime) imageConversionTime += result.conversionTime;
+		resource.icon_url_base64 = result?.data
+		if (result?.conversionTime) imageConversionTime += result.conversionTime
 
-        // Fetch versions for the resource
-        let versions = [];
-        let totalVersionCount = 0;
-        try {
-            const versionsResponse = await this.getResourceVersions(resourceId, CARD_LIMITS.MAX_COUNT);
-            const allVersions = versionsResponse || [];
-            totalVersionCount = allVersions.length;
+		// Fetch versions for the resource
+		let versions = []
+		let totalVersionCount = 0
+		try {
+			const versionsResponse = await this.getResourceVersions(resourceId, CARD_LIMITS.MAX_COUNT)
+			const allVersions = versionsResponse || []
+			totalVersionCount = allVersions.length
 
-            // Sort by date (newest first) - card generator will slice to maxVersions
-            versions = allVersions
-                .sort((a, b) => (b.releaseDate || 0) - (a.releaseDate || 0))
-                .map(version => ({
-                    name: version.name,
-                    version_number: version.name,
-                    releaseDate: version.releaseDate * 1000, // Convert seconds to ms
-                    date_published: new Date(version.releaseDate * 1000).toISOString(),
-                    downloads: version.downloads || 0,
-                    rating: version.rating?.average || 0,
-                    loaders: [], // Spigot doesn't provide loader info in versions
-                    game_versions: [] // Spigot doesn't provide game versions in versions
-                }));
-        } catch {
-            // If versions fetch fails, continue with empty versions array
-            versions = [];
-        }
+			// Sort by date (newest first) - card generator will slice to maxVersions
+			versions = allVersions
+				.sort((a, b) => (b.releaseDate || 0) - (a.releaseDate || 0))
+				.map((version) => ({
+					name: version.name,
+					version_number: version.name,
+					releaseDate: version.releaseDate * 1000, // Convert seconds to ms
+					date_published: new Date(version.releaseDate * 1000).toISOString(),
+					downloads: version.downloads || 0,
+					rating: version.rating?.average || 0,
+					loaders: [], // Spigot doesn't provide loader info in versions
+					game_versions: [], // Spigot doesn't provide game versions in versions
+				}))
+		} catch {
+			// If versions fetch fails, continue with empty versions array
+			versions = []
+		}
 
-        const apiTime = performance.now() - apiStart;
+		const apiTime = performance.now() - apiStart
 
-        // Get stats from resource
-        const stats = {
-            downloads: resource?.downloads || 0,
-            likes: resource?.likes || 0,
-            rating: resource?.rating?.average || 0,
-            ratingCount: resource?.rating?.count || 0,
-            versionCount: totalVersionCount
-        };
+		// Get stats from resource
+		const stats = {
+			downloads: resource?.downloads || 0,
+			likes: resource?.likes || 0,
+			rating: resource?.rating?.average || 0,
+			ratingCount: resource?.rating?.count || 0,
+			versionCount: totalVersionCount,
+		}
 
-        return {
-            project: resource, // Use 'project' key for consistency with unified system
-            versions,
-            stats,
-            timings: {
-                api: apiTime,
-                imageConversion: imageConversionTime
-            }
-        };
-    }
+		return {
+			project: resource, // Use 'project' key for consistency with unified system
+			versions,
+			stats,
+			timings: {
+				api: apiTime,
+				imageConversion: imageConversionTime,
+			},
+		}
+	}
 
-    async getAuthorStats(authorId, convertToPng = false)
-    {
-        // Validate authorId is a number
-        if (!/^\d+$/.test(String(authorId))) {
-            return null;
-        }
+	async getAuthorStats(authorId, convertToPng = false) {
+		// Validate authorId is a number
+		if (!/^\d+$/.test(String(authorId))) {
+			return null
+		}
 
-        const apiStart = performance.now();
+		const apiStart = performance.now()
 
-        const authorResponse = await this.getAuthor(authorId);
-        if (!authorResponse) {
-            return null;
-        }
-        const author = authorResponse;
+		const authorResponse = await this.getAuthor(authorId)
+		if (!authorResponse) {
+			return null
+		}
+		const author = authorResponse
 
-        let imageConversionTime = 0;
+		let imageConversionTime = 0
 
-        // Fetch author avatar - Spiget API has separate avatar endpoint
-        const avatarUrl = `${SPIGOT_API_URL}/v2/authors/${authorId}/avatar`;
-        const avatarResult = await fetchImageAsBase64(avatarUrl, convertToPng);
-        author.avatar_url_base64 = avatarResult?.data;
-        if (avatarResult?.conversionTime) imageConversionTime += avatarResult.conversionTime;
+		// Fetch author avatar - Spiget API has separate avatar endpoint
+		const avatarUrl = `${SPIGOT_API_URL}/v2/authors/${authorId}/avatar`
+		const avatarResult = await fetchImageAsBase64(avatarUrl, convertToPng)
+		author.avatar_url_base64 = avatarResult?.data
+		if (avatarResult?.conversionTime) imageConversionTime += avatarResult.conversionTime
 
-        // Fetch author's resources
-        let resources = [];
-        let totalDownloads = 0;
-        let allVersionDates = [];
+		// Fetch author's resources
+		let resources = []
+		let totalDownloads = 0
+		let allVersionDates = []
 
-        try {
-            const resourcesResponse = await this.getAuthorResources(authorId, 50); // Fetch more for sorting
-            const allResources = resourcesResponse || [];
+		try {
+			const resourcesResponse = await this.getAuthorResources(authorId, 50) // Fetch more for sorting
+			const allResources = resourcesResponse || []
 
-            // Sort by downloads and take max (for caching, card generator slices to maxResources)
-            resources = allResources
-                .sort((a, b) => (b?.downloads || 0) - (a?.downloads || 0))
-                .slice(0, CARD_LIMITS.MAX_COUNT)
-                .map(r => ({
-                    id: r.id,
-                    slug: r.id, // Spigot uses IDs, not slugs
-                    name: r.name,
-                    title: r.name,
-                    description: r.tag || r.description || "",
-                    downloads: r?.downloads || 0,
-                    likes: r?.likes || 0,
-                    rating: r?.rating?.average || 0,
-                    date_created: r?.releaseDate ? new Date(r.releaseDate * 1000).toISOString() : null,
-                    createdAt: r?.releaseDate ? new Date(r.releaseDate * 1000).toISOString() : null,
-                    lastUpdated: r?.updateDate ? new Date(r.updateDate * 1000).toISOString() : null,
-                    // Construct icon URL manually - Spiget API has separate icon endpoint per resource
-                    // Note: The icon endpoint may return 404 even if the icon exists on the SpigotMC website
-                    // Try both the Spiget API endpoint and the direct SpigotMC URL
-                    icon_url: `${SPIGOT_API_URL}/v2/resources/${r.id}/icon`,
-                    // Fallback to direct SpigotMC URL if Spiget API fails
-                    icon_url_fallback: `https://www.spigotmc.org/data/resource_icons/${Math.floor(r.id / 1000)}/${r.id}.jpg`,
-                    project_type: "plugin", // Spigot primarily has plugins
-                    category: r?.category
-                }));
+			// Sort by downloads and take max (for caching, card generator slices to maxResources)
+			resources = allResources
+				.sort((a, b) => (b?.downloads || 0) - (a?.downloads || 0))
+				.slice(0, CARD_LIMITS.MAX_COUNT)
+				.map((r) => ({
+					id: r.id,
+					slug: r.id, // Spigot uses IDs, not slugs
+					name: r.name,
+					title: r.name,
+					description: r.tag || r.description || '',
+					downloads: r?.downloads || 0,
+					likes: r?.likes || 0,
+					rating: r?.rating?.average || 0,
+					date_created: r?.releaseDate ? new Date(r.releaseDate * 1000).toISOString() : null,
+					createdAt: r?.releaseDate ? new Date(r.releaseDate * 1000).toISOString() : null,
+					lastUpdated: r?.updateDate ? new Date(r.updateDate * 1000).toISOString() : null,
+					// Construct icon URL manually - Spiget API has separate icon endpoint per resource
+					// Note: The icon endpoint may return 404 even if the icon exists on the SpigotMC website
+					// Try both the Spiget API endpoint and the direct SpigotMC URL
+					icon_url: `${SPIGOT_API_URL}/v2/resources/${r.id}/icon`,
+					// Fallback to direct SpigotMC URL if Spiget API fails
+					icon_url_fallback: `https://www.spigotmc.org/data/resource_icons/${Math.floor(r.id / 1000)}/${r.id}.jpg`,
+					project_type: 'plugin', // Spigot primarily has plugins
+					category: r?.category,
+				}))
 
-            // Calculate total downloads across all author's resources
-            totalDownloads = allResources.reduce((sum, r) => sum + (r?.downloads || 0), 0);
+			// Calculate total downloads across all author's resources
+			totalDownloads = allResources.reduce((sum, r) => sum + (r?.downloads || 0), 0)
 
-            // Fetch images for resources
-            const projectsConversionTime = await this.fetchImagesForResources(resources, convertToPng);
-            imageConversionTime += projectsConversionTime;
+			// Fetch images for resources
+			const projectsConversionTime = await this.fetchImagesForResources(resources, convertToPng)
+			imageConversionTime += projectsConversionTime
 
-            // Use resource creation dates for sparkline (better than no sparkline, no extra API calls)
-            allVersionDates = allResources
-                .map(r => r?.releaseDate ? new Date(r.releaseDate * 1000).toISOString() : null)
-                .filter(Boolean);
-        } catch {
-            // If resources fetch fails, continue with empty resources array
-            resources = [];
-        }
+			// Use resource creation dates for sparkline (better than no sparkline, no extra API calls)
+			allVersionDates = allResources
+				.map((r) => (r?.releaseDate ? new Date(r.releaseDate * 1000).toISOString() : null))
+				.filter(Boolean)
+		} catch {
+			// If resources fetch fails, continue with empty resources array
+			resources = []
+		}
 
-        const apiTime = performance.now() - apiStart;
+		const apiTime = performance.now() - apiStart
 
-        const stats = {
-            totalDownloads,
-            totalFollowers: 0, // Spigot doesn't have author followers
-            resourceCount: resources.length,
-            avgRating: this.calculateAvgRating(resources),
-            allVersionDates
-        };
+		const stats = {
+			totalDownloads,
+			totalFollowers: 0, // Spigot doesn't have author followers
+			resourceCount: resources.length,
+			avgRating: this.calculateAvgRating(resources),
+			allVersionDates,
+		}
 
-        return {
-            user: author, // Use 'user' key for consistency with unified system
-            projects: resources, // Use 'projects' key for consistency
-            stats,
-            timings: {
-                api: apiTime,
-                imageConversion: imageConversionTime
-            }
-        };
-    }
+		return {
+			user: author, // Use 'user' key for consistency with unified system
+			projects: resources, // Use 'projects' key for consistency
+			stats,
+			timings: {
+				api: apiTime,
+				imageConversion: imageConversionTime,
+			},
+		}
+	}
 
-    async getResourceBadgeStats(resourceId)
-    {
-        // Validate resourceId is a number
-        if (!/^\d+$/.test(String(resourceId))) {
-            return null;
-        }
+	async getResourceBadgeStats(resourceId) {
+		// Validate resourceId is a number
+		if (!/^\d+$/.test(String(resourceId))) {
+			return null
+		}
 
-        const apiStart = performance.now();
+		const apiStart = performance.now()
 
-        const resourceResponse = await this.getResource(resourceId);
-        if (!resourceResponse) {
-            return null;
-        }
-        const resource = resourceResponse;
+		const resourceResponse = await this.getResource(resourceId)
+		if (!resourceResponse) {
+			return null
+		}
+		const resource = resourceResponse
 
-        const stats = {
-            downloads: resource?.downloads || 0,
-            likes: resource?.likes || 0,
-            rating: resource?.rating?.average || 0,
-            ratingCount: resource?.rating?.count || 0,
-            versionCount: 0
-        };
+		const stats = {
+			downloads: resource?.downloads || 0,
+			likes: resource?.likes || 0,
+			rating: resource?.rating?.average || 0,
+			ratingCount: resource?.rating?.count || 0,
+			versionCount: 0,
+		}
 
-        // Fetch versions
-        try {
-            const versionsResponse = await this.getResourceVersions(resourceId);
-            stats.versionCount = versionsResponse?.length || 0;
-        } catch {
-            stats.versionCount = 0;
-        }
+		// Fetch versions
+		try {
+			const versionsResponse = await this.getResourceVersions(resourceId)
+			stats.versionCount = versionsResponse?.length || 0
+		} catch {
+			stats.versionCount = 0
+		}
 
-        const apiTime = performance.now() - apiStart;
-        return { stats, timings: { api: apiTime } };
-    }
+		const apiTime = performance.now() - apiStart
+		return { stats, timings: { api: apiTime } }
+	}
 
-    async getAuthorBadgeStats(authorId)
-    {
-        // Validate authorId is a number
-        if (!/^\d+$/.test(String(authorId))) {
-            return null;
-        }
+	async getAuthorBadgeStats(authorId) {
+		// Validate authorId is a number
+		if (!/^\d+$/.test(String(authorId))) {
+			return null
+		}
 
-        const apiStart = performance.now();
+		const apiStart = performance.now()
 
-        const authorResponse = await this.getAuthor(authorId);
-        if (!authorResponse) {
-            return null;
-        }
+		const authorResponse = await this.getAuthor(authorId)
+		if (!authorResponse) {
+			return null
+		}
 
-        let totalDownloads = 0;
-        let resourceCount = 0;
-        let totalRating = 0;
-        let ratingCount = 0;
+		let totalDownloads = 0
+		let resourceCount = 0
+		let totalRating = 0
+		let ratingCount = 0
 
-        // Fetch all author's resources for stats
-        try {
-            const resourcesResponse = await this.getAuthorResources(authorId, 100);
-            const allResources = resourcesResponse || [];
-            totalDownloads = allResources.reduce((sum, r) => sum + (r?.downloads || 0), 0);
-            resourceCount = allResources.length;
+		// Fetch all author's resources for stats
+		try {
+			const resourcesResponse = await this.getAuthorResources(authorId, 100)
+			const allResources = resourcesResponse || []
+			totalDownloads = allResources.reduce((sum, r) => sum + (r?.downloads || 0), 0)
+			resourceCount = allResources.length
 
-            // Calculate average rating across all resources
-            for (const r of allResources) {
-                if (r?.rating?.average) {
-                    totalRating += r.rating.average;
-                    ratingCount++;
-                }
-            }
-        } catch {
-            // Use basic author data if fetch fails
-        }
+			// Calculate average rating across all resources
+			for (const r of allResources) {
+				if (r?.rating?.average) {
+					totalRating += r.rating.average
+					ratingCount++
+				}
+			}
+		} catch {
+			// Use basic author data if fetch fails
+		}
 
-        const apiTime = performance.now() - apiStart;
+		const apiTime = performance.now() - apiStart
 
-        const stats = {
-            totalDownloads,
-            totalFollowers: 0,
-            resourceCount,
-            avgRating: ratingCount > 0 ? totalRating / ratingCount : 0
-        };
+		const stats = {
+			totalDownloads,
+			totalFollowers: 0,
+			resourceCount,
+			avgRating: ratingCount > 0 ? totalRating / ratingCount : 0,
+		}
 
-        return { stats, timings: { api: apiTime } };
-    }
+		return { stats, timings: { api: apiTime } }
+	}
 
-    async fetchImagesForResources(resources, convertToPng)
-    {
-        let totalConversionTime = 0;
+	async fetchImagesForResources(resources, convertToPng) {
+		let totalConversionTime = 0
 
-        // Process images for each resource
-        for (const resource of resources) {
-            if (resource.icon_url) {
-                // Try primary Spiget API endpoint first
-                let result = await fetchImageAsBase64(resource.icon_url, convertToPng);
+		// Process images for each resource
+		for (const resource of resources) {
+			if (resource.icon_url) {
+				// Try primary Spiget API endpoint first
+				let result = await fetchImageAsBase64(resource.icon_url, convertToPng)
 
-                // If that fails, try the direct SpigotMC URL as fallback
-                if (!result?.data && resource.icon_url_fallback) {
-                    result = await fetchImageAsBase64(resource.icon_url_fallback, convertToPng);
-                }
+				// If that fails, try the direct SpigotMC URL as fallback
+				if (!result?.data && resource.icon_url_fallback) {
+					result = await fetchImageAsBase64(resource.icon_url_fallback, convertToPng)
+				}
 
-                resource.icon_url_base64 = result?.data;
-                if (result?.conversionTime) totalConversionTime += result.conversionTime;
-            }
-        }
+				resource.icon_url_base64 = result?.data
+				if (result?.conversionTime) totalConversionTime += result.conversionTime
+			}
+		}
 
-        return totalConversionTime;
-    }
+		return totalConversionTime
+	}
 
-    calculateAvgRating(resources)
-    {
-        const resourcesWithRating = resources.filter(r => r.rating && r.rating > 0);
-        if (resourcesWithRating.length === 0) return 0;
+	calculateAvgRating(resources) {
+		const resourcesWithRating = resources.filter((r) => r.rating && r.rating > 0)
+		if (resourcesWithRating.length === 0) return 0
 
-        const sum = resourcesWithRating.reduce((acc, r) => acc + r.rating, 0);
-        return (sum / resourcesWithRating.length).toFixed(1);
-    }
+		const sum = resourcesWithRating.reduce((acc, r) => acc + r.rating, 0)
+		return (sum / resourcesWithRating.length).toFixed(1)
+	}
 
-    isConfigured()
-    {
-        return true;
-    }
+	isConfigured() {
+		return true
+	}
 }
 
-export default new SpigotClient();
+export default new SpigotClient()

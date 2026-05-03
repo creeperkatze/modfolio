@@ -1,8 +1,9 @@
-import express from "express";
-import { getModrinthMeta } from "../../controllers/modrinthController.js";
+import express from 'express'
 
-const router = express.Router();
+import { getModrinthMeta } from '../../controllers/modrinthController.js'
 
-router.get("/modrinth/meta/:type/:id", getModrinthMeta);
+const router = express.Router()
 
-export default router;
+router.get('/modrinth/meta/:type/:id', getModrinthMeta)
+
+export default router

@@ -1,12 +1,13 @@
-import express from "express";
-import metaRoutes from "./metaRoutes.js";
-import resourceRoutes from "./resourceRoutes.js";
-import authorRoutes from "./authorRoutes.js";
+import express from 'express'
 
-const router = express.Router();
+import authorRoutes from './authorRoutes.js'
+import metaRoutes from './metaRoutes.js'
+import resourceRoutes from './resourceRoutes.js'
 
-router.use(metaRoutes);
-router.use(resourceRoutes);
-router.use(authorRoutes);
+const router = express.Router()
 
-export default router;
+router.use(metaRoutes)
+router.use(resourceRoutes)
+router.use(authorRoutes)
+
+export default router
