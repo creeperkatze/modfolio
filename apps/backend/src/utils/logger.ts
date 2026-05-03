@@ -1,20 +1,16 @@
 import pino from "pino";
 
-const isProduction = process.env.NODE_ENV === "production";
-
 const logger = pino({
-    name: "modfolio-backend",
-    level: process.env.LOG_LEVEL || (isProduction ? "info" : "debug"),
-    transport: isProduction
-        ? undefined
-        : {
+    level: process.env.LOG_LEVEL ?? "info",
+    formatters: {
+        level: (label) => ({ level: label }),
+    },
+    ...(process.env.NODE_ENV !== "production" && {
+        transport: {
             target: "pino-pretty",
-            options: {
-                colorize: true,
-                ignore: "pid,hostname",
-                translateTime: "SYS:standard"
-            }
-        }
+            options: { colorize: true },
+        },
+    }),
 });
 
 export default logger;
