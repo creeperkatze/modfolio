@@ -35,23 +35,8 @@
   "field.url": {
     "message": "URL"
   },
-  "footer.helpTranslate": {
-    "message": "Допомога з перекладом"
-  },
-  "footer.madeBy": {
-    "message": "Створено з ♥ ними"
-  },
   "footer.notAffiliated": {
     "message": "Не пов'язано з Modrinth, CurseForge, Hangar або Spigot"
-  },
-  "footer.starOnGithub": {
-    "message": "★ На GitHub"
-  },
-  "footer.viewApiDocs": {
-    "message": "Документація API"
-  },
-  "footer.viewSource": {
-    "message": "Джерело"
   },
   "hint.transparentBg": {
     "message": "Прозорий фон найкраще підходить у більшості випадків, оскільки він зливається з фоном без зміни його стилю."

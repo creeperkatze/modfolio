@@ -35,23 +35,26 @@
   "field.url": {
     "message": "URL"
   },
-  "footer.helpTranslate": {
-    "message": "Hilf beim Übersetzen"
+  "footer.apiDocs": {
+    "message": "API-Dokumentation"
   },
-  "footer.madeBy": {
+  "footer.credits": {
     "message": "Mit ♥ erstellt von"
+  },
+  "footer.github": {
+    "message": "Auf GitHub"
   },
   "footer.notAffiliated": {
     "message": "Nicht assoziiert mit Modrinth, CurseForge, Hangar oder Spigot"
   },
-  "footer.starOnGithub": {
-    "message": "★ Auf GitHub"
-  },
-  "footer.viewApiDocs": {
-    "message": "API-Dokumentation"
-  },
-  "footer.viewSource": {
+  "footer.source": {
     "message": "Quelle"
+  },
+  "footer.support": {
+    "message": "Unterstützen"
+  },
+  "footer.translate": {
+    "message": "Hilf beim Übersetzen"
   },
   "hint.transparentBg": {
     "message": "Transparent funktioniert in den meisten Situationen am besten, da es sich in den Hintergrund anpasst, ohne seinen Stil zu verändern."

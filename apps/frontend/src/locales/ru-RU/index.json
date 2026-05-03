@@ -32,23 +32,8 @@
   "field.url": {
     "message": "URL"
   },
-  "footer.helpTranslate": {
-    "message": "Помоги с переводом"
-  },
-  "footer.madeBy": {
-    "message": "Сделано с ♥ ими"
-  },
   "footer.notAffiliated": {
     "message": "Не связаны с Modrinth, CurseForge, Hangar или Spigot"
-  },
-  "footer.starOnGithub": {
-    "message": "★ На Github"
-  },
-  "footer.viewApiDocs": {
-    "message": "Документация по API"
-  },
-  "footer.viewSource": {
-    "message": "Источник"
   },
   "hint.transparentBg": {
     "message": "Прозрачный фон подходит лучше в большинстве случаев, потому что он сливается с фоном, не меняя стиль."
