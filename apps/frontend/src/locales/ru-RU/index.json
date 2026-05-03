@@ -23,6 +23,9 @@
   "field.projectType": {
     "message": "Тип проекта"
   },
+  "field.target": {
+    "message": "Целевой объект"
+  },
   "field.type": {
     "message": "Тип"
   },
@@ -47,6 +50,9 @@
   "footer.viewSource": {
     "message": "Источник"
   },
+  "hint.transparentBg": {
+    "message": "Прозрачный фон подходит лучше в большинстве случаев, потому что он сливается с фоном, не меняя стиль."
+  },
   "metric.downloads": {
     "message": "Скачиваний"
   },
@@ -62,8 +68,14 @@
   "metric.projects": {
     "message": "Проекты"
   },
+  "metric.rank": {
+    "message": "Ранг"
+  },
   "metric.rating": {
     "message": "Рейтинг"
+  },
+  "metric.resources": {
+    "message": "Ресурсы"
   },
   "metric.stars": {
     "message": "Звёзды"
@@ -74,17 +86,83 @@
   "metric.views": {
     "message": "Просмотры"
   },
+  "option.accentColor": {
+    "message": "Акцентный цвет"
+  },
   "option.animations": {
     "message": "Анимации"
   },
   "option.bgColor": {
     "message": "Цвет фона"
   },
+  "option.downloadBars": {
+    "message": "Панель скачиваний"
+  },
+  "option.maxFiles": {
+    "message": "Максимальное кол-во файлов"
+  },
+  "option.maxProjects": {
+    "message": "Максимальное кол-во проектов"
+  },
+  "option.maxVersions": {
+    "message": "Максимальное кол-во версий"
+  },
+  "option.relativeTime": {
+    "message": "Относительное время"
+  },
+  "option.showBorder": {
+    "message": "Показывать обрамление"
+  },
+  "option.showFiles": {
+    "message": "Показать файлы"
+  },
+  "option.showIcon": {
+    "message": "Показать иконку платформы"
+  },
+  "option.showProjects": {
+    "message": "Показать проекты"
+  },
+  "option.showSummary": {
+    "message": "Показать сводку"
+  },
   "option.showVersions": {
     "message": "Показать версии"
   },
+  "option.sparklines": {
+    "message": "Спарклайн график"
+  },
+  "output.htmlPlaceholder": {
+    "message": "Твой HTML-код появится тут"
+  },
+  "output.markdownPlaceholder": {
+    "message": "Твой код markdown появится тут"
+  },
+  "output.urlPlaceholder": {
+    "message": "Твой URL появится тут"
+  },
+  "placeholder.author": {
+    "message": "Введи ID автора"
+  },
+  "placeholder.collection": {
+    "message": "Введи ID коллекции"
+  },
+  "placeholder.project.curseforge": {
+    "message": "Введи ID проекта"
+  },
+  "placeholder.resource": {
+    "message": "Введи ID ресурс"
+  },
+  "placeholder.user.curseforge": {
+    "message": "Введи ID пользователя"
+  },
+  "placeholder.user.default": {
+    "message": "Введи имя пользователя или ID"
+  },
   "preview.imageAlt": {
     "message": "Предпросмотр"
+  },
+  "preview.placeholder": {
+    "message": "Твоя вставка будет здесь"
   },
   "projectType.all": {
     "message": "Все типы"
@@ -122,6 +200,9 @@
   "section.html": {
     "message": "HTML"
   },
+  "section.markdown": {
+    "message": "Markdown"
+  },
   "section.preview": {
     "message": "Предпросмотр"
   },
@@ -149,6 +230,9 @@
   "target.user": {
     "message": "Пользователь"
   },
+  "type.badge": {
+    "message": "Значок"
+  },
   "type.card": {
     "message": "Карточка"
   },
@@ -157,6 +241,9 @@
   },
   "valueLabel.collection": {
     "message": "ID коллекции"
+  },
+  "valueLabel.default": {
+    "message": "Значение"
   },
   "valueLabel.project.curseforge": {
     "message": "ID проекта"
@@ -169,6 +256,9 @@
   },
   "valueLabel.user.curseforge": {
     "message": "ID пользователя"
+  },
+  "valueLabel.user.default": {
+    "message": "Имя пользователя"
   },
   "warning.apiSlow": {
     "message": "API {platform} работает медленно. Загрузка элемента может занять некоторое время."
