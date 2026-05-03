@@ -1,7 +1,57 @@
+export type PlatformId = 'modrinth' | 'curseforge' | 'hangar' | 'spigot'
+export type EmbedType = 'card' | 'badge'
+export type TargetType = 'user' | 'project' | 'organization' | 'collection' | 'author' | 'resource'
+export type BadgeMetric =
+	| 'downloads'
+	| 'followers'
+	| 'projects'
+	| 'rank'
+	| 'stars'
+	| 'versions'
+	| 'views'
+	| 'likes'
+	| 'resources'
+	| 'rating'
+	| 'players'
+
+export type ColorValue = string | null
+
+export interface ColorOption {
+	name: string
+	value: ColorValue
+}
+
+export interface ProjectTypeOption {
+	value: string
+	label: string
+}
+
+export interface PlatformConfig {
+	id: PlatformId
+	name: string
+	defaultColor: string
+	baseUrl: string
+	projectPath: string
+	userPath?: string
+	targets: TargetType[]
+	badgeMetrics: Partial<Record<TargetType, BadgeMetric[]>>
+	projectTypeOptions?: ProjectTypeOption[]
+}
+
+export interface ParsedUrl {
+	platform: PlatformId
+	type: TargetType
+	id: string
+	slug?: string
+	isCurseForge?: boolean
+	needsId?: boolean
+	projectType?: string | null
+}
+
 export const CARD_LIMITS = {
 	DEFAULT_COUNT: 5,
 	MAX_COUNT: 10,
-}
+} as const
 
 export const MODRINTH_PROJECT_TYPE_SEGMENTS = {
 	mods: 'mod',
@@ -10,9 +60,9 @@ export const MODRINTH_PROJECT_TYPE_SEGMENTS = {
 	shaders: 'shader',
 	datapacks: 'datapack',
 	plugins: 'plugin',
-}
+} as const
 
-export const PLATFORMS = {
+export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
 	modrinth: {
 		id: 'modrinth',
 		name: 'Modrinth',
@@ -95,9 +145,9 @@ export const METRIC_LABELS = {
 	resources: 'Resources',
 	rating: 'Rating',
 	players: 'Players Online',
-}
+} satisfies Record<BadgeMetric, string>
 
-export function hslToHex(h) {
+export function hslToHex(h: number): string {
 	const s = 1,
 		l = 0.75
 	const c = (1 - Math.abs(2 * l - 1)) * s
@@ -131,27 +181,31 @@ export function hslToHex(h) {
 		b = x
 	}
 
-	const toHex = (val) =>
+	const toHex = (val: number) =>
 		Math.round((val + m) * 255)
 			.toString(16)
 			.padStart(2, '0')
 	return toHex(r) + toHex(g) + toHex(b)
 }
 
-export function getAccentColors(platformId) {
+export function getAccentColors(platformId: PlatformId): string[] {
 	return [
 		PLATFORMS[platformId].defaultColor,
 		...[0, 30, 60, 150, 180, 210, 240, 270, 330].map(hslToHex),
 	]
 }
 
-export const BG_COLORS = [
+export const BG_COLORS: ColorOption[] = [
 	{ name: 'transparent', value: null },
 	{ name: 'white', value: 'ffffff' },
 	{ name: 'github-dark', value: '0d1117' },
 ]
 
-export function parseUrl(urlString) {
+export function isPlatformId(value: string): value is PlatformId {
+	return value in PLATFORMS
+}
+
+export function parseUrl(urlString: string): ParsedUrl | null {
 	try {
 		const urlObj = new URL(urlString)
 		const platform = Object.values(PLATFORMS).find((p) => urlObj.hostname.includes(p.baseUrl))
@@ -213,7 +267,7 @@ export function parseUrl(urlString) {
 
 		// Modrinth
 		if (pathParts.length < 2) return null
-		const typeMap = {
+		const typeMap: Record<string, TargetType> = {
 			project: 'project',
 			mod: 'project',
 			modpack: 'project',
@@ -229,7 +283,11 @@ export function parseUrl(urlString) {
 		const mappedType = typeMap[pathParts[0]]
 		if (!mappedType) return null
 		// Check for optional project type filter segment: /user/name/mods or /organization/slug/resourcepacks
-		const projectType = pathParts[2] ? MODRINTH_PROJECT_TYPE_SEGMENTS[pathParts[2]] || null : null
+		const projectType = pathParts[2]
+			? MODRINTH_PROJECT_TYPE_SEGMENTS[
+					pathParts[2] as keyof typeof MODRINTH_PROJECT_TYPE_SEGMENTS
+				] || null
+			: null
 		return { platform: platform.id, type: mappedType, id: pathParts[1], projectType }
 	} catch {
 		return null

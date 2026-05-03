@@ -27,13 +27,18 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 
-const props = defineProps({
-	title: String,
-	startExpanded: { type: Boolean, default: false },
-})
+const props = withDefaults(
+	defineProps<{
+		title?: string
+		startExpanded?: boolean
+	}>(),
+	{
+		startExpanded: false,
+	},
+)
 
 const expanded = ref(props.startExpanded)
 </script>

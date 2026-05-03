@@ -87,11 +87,17 @@
 	</div>
 </template>
 
-<script setup>
-import { PLATFORMS } from '../platforms.js'
+<script setup lang="ts">
+import type { PlatformId } from '../platforms'
+import { PLATFORMS } from '../platforms'
 
-defineProps({ selected: String })
-defineEmits(['select'])
+defineProps<{
+	selected: PlatformId
+}>()
+
+defineEmits<{
+	select: [platform: PlatformId]
+}>()
 
 const platforms = Object.values(PLATFORMS)
 </script>

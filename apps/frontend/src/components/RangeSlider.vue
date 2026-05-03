@@ -10,17 +10,26 @@
 			:min="min"
 			:max="max"
 			class="w-full"
-			@input="$emit('update:modelValue', Number($event.target.value))"
+			@input="$emit('update:modelValue', Number(($event.target as HTMLInputElement).value))"
 		/>
 	</div>
 </template>
 
-<script setup>
-defineProps({
-	label: String,
-	modelValue: Number,
-	min: { type: Number, default: 1 },
-	max: { type: Number, default: 10 },
-})
-defineEmits(['update:modelValue'])
+<script setup lang="ts">
+withDefaults(
+	defineProps<{
+		label?: string
+		modelValue?: number
+		min?: number
+		max?: number
+	}>(),
+	{
+		min: 1,
+		max: 10,
+	},
+)
+
+defineEmits<{
+	'update:modelValue': [value: number]
+}>()
 </script>

@@ -504,7 +504,7 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -513,9 +513,24 @@ import ColorPalette from './components/ColorPalette.vue'
 import PlatformSelector from './components/PlatformSelector.vue'
 import RangeSlider from './components/RangeSlider.vue'
 import ToggleCheckbox from './components/ToggleCheckbox.vue'
-import { defineMessages } from './helpers/i18n.js'
-import { LOCALES } from './helpers/locales.js'
-import { BG_COLORS, CARD_LIMITS, getAccentColors, parseUrl, PLATFORMS } from './platforms.js'
+import { defineMessages } from './helpers/i18n'
+import { LOCALES } from './helpers/locales'
+import type {
+	BadgeMetric,
+	ColorValue,
+	EmbedType,
+	PlatformId,
+	ProjectTypeOption,
+	TargetType,
+} from './platforms'
+import {
+	BG_COLORS,
+	CARD_LIMITS,
+	getAccentColors,
+	isPlatformId,
+	parseUrl,
+	PLATFORMS,
+} from './platforms'
 
 const { t, locale } = useI18n()
 
@@ -670,18 +685,18 @@ const m = defineMessages({
 })
 
 // ── Helpers ──
-function targetLabel(target) {
+function targetLabel(target: TargetType) {
 	const key = `target.${target}`
 	return t(key)
 }
 
-function metricLabel(metric) {
+function metricLabel(metric: BadgeMetric) {
 	const key = `metric.${metric}`
 	return t(key)
 }
 
-// Map platforms.js project type option labels to message IDs
-const PROJECT_TYPE_MESSAGE_IDS = {
+// Map platform project type option labels to message IDs
+const PROJECT_TYPE_MESSAGE_IDS: Record<string, string> = {
 	'All Types': m.projectTypeAll.id,
 	Mods: m.projectTypeMod.id,
 	Modpacks: m.projectTypeModpack.id,
@@ -693,23 +708,23 @@ const PROJECT_TYPE_MESSAGE_IDS = {
 	'Bukkit Plugins': m.projectTypeBukkitPlugin.id,
 }
 
-function projectTypeLabel(opt) {
+function projectTypeLabel(opt: ProjectTypeOption) {
 	const id = PROJECT_TYPE_MESSAGE_IDS[opt.label]
 	return id ? t(id) : opt.label
 }
 
 // ── Reactive state ──
-const selectedPlatform = ref('modrinth')
-const embedType = ref('card')
-const targetType = ref('user')
-const badgeMetric = ref('downloads')
+const selectedPlatform = ref<PlatformId>('modrinth')
+const embedType = ref<EmbedType>('card')
+const targetType = ref<TargetType>('user')
+const badgeMetric = ref<BadgeMetric>('downloads')
 const identifier = ref('')
 const urlInput = ref('')
 
 const showProjects = ref(true)
-const maxProjects = ref(CARD_LIMITS.DEFAULT_COUNT)
+const maxProjects = ref<number>(CARD_LIMITS.DEFAULT_COUNT)
 const showVersions = ref(true)
-const maxVersions = ref(CARD_LIMITS.DEFAULT_COUNT)
+const maxVersions = ref<number>(CARD_LIMITS.DEFAULT_COUNT)
 const relativeTime = ref(true)
 const showSummary = ref(false)
 const showSparklines = ref(true)
@@ -718,32 +733,34 @@ const showIcon = ref(true)
 const showBorder = ref(true)
 const animations = ref(true)
 const selectedColor = ref('1bd96a')
-const selectedBgColor = ref(null)
+const selectedBgColor = ref<ColorValue>(null)
 
 const projectTypeFilter = ref('')
 
 const loading = ref(false)
-const generationTime = ref(null)
+const generationTime = ref<number | null>(null)
 const apiSlow = ref(false)
 const apiError = ref(false)
-const previewSrc = ref(null)
+const previewSrc = ref<string | null>(null)
 const metaName = ref('')
-const metaUrl = ref(null)
-const curseforgeSlug = ref(null)
+const metaUrl = ref<string | null>(null)
+const curseforgeSlug = ref<string | null>(null)
 
-const copiedType = ref(null)
+type CopyType = 'markdown' | 'html' | 'url'
+
+const copiedType = ref<CopyType | null>(null)
 const copyLabels = computed(() => ({
 	markdown: copiedType.value === 'markdown' ? t(m.actionCopied.id) : t(m.actionCopyMarkdown.id),
 	html: copiedType.value === 'html' ? t(m.actionCopied.id) : t(m.actionCopyHtml.id),
 	url: copiedType.value === 'url' ? t(m.actionCopied.id) : t(m.actionCopyUrl.id),
 }))
 
-const customizationSection = ref(null)
+const customizationSection = ref<InstanceType<typeof CollapsibleSection> | null>(null)
 
 // ── Computed ──
 const platformConfig = computed(() => PLATFORMS[selectedPlatform.value])
 
-const availableMetrics = computed(() => {
+const availableMetrics = computed<BadgeMetric[]>(() => {
 	const metrics =
 		platformConfig.value.badgeMetrics[targetType.value] ||
 		platformConfig.value.badgeMetrics[platformConfig.value.targets[0]]
@@ -849,12 +866,12 @@ const embedUrl = computed(() => {
 	if (isUserLike.value) {
 		if (!showProjects.value) params.set('showProjects', 'false')
 		if (maxProjects.value !== CARD_LIMITS.DEFAULT_COUNT)
-			params.set('maxProjects', maxProjects.value)
+			params.set('maxProjects', String(maxProjects.value))
 	}
 	if (isProject.value) {
 		if (!showVersions.value) params.set('showVersions', 'false')
 		if (maxVersions.value !== CARD_LIMITS.DEFAULT_COUNT)
-			params.set('maxVersions', maxVersions.value)
+			params.set('maxVersions', String(maxVersions.value))
 		if (!relativeTime.value) params.set('relativeTime', 'false')
 	}
 	if (isUserLike.value) {
@@ -913,14 +930,14 @@ const urlText = computed(() => {
 })
 
 // ── Debounce ──
-let debounceTimer = null
-function debounce(fn, ms = 200) {
-	clearTimeout(debounceTimer)
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
+function debounce(fn: () => void, ms = 200) {
+	if (debounceTimer) clearTimeout(debounceTimer)
 	debounceTimer = setTimeout(fn, ms)
 }
 
 // ── Methods ──
-function setPlatform(platform) {
+function setPlatform(platform: PlatformId) {
 	selectedPlatform.value = platform
 	selectedColor.value = PLATFORMS[platform].defaultColor
 	targetType.value = PLATFORMS[platform].targets[0]
@@ -966,13 +983,14 @@ function resetToDefaults() {
 	updateBrowserUrl()
 }
 
-function onAccentChange(color) {
+function onAccentChange(color: ColorValue) {
+	if (color === null) return
 	selectedColor.value = color
 	generate()
 	updateBrowserUrl()
 }
 
-function onBgChange(color) {
+function onBgChange(color: ColorValue) {
 	selectedBgColor.value = color
 	generate()
 	updateBrowserUrl()
@@ -1175,7 +1193,7 @@ async function generate() {
 	}
 }
 
-function copy(type) {
+function copy(type: CopyType) {
 	const textMap = { markdown: markdownText.value, html: htmlText.value, url: urlText.value }
 	const text = textMap[type]
 	if (!text) return
@@ -1187,9 +1205,9 @@ function copy(type) {
 	})
 }
 
-function updateFavicon(color) {
+function updateFavicon(color: string) {
 	const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 100"><g fill="${color}" transform="translate(-195.12051,-249.04304)"><g transform="matrix(1.2138597,0,0,1.2138597,-53.114434,-63.81136)"><rect width="60" height="20" x="205.12053" y="259.04303" ry="10"/><rect width="20" height="20" x="275.12051" y="259.04303" ry="10"/><rect width="90" height="20" x="205.12053" y="319.04303" ry="10"/><rect width="90" height="20" x="204.50052" y="289.04303" ry="10"/></g></g></svg>`
-	const link = document.querySelector('link[type="image/svg+xml"]')
+	const link = document.querySelector<HTMLLinkElement>('link[type="image/svg+xml"]')
 	if (link) link.href = 'data:image/svg+xml,' + encodeURIComponent(svg)
 }
 
@@ -1209,10 +1227,10 @@ function updateBrowserUrl() {
 	if (embedType.value === 'card') {
 		if (isUserLike.value && !showProjects.value) params.set('showProjects', 'false')
 		if (isUserLike.value && maxProjects.value !== CARD_LIMITS.DEFAULT_COUNT)
-			params.set('maxProjects', maxProjects.value)
+			params.set('maxProjects', String(maxProjects.value))
 		if (!showVersions.value) params.set('showVersions', 'false')
 		if (maxVersions.value !== CARD_LIMITS.DEFAULT_COUNT)
-			params.set('maxVersions', maxVersions.value)
+			params.set('maxVersions', String(maxVersions.value))
 		if (!relativeTime.value) params.set('relativeTime', 'false')
 		if (!showSparklines.value) params.set('showSparklines', 'false')
 		if (!showDownloadBars.value) params.set('showDownloadBars', 'false')
@@ -1248,21 +1266,25 @@ function loadFromUrl() {
 		return
 	}
 
-	const platform = rawParams.get('platform') || 'modrinth'
+	const platformParam = rawParams.get('platform') || 'modrinth'
+	const platform = isPlatformId(platformParam) ? platformParam : 'modrinth'
 	const config = PLATFORMS[platform]
 
 	selectedPlatform.value = platform
-	embedType.value = rawParams.get('type') || 'card'
-	targetType.value = rawParams.get('target') || config.targets[0]
-	badgeMetric.value = rawParams.get('metric') || 'downloads'
+	embedType.value = rawParams.get('type') === 'badge' ? 'badge' : 'card'
+	const targetParam = rawParams.get('target') as TargetType | null
+	targetType.value =
+		targetParam && config.targets.includes(targetParam) ? targetParam : config.targets[0]
+	const metricParam = rawParams.get('metric') as BadgeMetric | null
+	badgeMetric.value = metricParam || 'downloads'
 	identifier.value = rawParams.get('value') || ''
 
 	projectTypeFilter.value = rawParams.get('projectType') || ''
 
 	showProjects.value = rawParams.get('showProjects') !== 'false'
-	maxProjects.value = parseInt(rawParams.get('maxProjects')) || CARD_LIMITS.DEFAULT_COUNT
+	maxProjects.value = parseInt(rawParams.get('maxProjects') || '') || CARD_LIMITS.DEFAULT_COUNT
 	showVersions.value = rawParams.get('showVersions') !== 'false'
-	maxVersions.value = parseInt(rawParams.get('maxVersions')) || CARD_LIMITS.DEFAULT_COUNT
+	maxVersions.value = parseInt(rawParams.get('maxVersions') || '') || CARD_LIMITS.DEFAULT_COUNT
 	relativeTime.value = rawParams.get('relativeTime') !== 'false'
 	showSummary.value = rawParams.get('showSummary') === 'true'
 	showSparklines.value = rawParams.get('showSparklines') !== 'false'

@@ -1,4 +1,10 @@
-export const LOCALES = [
+export interface LocaleOption {
+	code: string
+	name: string
+	dir?: 'ltr' | 'rtl'
+}
+
+export const LOCALES: LocaleOption[] = [
 	{ code: 'en-US', name: 'English' },
 	// { code: 'ar-SA', name: 'العربية', dir: 'rtl' },
 	// { code: 'cs-CZ', name: 'Čeština' },

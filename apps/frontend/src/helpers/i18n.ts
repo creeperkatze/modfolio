@@ -1,15 +1,24 @@
 import { createI18n } from 'vue-i18n'
 
-import { LOCALES } from './locales.js'
+import { LOCALES } from './locales'
+
+interface CrowdinMessage {
+	message?: string
+	defaultMessage?: string
+}
+
+type CrowdinMessages = Record<string, string | CrowdinMessage>
+type I18nMessages = Record<string, string>
+
+export interface MessageDescriptor {
+	id: string
+	defaultMessage: string
+}
 
 const LOCALE_CODES = new Set(LOCALES.map((l) => l.code))
 
-/**
- * Transform Crowdin JSON format ({ key: { message: "..." } }) to flat
- * vue-i18n messages ({ key: "..." }).
- */
-function transformCrowdinMessages(messages) {
-	const result = {}
+function transformCrowdinMessages(messages: CrowdinMessages): I18nMessages {
+	const result: I18nMessages = {}
 	for (const [key, value] of Object.entries(messages)) {
 		if (typeof value === 'string') {
 			result[key] = value
@@ -23,13 +32,14 @@ function transformCrowdinMessages(messages) {
 const localeModules = import.meta.glob('../locales/*/*.json', { eager: true })
 
 function buildMessages() {
-	const messages = {}
+	const messages: Record<string, I18nMessages> = {}
 	for (const [path, module] of Object.entries(localeModules)) {
 		const match = path.match(/\/([^/]+)\/[^/]+\.json$/)
 		if (match && LOCALE_CODES.has(match[1])) {
 			const locale = match[1]
 			if (!messages[locale]) messages[locale] = {}
-			Object.assign(messages[locale], transformCrowdinMessages(module.default))
+			const jsonModule = module as { default: CrowdinMessages }
+			Object.assign(messages[locale], transformCrowdinMessages(jsonModule.default))
 		}
 	}
 	return messages
@@ -44,7 +54,7 @@ export const i18n = createI18n({
 	messages: buildMessages(),
 })
 
-export function detectBrowserLocale() {
+export function detectBrowserLocale(): string {
 	const langs = navigator.languages?.length ? navigator.languages : [navigator.language]
 	for (const lang of langs) {
 		const exact = LOCALES.find((l) => l.code.toLowerCase() === lang.toLowerCase())
@@ -56,14 +66,10 @@ export function detectBrowserLocale() {
 	return 'en-US'
 }
 
-/**
- * Identity functions used as markers for @formatjs/cli message extraction.
- * These are recognised by `formatjs extract` without any extra configuration.
- */
-export function defineMessage(descriptor) {
+export function defineMessage<T extends MessageDescriptor>(descriptor: T): T {
 	return descriptor
 }
 
-export function defineMessages(descriptors) {
+export function defineMessages<T extends Record<string, MessageDescriptor>>(descriptors: T): T {
 	return descriptors
 }

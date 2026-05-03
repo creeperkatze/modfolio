@@ -47,16 +47,20 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 
-const props = defineProps({
-	label: String,
-	modelValue: [String, null],
-	presetColors: Array,
-})
+import type { ColorOption, ColorValue } from '../platforms'
 
-const emit = defineEmits(['update:modelValue'])
+const props = defineProps<{
+	label?: string
+	modelValue: ColorValue
+	presetColors: ColorOption[]
+}>()
+
+const emit = defineEmits<{
+	'update:modelValue': [value: ColorValue]
+}>()
 
 const isCustom = computed(() => {
 	if (props.modelValue === null) return false
@@ -69,7 +73,7 @@ const customPickerBg = computed(() => {
 	return 'transparent'
 })
 
-function colorButtonStyle(color) {
+function colorButtonStyle(color: ColorOption) {
 	if (color.value === null) {
 		return {
 			background: `
@@ -85,7 +89,8 @@ function colorButtonStyle(color) {
 	return { background: `#${color.value}` }
 }
 
-function onCustomColor(e) {
-	emit('update:modelValue', e.target.value.substring(1))
+function onCustomColor(e: Event) {
+	const target = e.target as HTMLInputElement
+	emit('update:modelValue', target.value.substring(1))
 }
 </script>
