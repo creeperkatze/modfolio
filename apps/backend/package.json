@@ -6,7 +6,7 @@
 	"main": "dist/server.ts",
 	"scripts": {
 		"build": "tsc",
-		"dev": "tsx watch src/server.ts",
+		"dev": "cross-env NODE_ENV=development tsx watch src/server.ts",
 		"start": "node dist/server.js",
 		"test": "vitest run",
 		"lint": "eslint src/",
@@ -27,6 +27,7 @@
 		"@types/express": "^5.0.6",
 		"@types/node": "^25.6.0",
 		"@types/swagger-ui-express": "^4.1.8",
+		"cross-env": "^10.1.0",
 		"eslint": "^10.0.2",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.5",

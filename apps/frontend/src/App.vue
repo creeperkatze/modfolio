@@ -470,44 +470,63 @@
 			</div>
 		</div>
 
-		<footer class="text-center py-8 px-5 pt-8 text-base text-text-muted font-semibold">
-			{{ t(m.footerMadeBy.id) }}
-			<a href="https://github.com/creeperkatze" target="_blank" class="dynamic-link no-underline"
+		<footer
+			class="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 py-8 px-5 pt-8 text-center text-base text-text-muted font-semibold"
+		>
+			<span>{{ t(m.footerCredits.id) }}</span>
+			<a
+				href="https://github.com/creeperkatze"
+				target="_blank"
+				class="dynamic-link no-underline transition-colors hover:text-[#55ff98]"
 				>Creeperkatze</a
 			>
-			&middot;
+			·
 			<a
 				href="https://github.com/creeperkatze/modfolio"
 				target="_blank"
-				class="dynamic-link no-underline"
-				>{{ t(m.footerViewSource.id) }}</a
+				class="dynamic-link no-underline transition-colors hover:text-[#55ff98]"
+				>{{ t(m.footerSource.id) }}</a
 			>
-			&middot;
-			<a href="/docs" class="dynamic-link no-underline">{{ t(m.footerViewApiDocs.id) }}</a>
-			&middot;
+			·
+			<a href="/docs" class="dynamic-link no-underline transition-colors hover:text-[#55ff98]">{{
+				t(m.footerApiDocs.id)
+			}}</a>
+			·
 			<a
 				href="https://github.com/creeperkatze/modfolio"
 				target="_blank"
-				class="no-underline"
-				style="color: #fbbf24"
-				>{{ t(m.footerStarOnGithub.id) }}</a
+				class="inline-flex shrink-0 items-center gap-1 text-[#fbbf24] no-underline transition-colors hover:text-[#ffd76b]"
 			>
-			&middot;
+				<Star class="size-3.5 shrink-0" aria-hidden="true" />
+				<span>{{ t(m.footerGithub.id) }}</span>
+			</a>
+			·
+			<a
+				href="https://ko-fi.com/creeperkatze"
+				target="_blank"
+				class="inline-flex shrink-0 items-center gap-1 text-[#FF5E5B] no-underline transition-colors hover:text-[#ff8e8c]"
+			>
+				<KofiIcon class="size-3.5 shrink-0 fill-current" aria-hidden="true" />
+				<span>{{ t(m.footerSupport.id) }}</span>
+			</a>
+			·
 			<a
 				href="https://crowdin.com/project/modfolio"
 				target="_blank"
-				class="dynamic-link no-underline"
-				>{{ t(m.footerHelpTranslate.id) }}</a
+				class="dynamic-link no-underline transition-colors hover:text-[#55ff98]"
+				>{{ t(m.footerTranslate.id) }}</a
 			>
-			&middot; {{ t(m.footerNotAffiliated.id) }}
+			· {{ t(m.footerNotAffiliated.id) }}
 		</footer>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { Star } from '@lucide/vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import KofiIcon from './assets/icons/kofi.svg?component'
 import CollapsibleSection from './components/CollapsibleSection.vue'
 import ColorPalette from './components/ColorPalette.vue'
 import PlatformSelector from './components/PlatformSelector.vue'
@@ -673,18 +692,18 @@ const m = defineMessages({
 	actionCopied: { id: 'action.copied', defaultMessage: 'Copied!' },
 	actionReset: { id: 'action.reset', defaultMessage: 'Reset' },
 
-	footerMadeBy: { id: 'footer.madeBy', defaultMessage: 'Made with ♥ by' },
-	footerViewSource: { id: 'footer.viewSource', defaultMessage: 'Source' },
-	footerViewApiDocs: { id: 'footer.viewApiDocs', defaultMessage: 'API Docs' },
-	footerStarOnGithub: { id: 'footer.starOnGithub', defaultMessage: '★ On Github' },
-	footerHelpTranslate: { id: 'footer.helpTranslate', defaultMessage: 'Help Translate' },
+	footerCredits: { id: 'footer.credits', defaultMessage: 'Made with ♥ by' },
+	footerSource: { id: 'footer.source', defaultMessage: 'Source' },
+	footerApiDocs: { id: 'footer.apiDocs', defaultMessage: 'API Docs' },
+	footerGithub: { id: 'footer.github', defaultMessage: 'On Github' },
+	footerSupport: { id: 'footer.support', defaultMessage: 'Support' },
+	footerTranslate: { id: 'footer.translate', defaultMessage: 'Help Translate' },
 	footerNotAffiliated: {
 		id: 'footer.notAffiliated',
 		defaultMessage: 'Not affiliated with Modrinth, CurseForge, Hangar or Spigot',
 	},
 })
 
-// ── Helpers ──
 function targetLabel(target: TargetType) {
 	const key = `target.${target}`
 	return t(key)
@@ -695,7 +714,6 @@ function metricLabel(metric: BadgeMetric) {
 	return t(key)
 }
 
-// Map platform project type option labels to message IDs
 const PROJECT_TYPE_MESSAGE_IDS: Record<string, string> = {
 	'All Types': m.projectTypeAll.id,
 	Mods: m.projectTypeMod.id,
@@ -713,7 +731,6 @@ function projectTypeLabel(opt: ProjectTypeOption) {
 	return id ? t(id) : opt.label
 }
 
-// ── Reactive state ──
 const selectedPlatform = ref<PlatformId>('modrinth')
 const embedType = ref<EmbedType>('card')
 const targetType = ref<TargetType>('user')
@@ -757,7 +774,6 @@ const copyLabels = computed(() => ({
 
 const customizationSection = ref<InstanceType<typeof CollapsibleSection> | null>(null)
 
-// ── Computed ──
 const platformConfig = computed(() => PLATFORMS[selectedPlatform.value])
 
 const availableMetrics = computed<BadgeMetric[]>(() => {
@@ -928,15 +944,12 @@ const urlText = computed(() => {
 	if (!embedUrl.value) return ''
 	return `${embedUrl.value}${embedUrl.value.includes('?') ? '&' : '?'}timestamp=${Date.now()}`
 })
-
-// ── Debounce ──
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 function debounce(fn: () => void, ms = 200) {
 	if (debounceTimer) clearTimeout(debounceTimer)
 	debounceTimer = setTimeout(fn, ms)
 }
 
-// ── Methods ──
 function setPlatform(platform: PlatformId) {
 	selectedPlatform.value = platform
 	selectedColor.value = PLATFORMS[platform].defaultColor

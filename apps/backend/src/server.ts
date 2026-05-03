@@ -16,6 +16,7 @@ dotenv.config({ quiet: true })
 
 const app = express()
 const port = process.env.PORT || 3000
+const frontendDevUrl = process.env.FRONTEND_DEV_URL || 'http://localhost:5173'
 
 const root = import.meta.dirname // apps/backend/src
 const publicDir = path.resolve(root, '..', 'public')
@@ -25,8 +26,10 @@ const swaggerDocument = JSON.parse(fs.readFileSync(path.join(publicDir, 'swagger
 swaggerDocument.info.version = packageJson.version
 const swaggerCss = fs.readFileSync(path.join(publicDir, 'swagger.css'), 'utf8')
 
-// Serve Vue frontend build output first, then fallback to public/ for swagger assets etc.
-app.use(express.static(frontendDist))
+// In dev, Vite serves the frontend with hot reload. Production serves the built Vue app here.
+if (process.env.NODE_ENV !== 'development') {
+	app.use(express.static(frontendDist))
+}
 app.use(express.static(publicDir))
 
 app.use(checkCrawlerMiddleware)
@@ -44,6 +47,20 @@ app.use(
 		customCss: swaggerCss,
 	}),
 )
+
+app.use((req, res, next) => {
+	if (
+		process.env.NODE_ENV === 'development' &&
+		req.method === 'GET' &&
+		req.path === '/' &&
+		req.accepts('html')
+	) {
+		res.redirect(`${frontendDevUrl}${req.originalUrl}`)
+		return
+	}
+
+	next()
+})
 
 app.use((req, res) => {
 	res.status(404).json({
