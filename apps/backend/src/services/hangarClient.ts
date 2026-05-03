@@ -245,7 +245,12 @@ export class HangarClient extends BasePlatformClient
                 await fetchVersionDatesForProjects(projects, getVersionsForSparkline);
                 allVersionDates = projects.flatMap(p => p.versionDates || []);
             } catch (err) {
-                logger.warn(`Failed to fetch version dates for Hangar user "${username}": ${err.message}`);
+                logger.warn({
+                    err,
+                    platform: "hangar",
+                    entity: "user",
+                    username
+                }, "Error fetching version dates");
                 allVersionDates = [];
             }
         } catch {

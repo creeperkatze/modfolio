@@ -139,7 +139,13 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
             if (!data) {
                 const errorMessage = getErrorMessage(entityConfig.platformName, entityConfig.entityName);
 
-                logger.warn(`Error showing ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge for "${identifier}": ${errorMessage}`);
+                logger.warn({
+                    platform: entityConfig.platformName,
+                    entity: entityConfig.entityName,
+                    badge: badgeType,
+                    identifier,
+                    errorMessage
+                }, "Error fetching badge data");
 
                 const notFoundSvg = generateBadge(badgeConfig.label, "Not found", entityConfig.platformName, defaultColor, null, "#f38ba8", showIcon, showBorder);
 
@@ -187,7 +193,13 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
     } catch (err) {
         const identifier = req.params.username || req.params.slug || req.params.id || req.params.projectId;
         const entityConfig = ENTITY_CONFIG[entityType];
-        logger.warn(`Error showing ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge for "${identifier}": ${err.message}`);
+        logger.warn({
+            err,
+            platform: entityConfig.platformName,
+            entity: entityConfig.entityName,
+            badge: badgeType,
+            identifier
+        }, "Error rendering badge");
         next(err);
     }
 };

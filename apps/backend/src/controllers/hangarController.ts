@@ -60,7 +60,12 @@ export const getHangarMeta = async (req, res, next) => {
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);
     } catch (err) {
-        logger.warn(`Error fetching hangar meta for "${req.params.slug}": ${err.message}`);
+        logger.warn({
+            err,
+            platform: PLATFORM.HANGAR,
+            slug: req.params.slug,
+            entity: req.query.type === "user" ? "user" : "project"
+        }, "Error fetching meta");
         next(err);
     }
 };

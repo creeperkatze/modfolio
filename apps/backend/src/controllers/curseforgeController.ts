@@ -53,7 +53,11 @@ export const getCfUserLookup = async (req, res) => {
 
         res.json({ id: userId });
     } catch (err) {
-        logger.warn(`Error looking up Curseforge user "${req.params.username}": ${err.message}`);
+        logger.warn({
+            err,
+            platform: PLATFORM.CURSEFORGE,
+            username: req.params.username
+        }, "Error looking up CurseForge user");
         res.status(404).json({ error: "User not found", message: err.message });
     }
 };
@@ -78,7 +82,11 @@ export const getCfSlugLookup = async (req, res) => {
 
         res.json({ id: modId });
     } catch (err) {
-        logger.warn(`Error looking up Curseforge slug "${req.params.slug}": ${err.message}`);
+        logger.warn({
+            err,
+            platform: PLATFORM.CURSEFORGE,
+            slug: req.params.slug
+        }, "Error looking up CurseForge slug");
         res.status(404).json({ error: "Project not found", message: err.message });
     }
 };
@@ -139,7 +147,12 @@ export const getCurseforgeMeta = async (req, res, next) => {
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);
     } catch (err) {
-        logger.warn(`Error fetching curseforge meta for "${req.params.type}" "${req.params.id}": ${err.message}`);
+        logger.warn({
+            err,
+            platform: PLATFORM.CURSEFORGE,
+            entity: req.params.type,
+            identifier: req.params.id
+        }, "Error fetching meta");
         next(err);
     }
 };

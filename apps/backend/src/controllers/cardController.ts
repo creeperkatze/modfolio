@@ -153,7 +153,12 @@ const handleCardRequest = async (req, res, next, cardType) => {
             if (!data) {
                 const errorMessage = getErrorMessage(config.platformId, config.entityName);
 
-                logger.warn(`Error showing ${config.platformId} ${config.entityName} card for "${identifier}": ${errorMessage}`);
+                logger.warn({
+                    platform: config.platformId,
+                    entity: config.entityName,
+                    identifier,
+                    errorMessage
+                }, "Error fetching card data");
 
                 // Generate error card with platform-specific branding
                 const errorSvg = generateErrorCard(
@@ -209,7 +214,12 @@ const handleCardRequest = async (req, res, next, cardType) => {
     } catch (err) {
         const config = CARD_CONFIGS[cardType];
         const identifier = req.params[config.paramKey];
-        logger.warn(`Error showing ${config.platformId} ${config.entityName} card for "${identifier}": ${err.message}`);
+        logger.warn({
+            err,
+            platform: config.platformId,
+            entity: config.entityName,
+            identifier
+        }, "Error rendering card");
         next(err);
     }
 };

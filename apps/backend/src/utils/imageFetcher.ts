@@ -42,7 +42,7 @@ export async function fetchImageAsBase64(url, convertToPng = false)
             return { data: `data:${mimeType};base64,${base64}`, conversionTime };
         } catch (error)
         {
-            logger.warn(`Failed to fetch image ${url}: ${error.message}`);
+            logger.warn({ err: error, url, convertToPng }, "Error fetching image");
             return null;
         }
     });

@@ -57,7 +57,12 @@ export const getSpigotMeta = async (req, res, next) => {
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);
     } catch (err) {
-        logger.warn(`Error fetching spigot meta for ${req.params.id}: ${err.message}`);
+        logger.warn({
+            err,
+            platform: PLATFORM.SPIGOT,
+            identifier: req.params.id,
+            entity: req.query.type === "author" ? "author" : "resource"
+        }, "Error fetching meta");
         next(err);
     }
 };
