@@ -7,6 +7,9 @@ export default [
         languageOptions: {
             ecmaVersion: "latest",
             sourceType: "module",
+            parserOptions: {
+                tsconfigRootDir: import.meta.dirname
+            },
             globals: {
                 console: "readonly",
                 process: "readonly",

@@ -14,6 +14,7 @@ export default [
 		languageOptions: {
 			parserOptions: {
 				parser: tseslint.parser,
+				tsconfigRootDir: import.meta.dirname,
 			},
 			globals: {
 				window: 'readonly',
