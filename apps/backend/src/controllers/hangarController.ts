@@ -75,7 +75,7 @@ export const getHangarMeta = async (req, res, next) => {
         const message = `Could not show ${PLATFORM.HANGAR} ${entity} meta`;
         logger.warn({
             target: { platform: PLATFORM.HANGAR, entity, identifier: req.params.slug, surface: "meta" },
-            error: { err }
+            err
         }, message);
         next(err);
     }

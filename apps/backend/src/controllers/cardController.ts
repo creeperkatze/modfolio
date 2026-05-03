@@ -239,7 +239,7 @@ const handleCardRequest = async (req, res, next, cardType) => {
                 identifier,
                 type: "card"
             },
-            error: { err }
+            err
         }, message);
         next(err);
     }

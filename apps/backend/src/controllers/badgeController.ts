@@ -220,7 +220,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
                 type: "badge",
                 badge: badgeType
             },
-            error: { err }
+            err
         }, message);
         next(err);
     }

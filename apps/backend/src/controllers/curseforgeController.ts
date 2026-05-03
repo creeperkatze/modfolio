@@ -67,7 +67,7 @@ export const getCfUserLookup = async (req, res) => {
         const message = `Could not show ${PLATFORM.CURSEFORGE} user lookup`;
         logger.warn({
             target: { platform: PLATFORM.CURSEFORGE, entity: "user", identifier: req.params.username, surface: "lookup" },
-            error: { err }
+            err
         }, message);
         res.status(404).json({ error: "User not found", message: err.message });
     }
@@ -107,7 +107,7 @@ export const getCfSlugLookup = async (req, res) => {
         const message = `Could not show ${PLATFORM.CURSEFORGE} project lookup`;
         logger.warn({
             target: { platform: PLATFORM.CURSEFORGE, entity: "project", identifier: req.params.slug, surface: "lookup" },
-            error: { err }
+            err
         }, message);
         res.status(404).json({ error: "Project not found", message: err.message });
     }
@@ -183,7 +183,7 @@ export const getCurseforgeMeta = async (req, res, next) => {
         const message = `Could not show ${PLATFORM.CURSEFORGE} ${req.params.type} meta`;
         logger.warn({
             target: { platform: PLATFORM.CURSEFORGE, entity: req.params.type, identifier: req.params.id, surface: "meta" },
-            error: { err }
+            err
         }, message);
         next(err);
     }

@@ -83,7 +83,7 @@ export const getModrinthMeta = async (req, res, next) => {
         const message = `Could not show ${PLATFORM.MODRINTH} ${req.params.type} meta`;
         logger.warn({
             target: { platform: PLATFORM.MODRINTH, entity: req.params.type, identifier: req.params.id, surface: "meta" },
-            error: { err }
+            err
         }, message);
         next(err);
     }

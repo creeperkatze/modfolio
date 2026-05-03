@@ -72,7 +72,7 @@ export const getSpigotMeta = async (req, res, next) => {
         const message = `Could not show ${PLATFORM.SPIGOT} ${entity} meta`;
         logger.warn({
             target: { platform: PLATFORM.SPIGOT, entity, identifier: req.params.id, surface: "meta" },
-            error: { err }
+            err
         }, message);
         next(err);
     }

@@ -7,6 +7,22 @@ type ClientConfig = {
     userAgent?: string;
 };
 
+export class PlatformApiError extends Error {
+    platformName: string;
+    upstreamStatusCode: number;
+    statusCode: number;
+    detailText: string;
+
+    constructor(platformName: string, upstreamStatusCode: number, detailText: string) {
+        super(`${platformName} API error: ${upstreamStatusCode}: ${detailText}`);
+        this.name = "PlatformApiError";
+        this.platformName = platformName;
+        this.upstreamStatusCode = upstreamStatusCode;
+        this.statusCode = upstreamStatusCode >= 500 ? 502 : upstreamStatusCode;
+        this.detailText = detailText;
+    }
+}
+
 function getDefaultUserAgent() {
     const envUserAgent = process.env.USER_AGENT;
     if (envUserAgent) {
@@ -67,7 +83,7 @@ export class BasePlatformClient {
                 // Use raw error text if JSON parsing fails
             }
 
-            throw new Error(`${this.platformName} API error: ${response.status}: ${errorText}`);
+            throw new PlatformApiError(this.platformName, response.status, errorText);
         }
 
         return response.json();

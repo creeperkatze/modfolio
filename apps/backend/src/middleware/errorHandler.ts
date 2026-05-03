@@ -2,6 +2,7 @@ import { generateBadge } from "../generators/badge.js";
 import { generateAttribution, generateInfo } from "../utils/svgComponents.js";
 import { generatePng } from "../utils/generateImage.js";
 import { ICONS } from "../constants/icons.js";
+import { PlatformApiError } from "../services/baseClient.js";
 
 export function generateErrorCard(message, detailText = "", isCurseforge = false, isHangar = false, isSpiget = false)
 {
@@ -120,6 +121,11 @@ export async function errorHandler(err, req, res)
                     isCollectionRequest ? "Collection not found" :
                         "User not found";
         }
+    } else if (err instanceof PlatformApiError)
+    {
+        statusCode = err.statusCode;
+        message = getStatusMessage(statusCode);
+        detailText = err.detailText;
     } else if (err.message.includes("CurseForge API"))
     {
         // Extract status code and error text from error message (format: "CurseForge API error: STATUS: TEXT")
@@ -127,8 +133,8 @@ export async function errorHandler(err, req, res)
         const apiStatusCode = errorMatch ? parseInt(errorMatch[1]) : 502;
         const apiErrorText = errorMatch && errorMatch[2] ? errorMatch[2].trim() : "";
 
-        statusCode = apiStatusCode;
-        message = getStatusMessage(apiStatusCode);
+        statusCode = apiStatusCode >= 500 ? 502 : apiStatusCode;
+        message = getStatusMessage(statusCode);
         detailText = apiErrorText;
     } else if (err.message.includes("Modrinth API"))
     {
@@ -137,8 +143,8 @@ export async function errorHandler(err, req, res)
         const apiStatusCode = errorMatch ? parseInt(errorMatch[1]) : 502;
         const apiErrorText = errorMatch && errorMatch[2] ? errorMatch[2].trim() : "";
 
-        statusCode = apiStatusCode;
-        message = getStatusMessage(apiStatusCode);
+        statusCode = apiStatusCode >= 500 ? 502 : apiStatusCode;
+        message = getStatusMessage(statusCode);
         detailText = apiErrorText;
     } else if (err.message.includes("Rate limit"))
     {
@@ -150,14 +156,24 @@ export async function errorHandler(err, req, res)
     const isBadge = req.path.includes("/badge");
 
     // Check if image format is requested or if it's an image crawler
-    const useImage = req.isImageCrawler || format === "image";
+    const useImage = req.isImageCrawler || format === "png" || format === "image";
 
     if (isBadge)
     {
-        res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 
-        return res.status(statusCode).send(generateBadge("error", message, "#f38ba8"));
+        const svg = generateBadge("error", message, "#f38ba8");
+
+        if (useImage) {
+            const { buffer: pngBuffer } = await generatePng(svg);
+            res.setHeader("Content-Type", "image/png");
+            return res.status(req.isImageCrawler ? 200 : statusCode).send(pngBuffer);
+        }
+
+        res.setHeader("Content-Type", "image/svg+xml");
+        res.setHeader("X-Error-Status", statusCode.toString());
+
+        return res.status(statusCode).send(svg);
     } else if (useImage)
     {
         const svg = generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget);
