@@ -20,6 +20,9 @@
   "error.apiDown": {
     "message": "API {platform} в настоящее время недоступен."
   },
+  "field.badgeMetric": {
+    "message": "Метрика"
+  },
   "field.projectType": {
     "message": "Тип проекта"
   },
@@ -32,8 +35,26 @@
   "field.url": {
     "message": "URL"
   },
+  "footer.apiDocs": {
+    "message": "Документация по API"
+  },
+  "footer.credits": {
+    "message": "Сделано с ♥ ими"
+  },
+  "footer.github": {
+    "message": "На Github"
+  },
   "footer.notAffiliated": {
     "message": "Не связаны с Modrinth, CurseForge, Hangar или Spigot"
+  },
+  "footer.source": {
+    "message": "Источник"
+  },
+  "footer.support": {
+    "message": "Поддержка"
+  },
+  "footer.translate": {
+    "message": "Помоги с переводом"
   },
   "hint.transparentBg": {
     "message": "Прозрачный фон подходит лучше в большинстве случаев, потому что он сливается с фоном, не меняя стиль."
