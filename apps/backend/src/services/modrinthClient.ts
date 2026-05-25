@@ -310,8 +310,6 @@ export class ModrinthClient extends BasePlatformClient {
 			return null
 		}
 
-		let apiTime = performance.now() - apiStart
-
 		const stats = {
 			downloads: project.downloads || 0,
 			followers: project.followers || 0,
@@ -324,7 +322,7 @@ export class ModrinthClient extends BasePlatformClient {
 		} catch {
 			stats.versionCount = 0
 		}
-		apiTime = performance.now() - apiStart
+		const apiTime = performance.now() - apiStart
 
 		return { stats, timings: { api: apiTime } }
 	}

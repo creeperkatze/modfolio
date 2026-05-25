@@ -131,7 +131,6 @@ export class CurseforgeClient extends BasePlatformClient {
 				})
 		} catch {
 			// If files fetch fails, continue with empty versions array
-			versions = []
 		}
 
 		const apiTime = performance.now() - apiStart
@@ -367,7 +366,6 @@ export class CurseforgeClient extends BasePlatformClient {
 			})
 		} catch {
 			// If project fetch fails, continue with empty projects array
-			projects = []
 		}
 
 		// Collect all version dates for sparkline
@@ -430,7 +428,7 @@ export class CurseforgeClient extends BasePlatformClient {
 			const searchResponse = await this.fetch(searchUrl)
 			projectCount = searchResponse.pagination?.totalCount || 0
 		} catch {
-			projectCount = 0
+			// projectCount stays 0
 		}
 
 		const apiTime = performance.now() - apiStart

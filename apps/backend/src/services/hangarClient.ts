@@ -109,7 +109,6 @@ export class HangarClient extends BasePlatformClient {
 				})
 		} catch {
 			// If versions fetch fails, continue with empty versions array
-			versions = []
 		}
 
 		const apiTime = performance.now() - apiStart
@@ -254,7 +253,6 @@ export class HangarClient extends BasePlatformClient {
 			}
 		} catch {
 			// If projects fetch fails, continue with empty projects array
-			projects = []
 		}
 
 		const apiTime = performance.now() - apiStart

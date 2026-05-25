@@ -94,7 +94,6 @@ export class SpigotClient extends BasePlatformClient {
 				}))
 		} catch {
 			// If versions fetch fails, continue with empty versions array
-			versions = []
 		}
 
 		const apiTime = performance.now() - apiStart
@@ -189,7 +188,6 @@ export class SpigotClient extends BasePlatformClient {
 				.filter(Boolean)
 		} catch {
 			// If resources fetch fails, continue with empty resources array
-			resources = []
 		}
 
 		const apiTime = performance.now() - apiStart
