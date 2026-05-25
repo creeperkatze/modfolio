@@ -27,27 +27,18 @@ export default tseslint.config(
 		},
 	},
 	{
-		files: ['src/**/*.{js,ts,vue}', '*.ts'],
-		languageOptions: {
-			parserOptions: {
-				parser: tseslint.parser,
-			},
-			globals: {
-				window: 'readonly',
-				document: 'readonly',
-				navigator: 'readonly',
-				console: 'readonly',
-				URL: 'readonly',
-				URLSearchParams: 'readonly',
-				fetch: 'readonly',
-				setTimeout: 'readonly',
-				clearTimeout: 'readonly',
-				setInterval: 'readonly',
-				clearInterval: 'readonly',
-				Image: 'readonly',
-				performance: 'readonly',
-			},
+		files: ['src/**/*.{js,ts}', '*.ts'],
+		plugins: {
+			'simple-import-sort': simpleImportSort,
 		},
+		rules: {
+			'simple-import-sort/imports': 'error',
+			'simple-import-sort/exports': 'error',
+			'@typescript-eslint/no-explicit-any': 'warn',
+		},
+	},
+	{
+		files: ['src/**/*.vue'],
 		plugins: {
 			'simple-import-sort': simpleImportSort,
 		},

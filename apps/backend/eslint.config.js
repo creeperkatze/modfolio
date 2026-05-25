@@ -16,27 +16,6 @@ export default tseslint.config(
 	prettierPlugin,
 	{
 		files: ['src/**/*.ts'],
-		languageOptions: {
-			ecmaVersion: 'latest',
-			sourceType: 'module',
-			globals: {
-				console: 'readonly',
-				process: 'readonly',
-				Buffer: 'readonly',
-				URL: 'readonly',
-				URLSearchParams: 'readonly',
-				fetch: 'readonly',
-				setTimeout: 'readonly',
-				clearTimeout: 'readonly',
-				setInterval: 'readonly',
-				clearInterval: 'readonly',
-				setImmediate: 'readonly',
-				clearImmediate: 'readonly',
-				Date: 'readonly',
-				JSON: 'readonly',
-				encodeURIComponent: 'readonly',
-			},
-		},
 		plugins: {
 			'simple-import-sort': simpleImportSort,
 		},
