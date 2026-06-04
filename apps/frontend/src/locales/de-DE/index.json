@@ -41,6 +41,9 @@
   "footer.credits": {
     "message": "Mit ♥ erstellt von"
   },
+  "footer.donate": {
+    "message": "Spenden"
+  },
   "footer.github": {
     "message": "Auf GitHub"
   },
@@ -49,9 +52,6 @@
   },
   "footer.source": {
     "message": "Quelle"
-  },
-  "footer.support": {
-    "message": "Unterstützen"
   },
   "footer.translate": {
     "message": "Hilf beim Übersetzen"
