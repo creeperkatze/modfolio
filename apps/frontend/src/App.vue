@@ -507,7 +507,7 @@
 				class="inline-flex shrink-0 items-center gap-1 text-[#FF5E5B] no-underline transition-colors hover:text-[#ff8e8c]"
 			>
 				<KofiIcon class="size-3.5 shrink-0 fill-current" aria-hidden="true" />
-				<span>{{ t(m.footerSupport.id) }}</span>
+				<span>{{ t(m.footerDonate.id) }}</span>
 			</a>
 			·
 			<a
@@ -696,7 +696,7 @@ const m = defineMessages({
 	footerSource: { id: 'footer.source', defaultMessage: 'Source' },
 	footerApiDocs: { id: 'footer.apiDocs', defaultMessage: 'API Docs' },
 	footerGithub: { id: 'footer.github', defaultMessage: 'On Github' },
-	footerSupport: { id: 'footer.support', defaultMessage: 'Support' },
+	footerDonate: { id: 'footer.donate', defaultMessage: 'Donate' },
 	footerTranslate: { id: 'footer.translate', defaultMessage: 'Help Translate' },
 	footerNotAffiliated: {
 		id: 'footer.notAffiliated',
