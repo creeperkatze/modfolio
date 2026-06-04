@@ -16,7 +16,7 @@ import { BasePlatformClient } from './baseClient.js'
 
 dotenv.config({ quiet: true })
 
-import packageJson from '../../package.json' with { type: 'json' }
+import packageJson from '../../../../package.json' with { type: 'json' }
 const VERSION = packageJson.version
 
 const MODRINTH_API_URL = process.env.MODRINTH_API_URL

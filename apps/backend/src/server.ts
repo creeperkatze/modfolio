@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import swaggerUi from 'swagger-ui-express'
 
-import packageJson from '../package.json' with { type: 'json' }
+import packageJson from '../../../package.json' with { type: 'json' }
 import { checkCrawlerMiddleware } from './middleware/checkCrawler.js'
 import { errorHandler } from './middleware/errorHandler.js'
 import curseforgeRoutes from './routes/curseforge/index.js'

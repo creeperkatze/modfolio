@@ -7,7 +7,7 @@ import { BasePlatformClient } from './baseClient.js'
 
 dotenv.config({ quiet: true })
 
-import packageJson from '../../package.json' with { type: 'json' }
+import packageJson from '../../../../package.json' with { type: 'json' }
 const VERSION = packageJson.version
 
 const CURSEFORGE_API_URL = process.env.CURSEFORGE_API_URL || 'https://api.curseforge.com'

@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from 'date-fns'
 
-import packageJson from '../../package.json' with { type: 'json' }
+import packageJson from '../../../../package.json' with { type: 'json' }
 import { ICONS } from '../constants/icons.js'
 import { getLoaderColor, getProjectTypeIcon } from '../constants/loaderConfig.js'
 import { escapeXml, formatNumber, generateSparkline, truncateText } from '../utils/formatters.js'
