@@ -2,11 +2,11 @@
 
 Generate fast, beautiful and consistent embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content.
 
-[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/2d89t.svg)](https://status.creeperkatze.dev)
-![GitHub Branch Check Runs](https://img.shields.io/github/check-runs/creeperkatze/modfolio/main?labelColor=0d143c)
-![GitHub Issues](https://img.shields.io/github/issues/creeperkatze/modfolio?labelColor=0d143c)
-![GitHub Pull Requests](https://img.shields.io/github/issues-pr/creeperkatze/modfolio?labelColor=0d143c)
-![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modfolio?style=flat&labelColor=0d143c)
+[![Uptime](https://uptime.betterstack.com/status-badges/v2/monitor/2d89t.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
+![GitHub Branch Check Runs](https://img.shields.io/github/check-runs/creeperkatze/modfolio/main)
+![GitHub Issues](https://img.shields.io/github/issues/creeperkatze/modfolio)
+![GitHub Pull Requests](https://img.shields.io/github/issues-pr/creeperkatze/modfolio)
+![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modfolio?style=flat)
 [![Crowdin](https://badges.crowdin.net/modfolio/localized.svg)](https://crowdin.com/project/modfolio)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F11WYJU3)
@@ -185,6 +185,8 @@ New translations are automatically pulled every Monday.
 | Language | Translators |
 |----------|------------|
 | Italian | emanuelplaysofficial |
+| Russian | [lazdni](https://crowdin.com/profile/sasggik) |
+| Ukrainian | [Usia](https://crowdin.com/profile/usia) |
 
 ## 🤝 Contributing
 
