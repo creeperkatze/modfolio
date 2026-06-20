@@ -6,8 +6,8 @@ Generate fast, beautiful and consistent embeddable cards and badges for Modrinth
 ![GitHub Branch Check Runs](https://img.shields.io/github/check-runs/creeperkatze/modfolio/main)
 ![GitHub Issues](https://img.shields.io/github/issues/creeperkatze/modfolio)
 ![GitHub Pull Requests](https://img.shields.io/github/issues-pr/creeperkatze/modfolio)
-![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modfolio?style=flat)
 [![Crowdin](https://badges.crowdin.net/modfolio/localized.svg)](https://crowdin.com/project/modfolio)
+![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modfolio?style=flat)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F11WYJU3)
 
