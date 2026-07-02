@@ -1,6 +1,6 @@
 allowBuilds:
-  esbuild: set this to true or false
-  sharp: set this to true or false
+  esbuild: v
+  sharp: true
 minimumReleaseAgeExclude:
   - curseforge-js@1.1.1
   - hangarmc-js@1.0.1
