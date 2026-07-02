@@ -1,5 +1,5 @@
 allowBuilds:
-  esbuild: v
+  esbuild: true
   sharp: true
 minimumReleaseAgeExclude:
   - curseforge-js@1.1.1
