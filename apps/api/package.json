@@ -1,5 +1,5 @@
 {
-	"name": "modfolio-backend",
+	"name": "modfolio-api",
 	"private": true,
 	"type": "module",
 	"main": "dist/server.ts",
@@ -12,20 +12,22 @@
 		"lint:fix": "eslint src/ --fix"
 	},
 	"dependencies": {
+		"@hono/node-server": "^1.14.0",
+		"@modrinth/api-client": "^0.23.0",
 		"@resvg/resvg-js": "^2.6.2",
+		"curseforge-js": "^1.1.1",
 		"date-fns": "^4.3.0",
 		"dotenv": "^17.4.2",
-		"express": "^5.2.1",
 		"file-type": "^22.0.1",
+		"hangarmc-js": "^1.0.1",
+		"hono": "^4.6.0",
 		"pino": "^10.3.1",
 		"sharp": "^0.34.5",
-		"swagger-ui-express": "^5.0.1"
+		"spiget-js": "^1.0.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
-		"@types/express": "^5.0.6",
 		"@types/node": "^25.9.1",
-		"@types/swagger-ui-express": "^4.1.8",
 		"cross-env": "^10.1.0",
 		"eslint": "^10.4.0",
 		"eslint-config-prettier": "^10.1.8",

@@ -7,21 +7,24 @@
     "author": "Creeperkatze",
     "license": "AGPL-3.0-only",
     "scripts": {
-        "dev": "concurrently -n backend,frontend -c blue,green \"pnpm --filter ./apps/backend dev\" \"pnpm --filter ./apps/frontend dev\"",
-        "frontend:dev": "pnpm --filter ./apps/frontend dev",
-        "frontend:build": "pnpm --filter ./apps/frontend build",
-        "frontend:intl:extract": "pnpm --filter ./apps/frontend intl:extract",
-        "backend:dev": "pnpm --filter ./apps/backend dev",
-        "backend:build": "pnpm --filter ./apps/backend build",
-        "backend:start": "pnpm --filter ./apps/backend start",
-        "test": "pnpm -r test",
-        "lint": "pnpm -r lint",
-        "lint:fix": "pnpm -r lint:fix",
+        "dev": "turbo run dev",
+        "build": "turbo run build",
+        "web:dev": "turbo run dev --filter=modfolio-web",
+        "web:build": "turbo run build --filter=modfolio-web",
+        "web:intl:extract": "pnpm --filter modfolio-web intl:extract",
+        "api:dev": "turbo run dev --filter=modfolio-api",
+        "api:build": "turbo run build --filter=modfolio-api",
+        "api:start": "pnpm --filter modfolio-api start",
+        "docs:dev": "turbo run dev --filter=modfolio-docs",
+        "docs:build": "turbo run build --filter=modfolio-docs",
+        "test": "turbo run test",
+        "lint": "turbo run lint",
+        "lint:fix": "turbo run lint:fix",
         "release:patch": "pnpm version patch && git push && git push --tags",
         "release:minor": "pnpm version minor && git push && git push --tags",
         "release:major": "pnpm version major && git push && git push --tags"
     },
     "devDependencies": {
-        "concurrently": "^9.2.1"
+        "turbo": "^2.10.2"
     }
 }
