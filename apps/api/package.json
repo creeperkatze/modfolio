@@ -5,7 +5,7 @@
 	"main": "dist/server.ts",
 	"scripts": {
 		"build": "tsc",
-		"dev": "cross-env NODE_ENV=development tsx watch src/server.ts",
+		"dev": "tsx watch src/server.ts",
 		"start": "node dist/server.js",
 		"test": "vitest run",
 		"lint": "eslint src/",
@@ -28,7 +28,6 @@
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
 		"@types/node": "^25.9.1",
-		"cross-env": "^10.1.0",
 		"eslint": "^10.4.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.5",
