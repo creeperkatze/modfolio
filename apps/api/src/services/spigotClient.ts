@@ -1,45 +1,43 @@
 import dotenv from 'dotenv'
 import { performance } from 'perf_hooks'
+import SpigetClient from 'spiget-js'
 
 import { CARD_LIMITS } from '../constants/platformConfig.js'
 import { fetchImageAsBase64 } from '../utils/imageFetcher.js'
-import { BasePlatformClient } from './baseClient.js'
+import { callPlatform, getDefaultUserAgent } from './baseClient.js'
 
 dotenv.config({ quiet: true })
 
-import packageJson from '../../../../package.json' with { type: 'json' }
-const VERSION = packageJson.version
+const SPIGOT_API_URL = process.env.SPIGOT_API_URL || 'https://api.spiget.org/v2'
 
-const SPIGOT_API_URL = process.env.SPIGOT_API_URL || 'https://api.spiget.org'
-const USER_AGENT = process.env.USER_AGENT
+export class SpigotClientWrapper {
+	private client: SpigetClient
 
-export class SpigotClient extends BasePlatformClient {
 	constructor() {
-		super('Spigot', {
+		this.client = new SpigetClient({
 			baseUrl: SPIGOT_API_URL,
-			userAgent: USER_AGENT ? USER_AGENT.replace('{version}', VERSION) : undefined,
+			userAgent: getDefaultUserAgent(),
 		})
 	}
 
-	getHeaders() {
-		const headers = super.getHeaders()
-		return headers
-	}
-
 	async getResource(resourceId) {
-		return this.fetch(`/v2/resources/${resourceId}`)
+		return callPlatform('Spigot', () => this.client.resources.get(Number(resourceId)))
 	}
 
 	async getResourceVersions(resourceId, limit = 10) {
-		return this.fetch(`/v2/resources/${resourceId}/versions?size=${limit}&sort=-releaseDate`)
+		return callPlatform('Spigot', () =>
+			this.client.resources.getVersions(Number(resourceId), { size: limit, sort: '-releaseDate' }),
+		)
 	}
 
 	async getAuthor(authorId) {
-		return this.fetch(`/v2/authors/${authorId}`)
+		return callPlatform('Spigot', () => this.client.authors.get(Number(authorId)))
 	}
 
 	async getAuthorResources(authorId, limit = 25) {
-		return this.fetch(`/v2/authors/${authorId}/resources?size=${limit}&sort=-downloads`)
+		return callPlatform('Spigot', () =>
+			this.client.authors.getResources(Number(authorId), { size: limit, sort: '-downloads' }),
+		)
 	}
 
 	async getResourceStats(resourceId, convertToPng = false) {
@@ -50,25 +48,24 @@ export class SpigotClient extends BasePlatformClient {
 
 		const apiStart = performance.now()
 
-		const resourceResponse = await this.getResource(resourceId)
-		if (!resourceResponse) {
+		const resource = await this.getResource(resourceId)
+		if (!resource) {
 			return null
 		}
-		const resource = resourceResponse
 
 		let imageConversionTime = 0
 
 		// Fetch resource icon - Spiget API has separate icon endpoint
-		const iconUrl = `${SPIGOT_API_URL}/v2/resources/${resourceId}/icon`
+		const iconUrl = `${SPIGOT_API_URL}/resources/${resourceId}/icon`
 		let result = await fetchImageAsBase64(iconUrl, convertToPng)
 
 		// If that fails, try the direct SpigotMC URL as fallback
 		if (!result?.data) {
-			const iconUrlFallback = `https://www.spigotmc.org/data/resource_icons/${Math.floor(resourceId / 1000)}/${resourceId}.jpg`
+			const iconUrlFallback = `https://www.spigotmc.org/data/resource_icons/${Math.floor(Number(resourceId) / 1000)}/${resourceId}.jpg`
 			result = await fetchImageAsBase64(iconUrlFallback, convertToPng)
 		}
 
-		resource.icon_url_base64 = result?.data
+		resource['icon_url_base64'] = result?.data
 		if (result?.conversionTime) imageConversionTime += result.conversionTime
 
 		// Fetch versions for the resource
@@ -76,7 +73,7 @@ export class SpigotClient extends BasePlatformClient {
 		let totalVersionCount = 0
 		try {
 			const versionsResponse = await this.getResourceVersions(resourceId, CARD_LIMITS.MAX_COUNT)
-			const allVersions = versionsResponse || []
+			const allVersions = versionsResponse?.data || []
 			totalVersionCount = allVersions.length
 
 			// Sort by date (newest first) - card generator will slice to maxVersions
@@ -126,18 +123,17 @@ export class SpigotClient extends BasePlatformClient {
 
 		const apiStart = performance.now()
 
-		const authorResponse = await this.getAuthor(authorId)
-		if (!authorResponse) {
+		const author = await this.getAuthor(authorId)
+		if (!author) {
 			return null
 		}
-		const author = authorResponse
 
 		let imageConversionTime = 0
 
 		// Fetch author avatar - Spiget API has separate avatar endpoint
-		const avatarUrl = `${SPIGOT_API_URL}/v2/authors/${authorId}/avatar`
+		const avatarUrl = `${SPIGOT_API_URL}/authors/${authorId}/avatar`
 		const avatarResult = await fetchImageAsBase64(avatarUrl, convertToPng)
-		author.avatar_url_base64 = avatarResult?.data
+		author['avatar_url_base64'] = avatarResult?.data
 		if (avatarResult?.conversionTime) imageConversionTime += avatarResult.conversionTime
 
 		// Fetch author's resources
@@ -147,7 +143,7 @@ export class SpigotClient extends BasePlatformClient {
 
 		try {
 			const resourcesResponse = await this.getAuthorResources(authorId, 50) // Fetch more for sorting
-			const allResources = resourcesResponse || []
+			const allResources = resourcesResponse?.data || []
 
 			// Sort by downloads and take max (for caching, card generator slices to maxResources)
 			resources = allResources
@@ -158,7 +154,7 @@ export class SpigotClient extends BasePlatformClient {
 					slug: r.id, // Spigot uses IDs, not slugs
 					name: r.name,
 					title: r.name,
-					description: r.tag || r.description || '',
+					description: r.tag || '',
 					downloads: r?.downloads || 0,
 					likes: r?.likes || 0,
 					rating: r?.rating?.average || 0,
@@ -168,7 +164,7 @@ export class SpigotClient extends BasePlatformClient {
 					// Construct icon URL manually - Spiget API has separate icon endpoint per resource
 					// Note: The icon endpoint may return 404 even if the icon exists on the SpigotMC website
 					// Try both the Spiget API endpoint and the direct SpigotMC URL
-					icon_url: `${SPIGOT_API_URL}/v2/resources/${r.id}/icon`,
+					icon_url: `${SPIGOT_API_URL}/resources/${r.id}/icon`,
 					// Fallback to direct SpigotMC URL if Spiget API fails
 					icon_url_fallback: `https://www.spigotmc.org/data/resource_icons/${Math.floor(r.id / 1000)}/${r.id}.jpg`,
 					project_type: 'plugin', // Spigot primarily has plugins
@@ -219,11 +215,10 @@ export class SpigotClient extends BasePlatformClient {
 
 		const apiStart = performance.now()
 
-		const resourceResponse = await this.getResource(resourceId)
-		if (!resourceResponse) {
+		const resource = await this.getResource(resourceId)
+		if (!resource) {
 			return null
 		}
-		const resource = resourceResponse
 
 		const stats = {
 			downloads: resource?.downloads || 0,
@@ -236,7 +231,7 @@ export class SpigotClient extends BasePlatformClient {
 		// Fetch versions
 		try {
 			const versionsResponse = await this.getResourceVersions(resourceId)
-			stats.versionCount = versionsResponse?.length || 0
+			stats.versionCount = versionsResponse?.data?.length || 0
 		} catch {
 			stats.versionCount = 0
 		}
@@ -253,8 +248,8 @@ export class SpigotClient extends BasePlatformClient {
 
 		const apiStart = performance.now()
 
-		const authorResponse = await this.getAuthor(authorId)
-		if (!authorResponse) {
+		const author = await this.getAuthor(authorId)
+		if (!author) {
 			return null
 		}
 
@@ -266,7 +261,7 @@ export class SpigotClient extends BasePlatformClient {
 		// Fetch all author's resources for stats
 		try {
 			const resourcesResponse = await this.getAuthorResources(authorId, 100)
-			const allResources = resourcesResponse || []
+			const allResources = resourcesResponse?.data || []
 			totalDownloads = allResources.reduce((sum, r) => sum + (r?.downloads || 0), 0)
 			resourceCount = allResources.length
 
@@ -328,4 +323,4 @@ export class SpigotClient extends BasePlatformClient {
 	}
 }
 
-export default new SpigotClient()
+export default new SpigotClientWrapper()

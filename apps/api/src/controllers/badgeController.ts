@@ -5,6 +5,7 @@ import curseforgeClient from '../services/curseforgeClient.js'
 import hangarClient from '../services/hangarClient.js'
 import modrinthClient from '../services/modrinthClient.js'
 import spigotClient from '../services/spigotClient.js'
+import type { AppContext } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cacheKeys.js'
 import { formatNumber } from '../utils/formatters.js'
@@ -158,13 +159,15 @@ const ENTITY_CONFIG = {
 	},
 }
 
-const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
+const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: string) => {
+	const entityConfig = ENTITY_CONFIG[entityType]
+	const params = c.req.param()
+	const identifier = params.username || params.slug || params.id || params.projectId
+
 	try {
-		const entityConfig = ENTITY_CONFIG[entityType]
 		const platform = entityConfig.platform
-		const identifier =
-			req.params.username || req.params.slug || req.params.id || req.params.projectId
-		const format = req.query.format
+		const format = c.req.query('format')
+		const isImageCrawler = c.get('isImageCrawler')
 		const defaultColor =
 			platform === PLATFORMS.CURSEFORGE.id
 				? PLATFORMS.CURSEFORGE.defaultColor
@@ -173,16 +176,16 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 					: platform === 'spigot'
 						? '#E8A838'
 						: PLATFORMS.MODRINTH.defaultColor
-		const color = req.query.color ? `#${req.query.color.replace(/^#/, '')}` : defaultColor
-		const backgroundColor = req.query.backgroundColor
-			? `#${req.query.backgroundColor.replace(/^#/, '')}`
+		const color = c.req.query('color') ? `#${c.req.query('color').replace(/^#/, '')}` : defaultColor
+		const backgroundColor = c.req.query('backgroundColor')
+			? `#${c.req.query('backgroundColor').replace(/^#/, '')}`
 			: null
-		const showIcon = req.query.showIcon !== 'false'
-		const showBorder = req.query.showBorder !== 'false'
+		const showIcon = c.req.query('showIcon') !== 'false'
+		const showBorder = c.req.query('showBorder') !== 'false'
 		const badgeConfig = BADGE_CONFIGS[entityType][badgeType]
 
 		// Determine if we need to render the svg as a image
-		const renderImage = req.isImageCrawler || format === 'png'
+		const renderImage = isImageCrawler || format === 'png'
 
 		// API data cache key - independent of styling options
 		const apiCacheKey = entityConfig.cacheKeyFn(identifier)
@@ -227,19 +230,15 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 
 				if (renderImage) {
 					const { buffer: pngBuffer } = await generatePng(notFoundSvg)
-					res.setHeader('Content-Type', 'image/png')
-					res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-					return req.isImageCrawler
-						? res.status(200).send(pngBuffer)
-						: res.status(404).send(pngBuffer)
+					c.header('Content-Type', 'image/png')
+					c.header('Cache-Control', 'no-cache, no-store, must-revalidate')
+					return c.body(pngBuffer as any, isImageCrawler ? 200 : 404)
 				}
 
-				res.setHeader('Content-Type', 'image/svg+xml')
-				res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-				res.setHeader('X-Error-Status', '404')
-				return req.isImageCrawler
-					? res.status(200).send(notFoundSvg)
-					: res.status(404).send(notFoundSvg)
+				c.header('Content-Type', 'image/svg+xml')
+				c.header('Cache-Control', 'no-cache, no-store, must-revalidate')
+				c.header('X-Error-Status', '404')
+				return c.body(notFoundSvg, isImageCrawler ? 200 : 404)
 			}
 			apiCache.set(apiCacheKey, data)
 		}
@@ -286,25 +285,22 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 
 			const apiTimeHeader = fromCache ? '-1' : `${Math.round(data.timings.api)}ms`
 
-			res.setHeader('Content-Type', 'image/png')
-			res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-			res.setHeader('X-Cache', fromCache ? 'HIT' : 'MISS')
-			res.setHeader('X-API-Time', apiTimeHeader)
-			return res.send(pngBuffer)
+			c.header('Content-Type', 'image/png')
+			c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+			c.header('X-Cache', fromCache ? 'HIT' : 'MISS')
+			c.header('X-API-Time', apiTimeHeader)
+			return c.body(pngBuffer as any)
 		}
 
 		// Return SVG
 		const apiTimeHeader = fromCache ? '-1' : `${Math.round(data.timings.api)}ms`
 
-		res.setHeader('Content-Type', 'image/svg+xml')
-		res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-		res.setHeader('X-Cache', fromCache ? 'HIT' : 'MISS')
-		res.setHeader('X-API-Time', apiTimeHeader)
-		res.send(svg)
+		c.header('Content-Type', 'image/svg+xml')
+		c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+		c.header('X-Cache', fromCache ? 'HIT' : 'MISS')
+		c.header('X-API-Time', apiTimeHeader)
+		return c.body(svg)
 	} catch (err) {
-		const identifier =
-			req.params.username || req.params.slug || req.params.id || req.params.projectId
-		const entityConfig = ENTITY_CONFIG[entityType]
 		const message = `Could not show ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge`
 		logger.warn(
 			{
@@ -319,88 +315,80 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 			},
 			message,
 		)
-		next(err)
+		throw err
 	}
 }
 
 // User badges
-export const getUserDownloads = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'user', 'downloads')
-export const getUserProjects = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'user', 'projects')
-export const getUserFollowers = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'user', 'followers')
+export const getUserDownloads = (c: AppContext) => handleBadgeRequest(c, 'user', 'downloads')
+export const getUserProjects = (c: AppContext) => handleBadgeRequest(c, 'user', 'projects')
+export const getUserFollowers = (c: AppContext) => handleBadgeRequest(c, 'user', 'followers')
 
 // Project badges
-export const getProjectDownloads = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'project', 'downloads')
-export const getProjectFollowers = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'project', 'followers')
-export const getProjectVersions = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'project', 'versions')
+export const getProjectDownloads = (c: AppContext) => handleBadgeRequest(c, 'project', 'downloads')
+export const getProjectFollowers = (c: AppContext) => handleBadgeRequest(c, 'project', 'followers')
+export const getProjectVersions = (c: AppContext) => handleBadgeRequest(c, 'project', 'versions')
 
 // Organization badges
-export const getOrganizationDownloads = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'organization', 'downloads')
-export const getOrganizationProjects = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'organization', 'projects')
-export const getOrganizationFollowers = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'organization', 'followers')
+export const getOrganizationDownloads = (c: AppContext) =>
+	handleBadgeRequest(c, 'organization', 'downloads')
+export const getOrganizationProjects = (c: AppContext) =>
+	handleBadgeRequest(c, 'organization', 'projects')
+export const getOrganizationFollowers = (c: AppContext) =>
+	handleBadgeRequest(c, 'organization', 'followers')
 
 // Collection badges
-export const getCollectionDownloads = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'collection', 'downloads')
-export const getCollectionProjects = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'collection', 'projects')
-export const getCollectionFollowers = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'collection', 'followers')
+export const getCollectionDownloads = (c: AppContext) =>
+	handleBadgeRequest(c, 'collection', 'downloads')
+export const getCollectionProjects = (c: AppContext) =>
+	handleBadgeRequest(c, 'collection', 'projects')
+export const getCollectionFollowers = (c: AppContext) =>
+	handleBadgeRequest(c, 'collection', 'followers')
 
 // CurseForge mod badges
-export const getCfModDownloads = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'curseforge_project', 'downloads')
-export const getCfModVersions = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'curseforge_project', 'versions')
-export const getCfModRank = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'curseforge_project', 'rank')
+export const getCfModDownloads = (c: AppContext) =>
+	handleBadgeRequest(c, 'curseforge_project', 'downloads')
+export const getCfModVersions = (c: AppContext) =>
+	handleBadgeRequest(c, 'curseforge_project', 'versions')
+export const getCfModRank = (c: AppContext) => handleBadgeRequest(c, 'curseforge_project', 'rank')
 
 // CurseForge user badges
-export const getCfUserDownloads = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'curseforge_user', 'downloads')
-export const getCfUserProjects = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'curseforge_user', 'projects')
-export const getCfUserFollowers = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'curseforge_user', 'followers')
+export const getCfUserDownloads = (c: AppContext) =>
+	handleBadgeRequest(c, 'curseforge_user', 'downloads')
+export const getCfUserProjects = (c: AppContext) =>
+	handleBadgeRequest(c, 'curseforge_user', 'projects')
+export const getCfUserFollowers = (c: AppContext) =>
+	handleBadgeRequest(c, 'curseforge_user', 'followers')
 
 // Hangar project badges
-export const getHangarProjectDownloads = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'hangar_project', 'downloads')
-export const getHangarProjectVersions = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'hangar_project', 'versions')
-export const getHangarProjectViews = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'hangar_project', 'views')
+export const getHangarProjectDownloads = (c: AppContext) =>
+	handleBadgeRequest(c, 'hangar_project', 'downloads')
+export const getHangarProjectVersions = (c: AppContext) =>
+	handleBadgeRequest(c, 'hangar_project', 'versions')
+export const getHangarProjectViews = (c: AppContext) =>
+	handleBadgeRequest(c, 'hangar_project', 'views')
 
 // Hangar user badges
-export const getHangarUserDownloads = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'hangar_user', 'downloads')
-export const getHangarUserProjects = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'hangar_user', 'projects')
-export const getHangarUserStars = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'hangar_user', 'stars')
+export const getHangarUserDownloads = (c: AppContext) =>
+	handleBadgeRequest(c, 'hangar_user', 'downloads')
+export const getHangarUserProjects = (c: AppContext) =>
+	handleBadgeRequest(c, 'hangar_user', 'projects')
+export const getHangarUserStars = (c: AppContext) => handleBadgeRequest(c, 'hangar_user', 'stars')
 
 // Spigot resource badges
-export const getSpigotResourceDownloads = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'spigot_resource', 'downloads')
-export const getSpigotResourceLikes = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'spigot_resource', 'likes')
-export const getSpigotResourceRating = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'spigot_resource', 'rating')
-export const getSpigotResourceVersions = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'spigot_resource', 'versions')
+export const getSpigotResourceDownloads = (c: AppContext) =>
+	handleBadgeRequest(c, 'spigot_resource', 'downloads')
+export const getSpigotResourceLikes = (c: AppContext) =>
+	handleBadgeRequest(c, 'spigot_resource', 'likes')
+export const getSpigotResourceRating = (c: AppContext) =>
+	handleBadgeRequest(c, 'spigot_resource', 'rating')
+export const getSpigotResourceVersions = (c: AppContext) =>
+	handleBadgeRequest(c, 'spigot_resource', 'versions')
 
 // Spigot author badges
-export const getSpigotAuthorDownloads = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'spigot_author', 'downloads')
-export const getSpigotAuthorResources = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'spigot_author', 'resources')
-export const getSpigotAuthorRating = (req, res, next) =>
-	handleBadgeRequest(req, res, next, 'spigot_author', 'rating')
+export const getSpigotAuthorDownloads = (c: AppContext) =>
+	handleBadgeRequest(c, 'spigot_author', 'downloads')
+export const getSpigotAuthorResources = (c: AppContext) =>
+	handleBadgeRequest(c, 'spigot_author', 'resources')
+export const getSpigotAuthorRating = (c: AppContext) =>
+	handleBadgeRequest(c, 'spigot_author', 'rating')

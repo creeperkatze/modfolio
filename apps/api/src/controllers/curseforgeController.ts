@@ -1,4 +1,5 @@
 import curseforgeClient from '../services/curseforgeClient.js'
+import type { AppContext } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { curseforgeKeys, metaKey, PLATFORM } from '../utils/cacheKeys.js'
 import logger from '../utils/logger.js'
@@ -25,16 +26,16 @@ async function getUsernameSlug(userId) {
 	return username
 }
 
-export const getCfUserLookup = async (req, res) => {
-	try {
-		const { username } = req.params
+export const getCfUserLookup = async (c: AppContext) => {
+	const { username } = c.req.param()
 
+	try {
 		if (!username) {
-			return res.status(400).json({ error: 'Username is required' })
+			return c.json({ error: 'Username is required' }, 400)
 		}
 
 		if (/^\d+$/.test(username)) {
-			return res.json({ id: username })
+			return c.json({ id: username })
 		}
 
 		const cacheKey = curseforgeKeys.userLookup(username)
@@ -60,7 +61,7 @@ export const getCfUserLookup = async (req, res) => {
 				},
 				message,
 			)
-			return res.json({ id: cached.value })
+			return c.json({ id: cached.value })
 		}
 
 		const userId = await curseforgeClient.getUserIdFromUsername(username)
@@ -83,7 +84,7 @@ export const getCfUserLookup = async (req, res) => {
 		const reverseCacheKey = curseforgeKeys.userIdLookup(userId)
 		apiCache.set(reverseCacheKey, username)
 
-		res.json({ id: userId })
+		return c.json({ id: userId })
 	} catch (err) {
 		const message = `Could not show ${PLATFORM.CURSEFORGE} user lookup`
 		logger.warn(
@@ -91,23 +92,23 @@ export const getCfUserLookup = async (req, res) => {
 				target: {
 					platform: PLATFORM.CURSEFORGE,
 					entity: 'user',
-					identifier: req.params.username,
+					identifier: username,
 					surface: 'lookup',
 				},
 				err,
 			},
 			message,
 		)
-		res.status(404).json({ error: 'User not found', message: err.message })
+		return c.json({ error: 'User not found', message: err.message }, 404)
 	}
 }
 
-export const getCfSlugLookup = async (req, res) => {
-	try {
-		const { slug } = req.params
+export const getCfSlugLookup = async (c: AppContext) => {
+	const { slug } = c.req.param()
 
+	try {
 		if (!slug) {
-			return res.status(400).json({ error: 'Slug is required' })
+			return c.json({ error: 'Slug is required' }, 400)
 		}
 
 		const cacheKey = curseforgeKeys.slugLookup(slug)
@@ -133,7 +134,7 @@ export const getCfSlugLookup = async (req, res) => {
 				},
 				message,
 			)
-			return res.json({ id: cached.value })
+			return c.json({ id: cached.value })
 		}
 
 		const modId = await curseforgeClient.searchModBySlug(slug)
@@ -152,7 +153,7 @@ export const getCfSlugLookup = async (req, res) => {
 			message,
 		)
 
-		res.json({ id: modId })
+		return c.json({ id: modId })
 	} catch (err) {
 		const message = `Could not show ${PLATFORM.CURSEFORGE} project lookup`
 		logger.warn(
@@ -160,23 +161,23 @@ export const getCfSlugLookup = async (req, res) => {
 				target: {
 					platform: PLATFORM.CURSEFORGE,
 					entity: 'project',
-					identifier: req.params.slug,
+					identifier: slug,
 					surface: 'lookup',
 				},
 				err,
 			},
 			message,
 		)
-		res.status(404).json({ error: 'Project not found', message: err.message })
+		return c.json({ error: 'Project not found', message: err.message }, 404)
 	}
 }
 
-export const getCurseforgeMeta = async (req, res, next) => {
-	try {
-		const { type, id } = req.params
+export const getCurseforgeMeta = async (c: AppContext) => {
+	const { type, id } = c.req.param()
 
+	try {
 		if (type !== 'project' && type !== 'user') {
-			return res.status(400).json({ error: `Invalid type: ${type}. Must be 'project' or 'user'` })
+			return c.json({ error: `Invalid type: ${type}. Must be 'project' or 'user'` }, 400)
 		}
 
 		const cacheKey = metaKey(PLATFORM.CURSEFORGE, type, id)
@@ -199,8 +200,8 @@ export const getCurseforgeMeta = async (req, res, next) => {
 				},
 				message,
 			)
-			res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-			return res.json(cachedResult)
+			c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+			return c.json(cachedResult)
 		}
 
 		let name = id
@@ -209,11 +210,10 @@ export const getCurseforgeMeta = async (req, res, next) => {
 		if (type === 'user') {
 			// Validate user id is a number
 			if (!/^\d+$/.test(String(id))) {
-				return res.status(400).json({ error: 'Invalid curseforge user id: must be a number' })
+				return c.json({ error: 'Invalid curseforge user id: must be a number' }, 400)
 			}
 
-			const userResponse = await curseforgeClient.getUser(id)
-			const user = userResponse.data
+			const user = await curseforgeClient.getUser(id)
 			name = user?.displayName || id
 
 			// Get username slug for profile URL (fetches via search API if not cached)
@@ -226,11 +226,10 @@ export const getCurseforgeMeta = async (req, res, next) => {
 		} else if (type === 'project') {
 			// Validate project id is a number
 			if (!/^\d+$/.test(String(id))) {
-				return res.status(400).json({ error: 'Invalid curseforge project id: must be a number' })
+				return c.json({ error: 'Invalid curseforge project id: must be a number' }, 400)
 			}
 
-			const modResponse = await curseforgeClient.getMod(id)
-			const mod = modResponse.data
+			const mod = await curseforgeClient.getMod(id)
 			name = mod?.name || id
 			url = mod?.links?.websiteUrl || null
 		}
@@ -246,22 +245,22 @@ export const getCurseforgeMeta = async (req, res, next) => {
 			message,
 		)
 
-		res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-		res.json(result)
+		c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+		return c.json(result)
 	} catch (err) {
-		const message = `Could not show ${PLATFORM.CURSEFORGE} ${req.params.type} meta`
+		const message = `Could not show ${PLATFORM.CURSEFORGE} ${type} meta`
 		logger.warn(
 			{
 				target: {
 					platform: PLATFORM.CURSEFORGE,
-					entity: req.params.type,
-					identifier: req.params.id,
+					entity: type,
+					identifier: id,
 					surface: 'meta',
 				},
 				err,
 			},
 			message,
 		)
-		next(err)
+		throw err
 	}
 }

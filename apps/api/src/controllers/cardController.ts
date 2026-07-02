@@ -5,6 +5,7 @@ import curseforgeClient from '../services/curseforgeClient.js'
 import hangarClient from '../services/hangarClient.js'
 import modrinthClient from '../services/modrinthClient.js'
 import spigotClient from '../services/spigotClient.js'
+import type { AppContext } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cacheKeys.js'
 import { generatePng } from '../utils/generateImage.js'
@@ -112,39 +113,41 @@ const CARD_CONFIGS = {
 	},
 }
 
-const handleCardRequest = async (req, res, next, cardType) => {
+const handleCardRequest = async (c: AppContext, cardType: string) => {
+	const config = CARD_CONFIGS[cardType]
+	const identifier = c.req.param(config.paramKey)
+
 	try {
-		const config = CARD_CONFIGS[cardType]
 		const client = CARD_CLIENTS[cardType]
-		const identifier = req.params[config.paramKey]
-		const format = req.query.format
+		const format = c.req.query('format')
+		const isImageCrawler = c.get('isImageCrawler')
 
 		// Determine if we need to render the svg as a image
-		const renderImage = req.isImageCrawler || format === 'png'
+		const renderImage = isImageCrawler || format === 'png'
 
 		// Parse customization options
 		const options: any = {
-			showProjects: req.query.showProjects !== 'false',
-			showVersions: req.query.showVersions !== 'false',
+			showProjects: c.req.query('showProjects') !== 'false',
+			showVersions: c.req.query('showVersions') !== 'false',
 			maxProjects: Math.min(
-				Math.max(parseInt(req.query.maxProjects) || CARD_LIMITS.DEFAULT_COUNT, 1),
+				Math.max(parseInt(c.req.query('maxProjects')) || CARD_LIMITS.DEFAULT_COUNT, 1),
 				CARD_LIMITS.MAX_COUNT,
 			),
 			maxVersions: Math.min(
-				Math.max(parseInt(req.query.maxVersions) || CARD_LIMITS.DEFAULT_COUNT, 1),
+				Math.max(parseInt(c.req.query('maxVersions')) || CARD_LIMITS.DEFAULT_COUNT, 1),
 				CARD_LIMITS.MAX_COUNT,
 			),
-			relativeTime: req.query.relativeTime !== 'false',
-			showSparklines: req.query.showSparklines !== 'false',
-			showDownloadBars: req.query.showDownloadBars !== 'false',
-			showSummary: req.query.showSummary === 'true',
-			showBorder: req.query.showBorder !== 'false',
-			animations: !renderImage && req.query.animations !== 'false',
-			color: req.query.color ? `#${req.query.color.replace(/^#/, '')}` : null,
-			backgroundColor: req.query.backgroundColor
-				? `#${req.query.backgroundColor.replace(/^#/, '')}`
+			relativeTime: c.req.query('relativeTime') !== 'false',
+			showSparklines: c.req.query('showSparklines') !== 'false',
+			showDownloadBars: c.req.query('showDownloadBars') !== 'false',
+			showSummary: c.req.query('showSummary') === 'true',
+			showBorder: c.req.query('showBorder') !== 'false',
+			animations: !renderImage && c.req.query('animations') !== 'false',
+			color: c.req.query('color') ? `#${c.req.query('color').replace(/^#/, '')}` : null,
+			backgroundColor: c.req.query('backgroundColor')
+				? `#${c.req.query('backgroundColor').replace(/^#/, '')}`
 				: null,
-			projectType: req.query.projectType || null,
+			projectType: c.req.query('projectType') || null,
 		}
 
 		// API data cache key - includes filter to avoid serving wrong cached data
@@ -189,17 +192,15 @@ const handleCardRequest = async (req, res, next, cardType) => {
 
 				if (renderImage) {
 					const { buffer: pngBuffer } = await generatePng(errorSvg)
-					res.setHeader('Content-Type', 'image/png')
-					res.setHeader('Cache-Control', 'no-cache')
-					return req.isImageCrawler
-						? res.status(200).send(pngBuffer)
-						: res.status(404).send(pngBuffer)
+					c.header('Content-Type', 'image/png')
+					c.header('Cache-Control', 'no-cache')
+					return c.body(pngBuffer as any, isImageCrawler ? 200 : 404)
 				}
 
-				res.setHeader('Content-Type', 'image/svg+xml')
-				res.setHeader('Cache-Control', 'no-cache')
-				res.setHeader('X-Error-Status', '404')
-				return req.isImageCrawler ? res.status(200).send(errorSvg) : res.status(404).send(errorSvg)
+				c.header('Content-Type', 'image/svg+xml')
+				c.header('Cache-Control', 'no-cache')
+				c.header('X-Error-Status', '404')
+				return c.body(errorSvg, isImageCrawler ? 200 : 404)
 			}
 			apiCache.set(apiCacheKey, data)
 		}
@@ -238,23 +239,21 @@ const handleCardRequest = async (req, res, next, cardType) => {
 
 			const apiTimeHeader = fromCache ? '-1' : `${Math.round(data.timings.api)}ms`
 
-			res.setHeader('Content-Type', 'image/png')
-			res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-			res.setHeader('X-Cache', fromCache ? 'HIT' : 'MISS')
-			res.setHeader('X-API-Time', apiTimeHeader)
-			return res.send(pngBuffer)
+			c.header('Content-Type', 'image/png')
+			c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+			c.header('X-Cache', fromCache ? 'HIT' : 'MISS')
+			c.header('X-API-Time', apiTimeHeader)
+			return c.body(pngBuffer as any)
 		}
 
 		// Return SVG
 		const apiTimeHeader = fromCache ? '-1' : `${Math.round(data.timings.api)}ms`
-		res.setHeader('Content-Type', 'image/svg+xml')
-		res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-		res.setHeader('X-Cache', fromCache ? 'HIT' : 'MISS')
-		res.setHeader('X-API-Time', apiTimeHeader)
-		res.send(svg)
+		c.header('Content-Type', 'image/svg+xml')
+		c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+		c.header('X-Cache', fromCache ? 'HIT' : 'MISS')
+		c.header('X-API-Time', apiTimeHeader)
+		return c.body(svg)
 	} catch (err) {
-		const config = CARD_CONFIGS[cardType]
-		const identifier = req.params[config.paramKey]
 		const message = `Could not show ${config.platformId} ${config.entityName} card`
 		logger.warn(
 			{
@@ -268,34 +267,29 @@ const handleCardRequest = async (req, res, next, cardType) => {
 			},
 			message,
 		)
-		next(err)
+		throw err
 	}
 }
 
-export const getUser = (req, res, next) => handleCardRequest(req, res, next, 'modrinth_user')
-export const getProject = (req, res, next) => handleCardRequest(req, res, next, 'modrinth_project')
-export const getOrganization = (req, res, next) =>
-	handleCardRequest(req, res, next, 'modrinth_organization')
-export const getCollection = (req, res, next) =>
-	handleCardRequest(req, res, next, 'modrinth_collection')
+export const getUser = (c: AppContext) => handleCardRequest(c, 'modrinth_user')
+export const getProject = (c: AppContext) => handleCardRequest(c, 'modrinth_project')
+export const getOrganization = (c: AppContext) => handleCardRequest(c, 'modrinth_organization')
+export const getCollection = (c: AppContext) => handleCardRequest(c, 'modrinth_collection')
 
 // CurseForge project card
-export const getCfMod = (req, res, next) => handleCardRequest(req, res, next, 'curseforge_project')
+export const getCfMod = (c: AppContext) => handleCardRequest(c, 'curseforge_project')
 
 // CurseForge user card
-export const getCfUser = (req, res, next) => handleCardRequest(req, res, next, 'curseforge_user')
+export const getCfUser = (c: AppContext) => handleCardRequest(c, 'curseforge_user')
 
 // Hangar project card
-export const getHangarProject = (req, res, next) =>
-	handleCardRequest(req, res, next, 'hangar_project')
+export const getHangarProject = (c: AppContext) => handleCardRequest(c, 'hangar_project')
 
 // Hangar user card
-export const getHangarUser = (req, res, next) => handleCardRequest(req, res, next, 'hangar_user')
+export const getHangarUser = (c: AppContext) => handleCardRequest(c, 'hangar_user')
 
 // Spigot resource card
-export const getSpigotResource = (req, res, next) =>
-	handleCardRequest(req, res, next, 'spigot_resource')
+export const getSpigotResource = (c: AppContext) => handleCardRequest(c, 'spigot_resource')
 
 // Spigot author card
-export const getSpigotAuthor = (req, res, next) =>
-	handleCardRequest(req, res, next, 'spigot_author')
+export const getSpigotAuthor = (c: AppContext) => handleCardRequest(c, 'spigot_author')

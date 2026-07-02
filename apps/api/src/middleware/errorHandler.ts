@@ -1,6 +1,7 @@
 import { ICONS } from '../constants/icons.js'
 import { generateBadge } from '../generators/badge.js'
 import { PlatformApiError } from '../services/baseClient.js'
+import type { AppContext } from '../types/hono.js'
 import { generatePng } from '../utils/generateImage.js'
 import { generateAttribution, generateInfo } from '../utils/svgComponents.js'
 
@@ -96,11 +97,13 @@ function getStatusMessage(statusCode) {
 	return statusMessages[statusCode] || `Error ${statusCode}`
 }
 
-export async function errorHandler(err, req, res) {
-	const format = req.query.format
-	const isCurseforge = req.path.includes('/curseforge/')
-	const isHangar = req.path.includes('/hangar/')
-	const isSpiget = req.path.includes('/spigot/')
+export async function errorHandler(err, c: AppContext) {
+	const format = c.req.query('format')
+	const path = c.req.path
+	const isCurseforge = path.includes('/curseforge/')
+	const isHangar = path.includes('/hangar/')
+	const isSpiget = path.includes('/spigot/')
+	const isImageCrawler = c.get('isImageCrawler')
 
 	let statusCode = 500
 	let message = 'Internal Server Error'
@@ -112,8 +115,8 @@ export async function errorHandler(err, req, res) {
 			message = 'Project not found'
 		} else if (isHangar) {
 			// Determine if this is a project or user request
-			const isProjectRequest = req.path.includes('/project/')
-			const isUserRequest = req.path.includes('/user/')
+			const isProjectRequest = path.includes('/project/')
+			const isUserRequest = path.includes('/user/')
 			message = isProjectRequest
 				? 'Project not found'
 				: isUserRequest
@@ -121,8 +124,8 @@ export async function errorHandler(err, req, res) {
 					: 'Project not found'
 		} else if (isSpiget) {
 			// Determine if this is a resource or author request
-			const isResourceRequest = req.path.includes('/resource/')
-			const isAuthorRequest = req.path.includes('/author/')
+			const isResourceRequest = path.includes('/resource/')
+			const isAuthorRequest = path.includes('/author/')
 			message = isResourceRequest
 				? 'Resource not found'
 				: isAuthorRequest
@@ -130,9 +133,9 @@ export async function errorHandler(err, req, res) {
 					: 'Resource not found'
 		} else {
 			// Determine if this is a project, user, organization, or collection request
-			const isProjectRequest = req.path.includes('/project/')
-			const isOrganizationRequest = req.path.includes('/organization/')
-			const isCollectionRequest = req.path.includes('/collection/')
+			const isProjectRequest = path.includes('/project/')
+			const isOrganizationRequest = path.includes('/organization/')
+			const isCollectionRequest = path.includes('/collection/')
 			message = isProjectRequest
 				? 'Project not found'
 				: isOrganizationRequest
@@ -169,54 +172,44 @@ export async function errorHandler(err, req, res) {
 	}
 
 	// Check if this is a badge request
-	const isBadge = req.path.includes('/badge')
+	const isBadge = path.includes('/badge')
 
 	// Check if image format is requested or if it's an image crawler
-	const useImage = req.isImageCrawler || format === 'png' || format === 'image'
+	const useImage = isImageCrawler || format === 'png' || format === 'image'
 
 	if (isBadge) {
-		res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+		c.header('Cache-Control', 'no-cache, no-store, must-revalidate')
 
 		const svg = generateBadge('error', message, '#f38ba8')
 
 		if (useImage) {
 			const { buffer: pngBuffer } = await generatePng(svg)
-			res.setHeader('Content-Type', 'image/png')
-			return res.status(req.isImageCrawler ? 200 : statusCode).send(pngBuffer)
+			c.header('Content-Type', 'image/png')
+			return c.body(pngBuffer as any, (isImageCrawler ? 200 : statusCode) as any)
 		}
 
-		res.setHeader('Content-Type', 'image/svg+xml')
-		res.setHeader('X-Error-Status', statusCode.toString())
+		c.header('Content-Type', 'image/svg+xml')
+		c.header('X-Error-Status', statusCode.toString())
 
-		return res.status(statusCode).send(svg)
+		return c.body(svg, statusCode as any)
 	} else if (useImage) {
 		const svg = generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget)
 		const { buffer: pngBuffer } = await generatePng(svg)
 
-		res.setHeader('Content-Type', 'image/png')
-		res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+		c.header('Content-Type', 'image/png')
+		c.header('Cache-Control', 'no-cache, no-store, must-revalidate')
 
 		// Use Code 200 for image crawlers since they dont like error codes
-		if (req.isImageCrawler) {
-			return res.status(200).send(pngBuffer)
-		} else {
-			return res.status(statusCode).send(pngBuffer)
-		}
+		return c.body(pngBuffer as any, (isImageCrawler ? 200 : statusCode) as any)
 	} else {
 		// Return SVG
-		res.setHeader('Content-Type', 'image/svg+xml')
-		res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-		res.setHeader('X-Error-Status', statusCode.toString())
+		c.header('Content-Type', 'image/svg+xml')
+		c.header('Cache-Control', 'no-cache, no-store, must-revalidate')
+		c.header('X-Error-Status', statusCode.toString())
+
+		const svg = generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget)
 
 		// Use Code 200 for image crawlers since they dont like error codes
-		if (req.isImageCrawler) {
-			return res
-				.status(200)
-				.send(generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget))
-		} else {
-			return res
-				.status(statusCode)
-				.send(generateErrorCard(message, detailText, isCurseforge, isHangar, isSpiget))
-		}
+		return c.body(svg, (isImageCrawler ? 200 : statusCode) as any)
 	}
 }

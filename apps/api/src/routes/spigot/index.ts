@@ -1,13 +1,14 @@
-import express from 'express'
+import { Hono } from 'hono'
 
+import type { AppEnv } from '../../types/hono.js'
 import authorRoutes from './authorRoutes.js'
 import metaRoutes from './metaRoutes.js'
 import resourceRoutes from './resourceRoutes.js'
 
-const router = express.Router()
+const router = new Hono<AppEnv>()
 
-router.use(metaRoutes)
-router.use(resourceRoutes)
-router.use(authorRoutes)
+router.route('/', metaRoutes)
+router.route('/', resourceRoutes)
+router.route('/', authorRoutes)
 
 export default router

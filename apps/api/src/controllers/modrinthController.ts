@@ -1,4 +1,5 @@
 import modrinthClient from '../services/modrinthClient.js'
+import type { AppContext } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { metaKey, PLATFORM } from '../utils/cacheKeys.js'
 import logger from '../utils/logger.js'
@@ -10,9 +11,10 @@ const PROJECT_TYPE_URL_SEGMENT = {
 	minecraft_bedrock_server: 'server',
 }
 
-export const getModrinthMeta = async (req, res, next) => {
+export const getModrinthMeta = async (c: AppContext) => {
+	const { type, id } = c.req.param()
+
 	try {
-		const { type, id } = req.params
 		const cacheKey = metaKey(PLATFORM.MODRINTH, type, id)
 
 		const cached = apiCache.getWithMeta(cacheKey)
@@ -33,8 +35,8 @@ export const getModrinthMeta = async (req, res, next) => {
 				},
 				message,
 			)
-			res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-			return res.json(cachedResult)
+			c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+			return c.json(cachedResult)
 		}
 
 		let name = id
@@ -45,7 +47,7 @@ export const getModrinthMeta = async (req, res, next) => {
 			const user = await modrinthClient.getUser(id)
 			data = user
 			if (!data) {
-				return res.status(404).json({ error: 'User not found' })
+				return c.json({ error: 'User not found' }, 404)
 			}
 			name = user.username
 			url = `https://modrinth.com/user/${id}`
@@ -53,7 +55,7 @@ export const getModrinthMeta = async (req, res, next) => {
 			const project = await modrinthClient.getProjectV3(id)
 			data = project
 			if (!data) {
-				return res.status(404).json({ error: 'Project not found' })
+				return c.json({ error: 'Project not found' }, 404)
 			}
 			name = project.name || project.title
 			const projectType = project.project_types?.[0] || project.project_type
@@ -63,7 +65,7 @@ export const getModrinthMeta = async (req, res, next) => {
 			const org = await modrinthClient.getOrganization(id)
 			data = org
 			if (!data) {
-				return res.status(404).json({ error: 'Organization not found' })
+				return c.json({ error: 'Organization not found' }, 404)
 			}
 			name = org.name
 			url = `https://modrinth.com/organization/${id}`
@@ -71,7 +73,7 @@ export const getModrinthMeta = async (req, res, next) => {
 			const collection = await modrinthClient.getCollection(id)
 			data = collection
 			if (!data) {
-				return res.status(404).json({ error: 'Collection not found' })
+				return c.json({ error: 'Collection not found' }, 404)
 			}
 			name = collection.name
 			url = `https://modrinth.com/collection/${id}`
@@ -88,22 +90,22 @@ export const getModrinthMeta = async (req, res, next) => {
 			message,
 		)
 
-		res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-		res.json(result)
+		c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+		return c.json(result)
 	} catch (err) {
-		const message = `Could not show ${PLATFORM.MODRINTH} ${req.params.type} meta`
+		const message = `Could not show ${PLATFORM.MODRINTH} ${type} meta`
 		logger.warn(
 			{
 				target: {
 					platform: PLATFORM.MODRINTH,
-					entity: req.params.type,
-					identifier: req.params.id,
+					entity: type,
+					identifier: id,
 					surface: 'meta',
 				},
 				err,
 			},
 			message,
 		)
-		next(err)
+		throw err
 	}
 }

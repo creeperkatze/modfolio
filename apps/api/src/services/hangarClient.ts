@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import HangarClient from 'hangarmc-js'
 import { performance } from 'perf_hooks'
 
 import { CARD_LIMITS } from '../constants/platformConfig.js'
@@ -8,62 +9,71 @@ import {
 	fetchVersionDatesForProjects,
 } from '../utils/imageFetcher.js'
 import logger from '../utils/logger.js'
-import { BasePlatformClient } from './baseClient.js'
+import { callPlatform, getDefaultUserAgent } from './baseClient.js'
 
 dotenv.config({ quiet: true })
 
-import packageJson from '../../../../package.json' with { type: 'json' }
-const VERSION = packageJson.version
-
 const HANGAR_API_URL = process.env.HANGAR_API_URL || 'https://hangar.papermc.io'
 const HANGAR_API_KEY = process.env.HANGAR_API_KEY
-const USER_AGENT = process.env.USER_AGENT
 
-export class HangarClient extends BasePlatformClient {
+export class HangarClientWrapper {
+	private client: HangarClient
+	// hangarmc-js requires an {owner, slug} pair to look up a project, but modfolio's
+	// routes only carry the slug - cache slug -> owner resolutions to avoid re-searching.
+	private namespaceCache = new Map<string, string>()
+
 	constructor() {
-		super('Hangar', {
+		this.client = new HangarClient({
 			baseUrl: HANGAR_API_URL,
 			apiKey: HANGAR_API_KEY,
-			userAgent: USER_AGENT ? USER_AGENT.replace('{version}', VERSION) : undefined,
+			userAgent: getDefaultUserAgent(),
 		})
 	}
 
-	getHeaders() {
-		const headers = super.getHeaders()
-		if (this.apiKey) {
-			// Hangar uses Authorization header with Bearer token or API key
-			headers['Authorization'] = `Bearer ${this.apiKey}`
+	private async resolveOwner(slug: string): Promise<string | null> {
+		if (this.namespaceCache.has(slug)) {
+			return this.namespaceCache.get(slug)
 		}
-		return headers
+
+		const results = await this.client.projects.list({ query: slug, limit: 5 })
+		const match = results.result.find((p) => p.namespace.slug.toLowerCase() === slug.toLowerCase())
+		if (!match) {
+			return null
+		}
+
+		this.namespaceCache.set(slug, match.namespace.owner)
+		return match.namespace.owner
 	}
 
 	async getProject(projectSlug) {
-		// Hangar API endpoint for projects: /api/v1/projects/{slug}
-		return this.fetch(`/api/v1/projects/${encodeURIComponent(projectSlug)}`)
+		return callPlatform('Hangar', async () => {
+			const owner = await this.resolveOwner(projectSlug)
+			if (!owner) return null
+			return this.client.projects.get(owner, projectSlug)
+		})
 	}
 
 	async getProjectVersions(projectSlug, limit = 10) {
-		// Hangar API endpoint for versions: /api/v1/projects/{slug}/versions
-		return this.fetch(`/api/v1/projects/${encodeURIComponent(projectSlug)}/versions?limit=${limit}`)
+		return callPlatform('Hangar', async () => {
+			const owner = await this.resolveOwner(projectSlug)
+			if (!owner) return null
+			return this.client.versions.list(owner, projectSlug, { limit })
+		})
 	}
 
 	async getProjectStats(projectSlug, convertToPng = false) {
 		const apiStart = performance.now()
 
-		const projectResponse = await this.getProject(projectSlug)
-		if (!projectResponse) {
+		const project = await this.getProject(projectSlug)
+		if (!project) {
 			return null // Return null instead of throwing to avoid stack trace
 		}
-		const project = projectResponse
 
 		let imageConversionTime = 0
 
-		// Fetch project icon if available
-		// Check multiple possible icon fields
-		const iconUrl = project?.iconUrl || project?.icon || project?.avatarUrl
-		if (iconUrl) {
-			const result = await fetchImageAsBase64(iconUrl, convertToPng)
-			project.icon_url_base64 = result?.data
+		if (project.avatarUrl) {
+			const result = await fetchImageAsBase64(project.avatarUrl, convertToPng)
+			project['icon_url_base64'] = result?.data
 			if (result?.conversionTime) imageConversionTime += result.conversionTime
 		}
 
@@ -87,9 +97,9 @@ export class HangarClient extends BasePlatformClient {
 					const downloads = version?.stats?.totalDownloads || 0
 
 					// Extract all unique Minecraft versions from platformDependencies
-					const gameVersions = new Set()
+					const gameVersions = new Set<string>()
 					if (version.platformDependencies) {
-						Object.values(version.platformDependencies).forEach((versionList: any) => {
+						Object.values(version.platformDependencies).forEach((versionList: string[]) => {
 							versionList.forEach((v) => gameVersions.add(v))
 						})
 					}
@@ -104,7 +114,6 @@ export class HangarClient extends BasePlatformClient {
 						platforms: platforms,
 						gameVersions: Array.from(gameVersions),
 						channel: version.channel?.name || 'Release',
-						externalUrl: version.externalUrl || null,
 					}
 				})
 		} catch {
@@ -115,7 +124,7 @@ export class HangarClient extends BasePlatformClient {
 
 		// Get stats from project
 		const stats = {
-			downloads: project?.stats?.downloads || project?.downloads || 0,
+			downloads: project?.stats?.downloads || 0,
 			stars: project?.stats?.stars || 0,
 			versionCount: totalVersionCount,
 		}
@@ -134,23 +143,21 @@ export class HangarClient extends BasePlatformClient {
 	async getProjectBadgeStats(projectSlug) {
 		const apiStart = performance.now()
 
-		const projectResponse = await this.getProject(projectSlug)
-		if (!projectResponse) {
+		const project = await this.getProject(projectSlug)
+		if (!project) {
 			return null
 		}
-		const project = projectResponse
 
 		const stats = {
-			downloads: project?.stats?.downloads || project?.downloads || 0,
-			views: project?.stats?.views || project?.views || 0,
+			downloads: project?.stats?.downloads || 0,
+			views: project?.stats?.views || 0,
 			versionCount: 0,
 		}
 
 		// Fetch versions
 		try {
 			const versionsResponse = await this.getProjectVersions(projectSlug)
-			stats.versionCount =
-				versionsResponse?.pagination?.count ?? versionsResponse?.result?.length ?? 0
+			stats.versionCount = versionsResponse?.pagination?.count ?? versionsResponse?.result?.length ?? 0
 		} catch {
 			stats.versionCount = 0
 		}
@@ -160,31 +167,27 @@ export class HangarClient extends BasePlatformClient {
 	}
 
 	async getUser(username) {
-		// Hangar API endpoint for users: /api/v1/users/{username}
-		return this.fetch(`/api/v1/users/${encodeURIComponent(username)}`)
+		return callPlatform('Hangar', () => this.client.users.get(username))
 	}
 
 	async getUserProjects(username, limit = 25) {
-		// Hangar API endpoint for projects with owner filter: /api/v1/projects?owner={username}
-		return this.fetch(`/api/v1/projects?owner=${encodeURIComponent(username)}&limit=${limit}`)
+		return callPlatform('Hangar', () => this.client.projects.list({ owner: username, limit }))
 	}
 
 	async getUserStats(username, convertToPng = false) {
 		const apiStart = performance.now()
 
-		const userResponse = await this.getUser(username)
-		if (!userResponse) {
+		const user = await this.getUser(username)
+		if (!user) {
 			return null // Return null instead of throwing to avoid stack trace
 		}
-		const user = userResponse
 
 		let imageConversionTime = 0
 
 		// Fetch user avatar if available
-		const avatarUrl = user?.avatarUrl
-		if (avatarUrl) {
-			const result = await fetchImageAsBase64(avatarUrl, convertToPng)
-			user.avatar_url_base64 = result?.data
+		if (user.avatarUrl) {
+			const result = await fetchImageAsBase64(user.avatarUrl, convertToPng)
+			user['avatar_url_base64'] = result?.data
 			if (result?.conversionTime) imageConversionTime += result.conversionTime
 		}
 
@@ -214,7 +217,6 @@ export class HangarClient extends BasePlatformClient {
 					createdAt: project.createdAt,
 					lastUpdated: project.lastUpdated,
 					// Normalize icon_url for fetchImagesForProjects utility
-					// Hangar API returns avatarUrl at root level
 					icon_url: project.avatarUrl || null,
 				}))
 
@@ -278,11 +280,10 @@ export class HangarClient extends BasePlatformClient {
 	async getUserBadgeStats(username) {
 		const apiStart = performance.now()
 
-		const userResponse = await this.getUser(username)
-		if (!userResponse) {
+		const user = await this.getUser(username)
+		if (!user) {
 			return null
 		}
-		const user = userResponse
 
 		let totalDownloads = 0
 		let totalStars = 0
@@ -315,4 +316,4 @@ export class HangarClient extends BasePlatformClient {
 	}
 }
 
-export default new HangarClient()
+export default new HangarClientWrapper()

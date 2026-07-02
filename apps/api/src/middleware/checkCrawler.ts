@@ -1,3 +1,7 @@
+import type { Next } from 'hono'
+
+import type { AppContext } from '../types/hono.js'
+
 // Crawlers that require PNG images (social media preview bots)
 const IMAGE_CRAWLERS = [
 	'Discordbot',
@@ -20,14 +24,17 @@ const ALL_CRAWLERS = [
 	'BingBot',
 ]
 
-export const checkCrawlerMiddleware = (req, res, next) => {
-	const userAgent = req.headers['user-agent'] || ''
+export const checkCrawlerMiddleware = async (c: AppContext, next: Next) => {
+	const userAgent = c.req.header('user-agent') || ''
 
 	// Check if the request is from an image crawler (social media bots)
-	req.isImageCrawler = IMAGE_CRAWLERS.some((crawler) => userAgent.includes(crawler))
+	c.set(
+		'isImageCrawler',
+		IMAGE_CRAWLERS.some((crawler) => userAgent.includes(crawler)),
+	)
 
 	// Identify which specific bot it is (for logging)
-	req.crawlerType = ALL_CRAWLERS.find((crawler) => userAgent.includes(crawler)) || null
+	c.set('crawlerType', ALL_CRAWLERS.find((crawler) => userAgent.includes(crawler)) || null)
 
-	next()
+	await next()
 }

@@ -1,16 +1,17 @@
 import hangarClient from '../services/hangarClient.js'
+import type { AppContext } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { metaKey, PLATFORM } from '../utils/cacheKeys.js'
 import logger from '../utils/logger.js'
 
 const API_CACHE_TTL = 3600 // 1 hour;
 
-export const getHangarMeta = async (req, res, next) => {
-	try {
-		const { slug } = req.params
-		const { type = 'project' } = req.query
+export const getHangarMeta = async (c: AppContext) => {
+	const { slug } = c.req.param()
+	const type = c.req.query('type') || 'project'
+	const entityType = type === 'user' ? 'user' : 'project'
 
-		const entityType = type === 'user' ? 'user' : 'project'
+	try {
 		const cacheKey = metaKey(PLATFORM.HANGAR, entityType, slug)
 
 		const cached = apiCache.getWithMeta(cacheKey)
@@ -36,8 +37,8 @@ export const getHangarMeta = async (req, res, next) => {
 				},
 				message,
 			)
-			res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-			return res.json(cachedResult)
+			c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+			return c.json(cachedResult)
 		}
 
 		let data
@@ -72,7 +73,7 @@ export const getHangarMeta = async (req, res, next) => {
 		}
 
 		if (!data) {
-			return res.status(404).json({ error: `${entityType} not found` })
+			return c.json({ error: `${entityType} not found` }, 404)
 		}
 
 		apiCache.set(cacheKey, result)
@@ -90,18 +91,17 @@ export const getHangarMeta = async (req, res, next) => {
 			message,
 		)
 
-		res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-		res.json(result)
+		c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+		return c.json(result)
 	} catch (err) {
-		const entity = req.query.type === 'user' ? 'user' : 'project'
-		const message = `Could not show ${PLATFORM.HANGAR} ${entity} meta`
+		const message = `Could not show ${PLATFORM.HANGAR} ${entityType} meta`
 		logger.warn(
 			{
-				target: { platform: PLATFORM.HANGAR, entity, identifier: req.params.slug, surface: 'meta' },
+				target: { platform: PLATFORM.HANGAR, entity: entityType, identifier: slug, surface: 'meta' },
 				err,
 			},
 			message,
 		)
-		next(err)
+		throw err
 	}
 }

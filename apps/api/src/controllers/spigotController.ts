@@ -1,18 +1,19 @@
 import spigotClient from '../services/spigotClient.js'
+import type { AppContext } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { metaKey, PLATFORM } from '../utils/cacheKeys.js'
 import logger from '../utils/logger.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
 
-export const getSpigotMeta = async (req, res, next) => {
-	try {
-		const { id } = req.params
-		const { type = 'resource' } = req.query
+export const getSpigotMeta = async (c: AppContext) => {
+	const { id } = c.req.param()
+	const type = c.req.query('type') || 'resource'
 
+	try {
 		// Validate id is a number
 		if (!/^\d+$/.test(String(id))) {
-			return res.status(400).json({ error: 'Invalid spigot id: must be a number' })
+			return c.json({ error: 'Invalid spigot id: must be a number' }, 400)
 		}
 
 		const entityType = type === 'author' ? 'author' : 'resource'
@@ -41,8 +42,8 @@ export const getSpigotMeta = async (req, res, next) => {
 				},
 				message,
 			)
-			res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-			return res.json(cachedResult)
+			c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+			return c.json(cachedResult)
 		}
 
 		let data
@@ -68,7 +69,7 @@ export const getSpigotMeta = async (req, res, next) => {
 		}
 
 		if (!data) {
-			return res.status(404).json({ error: `${entityType} not found` })
+			return c.json({ error: `${entityType} not found` }, 404)
 		}
 
 		apiCache.set(cacheKey, result)
@@ -81,18 +82,18 @@ export const getSpigotMeta = async (req, res, next) => {
 			message,
 		)
 
-		res.setHeader('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
-		res.json(result)
+		c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
+		return c.json(result)
 	} catch (err) {
-		const entity = req.query.type === 'author' ? 'author' : 'resource'
+		const entity = type === 'author' ? 'author' : 'resource'
 		const message = `Could not show ${PLATFORM.SPIGOT} ${entity} meta`
 		logger.warn(
 			{
-				target: { platform: PLATFORM.SPIGOT, entity, identifier: req.params.id, surface: 'meta' },
+				target: { platform: PLATFORM.SPIGOT, entity, identifier: id, surface: 'meta' },
 				err,
 			},
 			message,
 		)
-		next(err)
+		throw err
 	}
 }

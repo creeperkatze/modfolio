@@ -1,10 +1,11 @@
-import express from 'express'
+import { Hono } from 'hono'
 
 import * as badgeController from '../../controllers/badgeController.js'
 import * as cardController from '../../controllers/cardController.js'
 import * as curseforgeController from '../../controllers/curseforgeController.js'
+import type { AppEnv } from '../../types/hono.js'
 
-const router = express.Router()
+const router = new Hono<AppEnv>()
 
 // Slug lookup route (resolve CurseForge slugs to IDs)
 router.get('/curseforge/lookup/:slug', curseforgeController.getCfSlugLookup)

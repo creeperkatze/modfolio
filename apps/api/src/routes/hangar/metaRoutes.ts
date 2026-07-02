@@ -1,8 +1,9 @@
-import express from 'express'
+import { Hono } from 'hono'
 
 import { getHangarMeta } from '../../controllers/hangarController.js'
+import type { AppEnv } from '../../types/hono.js'
 
-const router = express.Router()
+const router = new Hono<AppEnv>()
 
 router.get('/hangar/meta/:slug', getHangarMeta)
 

@@ -23,13 +23,34 @@ export class PlatformApiError extends Error {
 	}
 }
 
-function getDefaultUserAgent() {
+export function getDefaultUserAgent() {
 	const envUserAgent = process.env.USER_AGENT
 	if (envUserAgent) {
 		return envUserAgent.replace('{version}', VERSION)
 	}
 	// Minimal fallback
 	return `modfolio/${VERSION}`
+}
+
+/**
+ * Runs a call against a platform client library, normalizing its thrown error into
+ * either `null` (client errors, 4xx - treated as "not found") or a `PlatformApiError`
+ * (server errors, 5xx, or network/timeout failures) so callers only ever deal with
+ * one error shape regardless of which underlying library raised it.
+ */
+export async function callPlatform<T>(
+	platformName: string,
+	fn: () => Promise<T>,
+): Promise<T | null> {
+	try {
+		return await fn()
+	} catch (err) {
+		const status = err?.status ?? err?.statusCode
+		if (status >= 400 && status < 500) {
+			return null
+		}
+		throw new PlatformApiError(platformName, status || 502, err?.message || 'Unknown error')
+	}
 }
 
 export class BasePlatformClient {

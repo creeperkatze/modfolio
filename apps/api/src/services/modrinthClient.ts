@@ -1,3 +1,4 @@
+import { GenericModrinthClient } from '@modrinth/api-client'
 import dotenv from 'dotenv'
 import { performance } from 'perf_hooks'
 
@@ -12,62 +13,57 @@ import {
 	aggregateProjectStats,
 	normalizeV3ProjectFields,
 } from '../utils/statsAggregator.js'
-import { BasePlatformClient } from './baseClient.js'
+import { callPlatform, getDefaultUserAgent } from './baseClient.js'
 
 dotenv.config({ quiet: true })
 
-import packageJson from '../../../../package.json' with { type: 'json' }
-const VERSION = packageJson.version
-
-const MODRINTH_API_URL = process.env.MODRINTH_API_URL
-const MODRINTH_API_V3_URL = process.env.MODRINTH_API_V3_URL
-const USER_AGENT = process.env.USER_AGENT
+const MODRINTH_API_URL = process.env.MODRINTH_API_URL || 'https://api.modrinth.com'
 
 const isServerProjectType = (type) =>
 	type === 'minecraft_java_server' || type === 'minecraft_bedrock_server'
 
-export class ModrinthClient extends BasePlatformClient {
-	v3BaseUrl?: string
+export class ModrinthClient {
+	private client: GenericModrinthClient
 
 	constructor() {
-		super('Modrinth', {
-			baseUrl: MODRINTH_API_URL,
-			userAgent: USER_AGENT ? USER_AGENT.replace('{version}', VERSION) : undefined,
+		this.client = new GenericModrinthClient({
+			labrinthBaseUrl: MODRINTH_API_URL,
+			userAgent: getDefaultUserAgent(),
 		})
-		this.v3BaseUrl = MODRINTH_API_V3_URL
 	}
 
-	async getUser(username) {
-		return this.fetch(`/user/${username}`)
+	async getUser(username): Promise<any> {
+		return callPlatform('Modrinth', () => this.client.labrinth.users_v2.get(username))
 	}
 
-	async getUserProjects(username) {
-		return this.fetch(`/user/${username}/projects`)
+	async getUserProjects(username): Promise<any> {
+		return callPlatform('Modrinth', () => this.client.labrinth.users_v2.getProjects(username))
 	}
 
-	async getProjectV3(slug) {
-		return this.fetch(`${this.v3BaseUrl}/project/${slug}`)
+	async getProjectV3(slug): Promise<any> {
+		return callPlatform('Modrinth', () => this.client.labrinth.projects_v3.get(slug))
 	}
 
-	async getProjectVersions(slug) {
-		return this.fetch(`/project/${slug}/version?include_changelog=false`)
+	async getProjectVersions(slug): Promise<any> {
+		return callPlatform('Modrinth', () =>
+			this.client.labrinth.versions_v3.getProjectVersions(slug, { include_changelog: false }),
+		)
 	}
 
-	async getOrganization(id) {
-		return this.fetch(`${this.v3BaseUrl}/organization/${id}`)
+	async getOrganization(id): Promise<any> {
+		return callPlatform('Modrinth', () => this.client.labrinth.organizations_v3.get(id))
 	}
 
-	async getOrganizationProjects(id) {
-		return this.fetch(`${this.v3BaseUrl}/organization/${id}/projects`)
+	async getOrganizationProjects(id): Promise<any> {
+		return callPlatform('Modrinth', () => this.client.labrinth.organizations_v3.getProjects(id))
 	}
 
-	async getCollection(id) {
-		return this.fetch(`${this.v3BaseUrl}/collection/${id}`)
+	async getCollection(id): Promise<any> {
+		return callPlatform('Modrinth', () => this.client.labrinth.collections.get(id))
 	}
 
-	async getProjects(ids) {
-		const idsParam = JSON.stringify(ids)
-		return this.fetch(`/projects?ids=${encodeURIComponent(idsParam)}`)
+	async getProjects(ids): Promise<any> {
+		return callPlatform('Modrinth', () => this.client.labrinth.projects_v2.getMultiple(ids))
 	}
 
 	async getUserStats(username, convertToPng = false, projectType = null) {
@@ -95,7 +91,7 @@ export class ModrinthClient extends BasePlatformClient {
 		const avatarResult = user.avatar_url
 			? await fetchImageAsBase64(user.avatar_url, convertToPng)
 			: null
-		user.avatar_url_base64 = avatarResult?.data
+		user['avatar_url_base64'] = avatarResult?.data
 		if (avatarResult?.conversionTime) imageConversionTime += avatarResult.conversionTime
 
 		const projectsConversionTime = await fetchImagesForProjects(topProjects, convertToPng)
@@ -139,7 +135,7 @@ export class ModrinthClient extends BasePlatformClient {
 		let imageConversionTime = 0
 		if (project.icon_url) {
 			const result = await fetchImageAsBase64(project.icon_url, convertToPng)
-			project.icon_url_base64 = result?.data
+			project['icon_url_base64'] = result?.data
 			if (result?.conversionTime) imageConversionTime += result.conversionTime
 		}
 
@@ -201,7 +197,7 @@ export class ModrinthClient extends BasePlatformClient {
 		const orgIconResult = organization.icon_url
 			? await fetchImageAsBase64(organization.icon_url, convertToPng)
 			: null
-		organization.icon_url_base64 = orgIconResult?.data
+		organization['icon_url_base64'] = orgIconResult?.data
 		if (orgIconResult?.conversionTime) imageConversionTime += orgIconResult.conversionTime
 
 		const projectsConversionTime = await fetchImagesForProjects(topProjects, convertToPng)
@@ -250,7 +246,7 @@ export class ModrinthClient extends BasePlatformClient {
 		const collectionIconResult = collection.icon_url
 			? await fetchImageAsBase64(collection.icon_url, convertToPng)
 			: null
-		collection.icon_url_base64 = collectionIconResult?.data
+		collection['icon_url_base64'] = collectionIconResult?.data
 		if (collectionIconResult?.conversionTime)
 			imageConversionTime += collectionIconResult.conversionTime
 

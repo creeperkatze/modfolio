@@ -1,18 +1,18 @@
+import CurseForgeClient, { ModsSearchSortField } from 'curseforge-js'
 import dotenv from 'dotenv'
 import { performance } from 'perf_hooks'
 
 import { CARD_LIMITS } from '../constants/platformConfig.js'
 import { fetchImageAsBase64, fetchVersionDatesForProjects } from '../utils/imageFetcher.js'
-import { BasePlatformClient } from './baseClient.js'
+import { callPlatform, getDefaultUserAgent } from './baseClient.js'
 
 dotenv.config({ quiet: true })
 
-import packageJson from '../../../../package.json' with { type: 'json' }
-const VERSION = packageJson.version
-
 const CURSEFORGE_API_URL = process.env.CURSEFORGE_API_URL || 'https://api.curseforge.com'
 const CURSEFORGE_API_KEY = process.env.CURSEFORGE_API_KEY
-const USER_AGENT = process.env.USER_AGENT
+
+// Minecraft's game id on CurseForge
+const MINECRAFT_GAME_ID = 432
 
 // Known loader names (for detecting loaders in gameVersions array)
 const KNOWN_LOADERS = [
@@ -38,29 +38,23 @@ const GAME_VERSION_TYPE_IDS = {
 	68441: 'NeoForge',
 }
 
-export class CurseforgeClient extends BasePlatformClient {
+export class CurseforgeClient {
+	private client: CurseForgeClient
+
 	constructor() {
-		super('CurseForge', {
+		this.client = new CurseForgeClient({
 			baseUrl: CURSEFORGE_API_URL,
 			apiKey: CURSEFORGE_API_KEY,
-			userAgent: USER_AGENT ? USER_AGENT.replace('{version}', VERSION) : undefined,
+			userAgent: getDefaultUserAgent(),
 		})
 	}
 
-	getHeaders() {
-		const headers = super.getHeaders()
-		if (this.apiKey) {
-			headers['x-api-key'] = this.apiKey
-		}
-		return headers
-	}
-
 	async getMod(modId) {
-		return this.fetch(`/v1/mods/${modId}`)
+		return callPlatform('CurseForge', () => this.client.mods.get(Number(modId)))
 	}
 
 	async getModFiles(modId, pageSize = CARD_LIMITS.MAX_COUNT) {
-		return this.fetch(`/v1/mods/${modId}/files?pageSize=${pageSize}`)
+		return callPlatform('CurseForge', () => this.client.files.list(Number(modId), { pageSize }))
 	}
 
 	async getModStats(modId, convertToPng = false) {
@@ -71,13 +65,9 @@ export class CurseforgeClient extends BasePlatformClient {
 
 		const apiStart = performance.now()
 
-		const modResponse = await this.getMod(modId)
-		if (!modResponse) {
-			return null // Return null instead of throwing to avoid stack trace
-		}
-		const mod = modResponse.data
+		const mod = await this.getMod(modId)
 		if (!mod) {
-			return null
+			return null // Return null instead of throwing to avoid stack trace
 		}
 
 		let imageConversionTime = 0
@@ -85,7 +75,7 @@ export class CurseforgeClient extends BasePlatformClient {
 		// Fetch mod logo if available and store as icon_url_base64 for consistency with unified system
 		if (mod?.logo?.url) {
 			const result = await fetchImageAsBase64(mod.logo.url, convertToPng)
-			mod.icon_url_base64 = result?.data
+			mod['icon_url_base64'] = result?.data
 			if (result?.conversionTime) imageConversionTime += result.conversionTime
 		}
 
@@ -94,9 +84,9 @@ export class CurseforgeClient extends BasePlatformClient {
 		let totalFileCount = 0
 		try {
 			const filesResponse = await this.getModFiles(modId, CARD_LIMITS.MAX_COUNT)
-			const allFiles = filesResponse.data || []
+			const allFiles = filesResponse?.data || []
 			// Use pagination totalCount if available, otherwise use the array length
-			totalFileCount = filesResponse.pagination?.totalCount ?? allFiles.length
+			totalFileCount = filesResponse?.pagination?.totalCount ?? allFiles.length
 
 			// Sort by date (newest first) and take max (card generator will slice to maxVersions)
 			versions = allFiles
@@ -159,13 +149,9 @@ export class CurseforgeClient extends BasePlatformClient {
 
 		const apiStart = performance.now()
 
-		const modResponse = await this.getMod(modId)
-		if (!modResponse) {
-			return null // Return null instead of throwing to avoid stack trace
-		}
-		const mod = modResponse.data
+		const mod = await this.getMod(modId)
 		if (!mod) {
-			return null
+			return null // Return null instead of throwing to avoid stack trace
 		}
 
 		const stats = {
@@ -179,7 +165,7 @@ export class CurseforgeClient extends BasePlatformClient {
 		try {
 			const filesResponse = await this.getModFiles(modId)
 			// Use pagination totalCount if available, otherwise use the array length
-			const count = filesResponse.pagination?.totalCount ?? filesResponse.data?.length ?? 0
+			const count = filesResponse?.pagination?.totalCount ?? filesResponse?.data?.length ?? 0
 			stats.versionCount = count // Use versionCount for consistency
 			stats.fileCount = count
 		} catch {
@@ -192,10 +178,7 @@ export class CurseforgeClient extends BasePlatformClient {
 	}
 
 	async searchModBySlug(slug) {
-		// CurseForge search API
-		const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&slug=${encodeURIComponent(slug)}`
-
-		const response = await this.fetch(searchUrl)
+		const response = await this.client.mods.search({ gameId: MINECRAFT_GAME_ID, slug })
 		const data = response.data
 
 		if (!data || data.length === 0) {
@@ -206,9 +189,13 @@ export class CurseforgeClient extends BasePlatformClient {
 	}
 
 	async getUserIdFromUsername(username) {
-		const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&searchFilter=${encodeURIComponent(username)}&pageSize=50&sortField=2&sortOrder=desc`
-
-		const response = await this.fetch(searchUrl)
+		const response = await this.client.mods.search({
+			gameId: MINECRAFT_GAME_ID,
+			searchFilter: username,
+			pageSize: 50,
+			sortField: ModsSearchSortField.Popularity,
+			sortOrder: 'desc',
+		})
 		const results = response.data || []
 
 		// Try to find a project where author name matches
@@ -246,9 +233,11 @@ export class CurseforgeClient extends BasePlatformClient {
 	}
 
 	async getUsernameFromUserId(userId) {
-		const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&authorId=${userId}&pageSize=1`
-
-		const response = await this.fetch(searchUrl)
+		const response = await this.client.mods.search({
+			gameId: MINECRAFT_GAME_ID,
+			authorId: Number(userId),
+			pageSize: 1,
+		})
 		const results = response.data || []
 
 		if (results.length > 0 && results[0].authors) {
@@ -262,7 +251,7 @@ export class CurseforgeClient extends BasePlatformClient {
 	}
 
 	async getUser(userId) {
-		return this.fetch(`/v1/users/${userId}`)
+		return callPlatform('CurseForge', () => this.client.users.get(Number(userId)))
 	}
 
 	async getUserStats(userId, convertToPng = false, classId = null) {
@@ -273,11 +262,7 @@ export class CurseforgeClient extends BasePlatformClient {
 
 		const apiStart = performance.now()
 
-		const userResponse = await this.getUser(userId)
-		if (!userResponse) {
-			return null
-		}
-		const user = userResponse.data
+		const user = await this.getUser(userId)
 		if (!user) {
 			return null
 		}
@@ -289,7 +274,7 @@ export class CurseforgeClient extends BasePlatformClient {
 			// Replace {0} placeholder in Twitch avatar URLs with actual size
 			const avatarUrl = user.avatarUrl.replace('{0}', '300x300')
 			const result = await fetchImageAsBase64(avatarUrl, convertToPng)
-			user.avatar_url_base64 = result?.data
+			user['avatar_url_base64'] = result?.data
 			if (result?.conversionTime) imageConversionTime += result.conversionTime
 		}
 
@@ -297,9 +282,14 @@ export class CurseforgeClient extends BasePlatformClient {
 		let projects = []
 		let projectCount = 0
 		try {
-			const classFilter = classId ? `&classId=${classId}` : ''
-			const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&authorId=${userId}&pageSize=${CARD_LIMITS.MAX_COUNT}&sortField=6&sortOrder=desc${classFilter}`
-			const searchResponse = await this.fetch(searchUrl)
+			const searchResponse = await this.client.mods.search({
+				gameId: MINECRAFT_GAME_ID,
+				authorId: Number(userId),
+				pageSize: CARD_LIMITS.MAX_COUNT,
+				sortField: ModsSearchSortField.TotalDownloads,
+				sortOrder: 'desc',
+				...(classId ? { classId: Number(classId) } : {}),
+			})
 			const searchResults = searchResponse.data || []
 
 			// Get total project count from pagination
@@ -321,7 +311,7 @@ export class CurseforgeClient extends BasePlatformClient {
 					let loaders = []
 					try {
 						const filesResponse = await this.getModFiles(mod.id, 1)
-						const files = filesResponse.data || []
+						const files = filesResponse?.data || []
 						if (files.length > 0) {
 							const latestFile = files[0]
 							// Extract loaders from sortableGameVersions based on gameVersionTypeId
@@ -359,7 +349,7 @@ export class CurseforgeClient extends BasePlatformClient {
 			// Fetch version dates for sparkline
 			await fetchVersionDatesForProjects(projects, async (modId) => {
 				const filesResponse = await this.getModFiles(modId, 50)
-				const files = filesResponse.data || []
+				const files = filesResponse?.data || []
 				return files.map((file) => ({
 					date_published: file.fileDate,
 				}))
@@ -375,7 +365,7 @@ export class CurseforgeClient extends BasePlatformClient {
 		const mappedUser = {
 			name: user.displayName,
 			username: user.displayName,
-			avatar_url_base64: user.avatar_url_base64,
+			avatar_url_base64: user['avatar_url_base64'],
 			avatarUrl: user.avatarUrl?.replace('{0}', '300x300'),
 			date_created: user.dateCreated,
 		}
@@ -384,7 +374,7 @@ export class CurseforgeClient extends BasePlatformClient {
 		const projectsDownloads = projects.reduce((sum, p) => sum + (p.downloads || 0), 0)
 		const totalDownloads = classId
 			? projectsDownloads
-			: user?.modsDownloadCount || projectsDownloads
+			: user?.['modsDownloadCount'] || projectsDownloads
 
 		const apiTime = performance.now() - apiStart
 
@@ -394,7 +384,7 @@ export class CurseforgeClient extends BasePlatformClient {
 			stats: {
 				totalDownloads: totalDownloads,
 				projectCount: projectCount,
-				totalFollowers: user?.followerCount || 0,
+				totalFollowers: user?.['followerCount'] || 0,
 				allVersionDates: allVersionDates,
 			},
 			timings: {
@@ -412,11 +402,7 @@ export class CurseforgeClient extends BasePlatformClient {
 
 		const apiStart = performance.now()
 
-		const userResponse = await this.getUser(userId)
-		if (!userResponse) {
-			return null
-		}
-		const user = userResponse.data
+		const user = await this.getUser(userId)
 		if (!user) {
 			return null
 		}
@@ -424,8 +410,11 @@ export class CurseforgeClient extends BasePlatformClient {
 		// Fetch project count
 		let projectCount = 0
 		try {
-			const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&authorId=${userId}&pageSize=1`
-			const searchResponse = await this.fetch(searchUrl)
+			const searchResponse = await this.client.mods.search({
+				gameId: MINECRAFT_GAME_ID,
+				authorId: Number(userId),
+				pageSize: 1,
+			})
 			projectCount = searchResponse.pagination?.totalCount || 0
 		} catch {
 			// projectCount stays 0
@@ -435,9 +424,9 @@ export class CurseforgeClient extends BasePlatformClient {
 
 		return {
 			stats: {
-				totalDownloads: user?.modsDownloadCount || 0,
+				totalDownloads: user?.['modsDownloadCount'] || 0,
 				projectCount: projectCount,
-				totalFollowers: user?.followerCount || 0,
+				totalFollowers: user?.['followerCount'] || 0,
 			},
 			timings: { api: apiTime },
 		}
