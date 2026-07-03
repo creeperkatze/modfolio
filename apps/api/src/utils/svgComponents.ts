@@ -647,7 +647,7 @@ export function generateInfo(
 		: ''
 
 	return `
-  <!-- Bottom left version + date -->
+  <!-- Bottom left version -->
   <text x="${fromCache ? 30 : 15}" y="${height - 5}"
         font-family="Inter, sans-serif"
         font-size="10"
