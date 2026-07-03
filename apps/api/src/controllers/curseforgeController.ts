@@ -1,4 +1,4 @@
-import curseforgeClient from '../services/curseforgeClient.js'
+import curseforgeClient from '../services/platforms/curseforge.js'
 import type { AppContext } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { curseforgeKeys, metaKey, PLATFORM } from '../utils/cacheKeys.js'

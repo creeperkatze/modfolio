@@ -1,4 +1,4 @@
-import modrinthClient from '../services/modrinthClient.js'
+import modrinthClient from '../services/platforms/modrinth.js'
 import type { AppContext } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { metaKey, PLATFORM } from '../utils/cacheKeys.js'

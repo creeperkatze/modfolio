@@ -1,4 +1,4 @@
-import spigotClient from '../services/spigotClient.js'
+import spigotClient from '../services/platforms/spigot.js'
 import type { AppContext } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { metaKey, PLATFORM } from '../utils/cacheKeys.js'

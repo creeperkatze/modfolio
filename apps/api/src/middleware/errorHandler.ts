@@ -1,6 +1,6 @@
 import { ICONS } from '../constants/icons.js'
 import { generateBadge } from '../generators/badge.js'
-import { PlatformApiError } from '../services/baseClient.js'
+import { PlatformApiError } from '../services/errors.js'
 import type { AppContext } from '../types/hono.js'
 import { generatePng } from '../utils/generateImage.js'
 import { generateAttribution, generateInfo } from '../utils/svgComponents.js'

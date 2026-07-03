@@ -1,4 +1,4 @@
-import hangarClient from '../services/hangarClient.js'
+import hangarClient from '../services/platforms/hangar.js'
 import type { AppContext } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { metaKey, PLATFORM } from '../utils/cacheKeys.js'
@@ -97,7 +97,12 @@ export const getHangarMeta = async (c: AppContext) => {
 		const message = `Could not show ${PLATFORM.HANGAR} ${entityType} meta`
 		logger.warn(
 			{
-				target: { platform: PLATFORM.HANGAR, entity: entityType, identifier: slug, surface: 'meta' },
+				target: {
+					platform: PLATFORM.HANGAR,
+					entity: entityType,
+					identifier: slug,
+					surface: 'meta',
+				},
 				err,
 			},
 			message,

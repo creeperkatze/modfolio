@@ -6,8 +6,7 @@ function makeContext(userAgent) {
 	const store = new Map<string, unknown>()
 	return {
 		req: {
-			header: (name: string) =>
-				name.toLowerCase() === 'user-agent' ? userAgent : undefined,
+			header: (name: string) => (name.toLowerCase() === 'user-agent' ? userAgent : undefined),
 		},
 		set: (key: string, value: unknown) => store.set(key, value),
 		get: (key: string) => store.get(key),

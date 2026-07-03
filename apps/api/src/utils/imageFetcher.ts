@@ -2,11 +2,9 @@ import { fileTypeFromBuffer } from 'file-type'
 import { performance } from 'perf_hooks'
 import sharp from 'sharp'
 
+import { MAX_CONCURRENT_REQUESTS, USER_AGENT } from '../config/env.js'
 import { pLimit, requestDeduplicator } from './asyncUtils.js'
 import logger from './logger.js'
-
-const USER_AGENT = process.env.USER_AGENT
-const MAX_CONCURRENT_REQUESTS = parseInt(process.env.MAX_CONCURRENT_REQUESTS || '10', 10)
 
 export async function fetchImageAsBase64(url, convertToPng = false) {
 	if (!url) return null
@@ -44,6 +42,30 @@ export async function fetchImageAsBase64(url, convertToPng = false) {
 			return null
 		}
 	})
+}
+
+/**
+ * Fetch `url`, base64-encode it, and assign the data URI onto `entity[field]`.
+ * Returns the PNG-conversion time (0 when nothing was fetched or converted) so
+ * callers can accumulate it into their `imageConversion` timing. Falls back to
+ * `fallbackUrl` when the primary fetch yields no data (used by Spigot icons).
+ */
+export async function enrichImage(
+	entity: Record<string, any>,
+	url: string | null | undefined,
+	field: string,
+	convertToPng = false,
+	fallbackUrl: string | null = null,
+): Promise<number> {
+	if (!url) return 0
+
+	let result = await fetchImageAsBase64(url, convertToPng)
+	if (!result?.data && fallbackUrl) {
+		result = await fetchImageAsBase64(fallbackUrl, convertToPng)
+	}
+
+	entity[field] = result?.data
+	return result?.conversionTime || 0
 }
 
 export async function fetchImagesForProjects(projects, convertToPng = false) {
