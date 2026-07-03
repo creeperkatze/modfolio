@@ -14,20 +14,18 @@
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
     --font-body: "Manrope", sans-serif;
 
-    /* Elevation scale: 0 = recessed wells, 1 = page background, rising to 4 = topmost fields. */
-    --color-surface-0: #09090a;
-    --color-surface-1: #0b0b0c;
-    --color-surface-2: #141414;
-    --color-surface-3: #181818;
+    --color-surface-0: #0a0a0a;
+    --color-surface-1: #0c0c0c;
+    --color-surface-2: #151415;
+    --color-surface-3: #191819;
     --color-surface-4: #1c1c1c;
-    --color-border: #48484a;
+    --color-border: #484848;
 
     --color-grid-minor: #ffffff08;
-    --color-grid-major: #ffffff14;
 
     --color-text-primary: #acacac;
     --color-text-secondary: #cacaca;
-    --color-text-muted: #78787a;
+    --color-text-muted: #787878;
     --color-text-bright: #f5f5f5;
 
     --color-yellow: #fbbf24;
@@ -46,14 +44,8 @@ body {
     background-color: var(--color-surface-1);
     background-image:
         linear-gradient(var(--color-grid-minor) 1px, transparent 1px),
-        linear-gradient(90deg, var(--color-grid-minor) 1px, transparent 1px),
-        linear-gradient(var(--color-grid-major) 1px, transparent 1px),
-        linear-gradient(90deg, var(--color-grid-major) 1px, transparent 1px);
-    background-size:
-        16px 16px,
-        16px 16px,
-        128px 128px,
-        128px 128px;
+        linear-gradient(90deg, var(--color-grid-minor) 1px, transparent 1px);
+    background-size: 16px 16px;
     background-position: center;
     font-family: var(--font-body);
 }
