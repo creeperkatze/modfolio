@@ -3,18 +3,14 @@ import {
 	enrichImage,
 	fetchImagesForProjects,
 	fetchVersionDatesForProjects,
-} from '../../utils/imageFetcher.js'
+} from '../../utils/image.js'
 import logger from '../../utils/logger.js'
 import { hangarApi } from '../clients/hangar.js'
 import { startTimer } from '../timing.js'
 
 const sumStat = (projects, field) => projects.reduce((sum, p) => sum + (p?.stats?.[field] || 0), 0)
 
-/**
- * Hangar assembly layer. Composes the raw `hangarApi` reads (which handle slug→owner
- * resolution) with shared image enrichment, sparklines and stat totals into the
- * card/badge payloads. Version/project field mapping to the unified shape lives here.
- */
+// Assembles hangarApi reads (owner-resolved) with image/sparkline/stat enrichment into card/badge payloads.
 export class HangarPlatform {
 	getProject = hangarApi.getProject.bind(hangarApi)
 	getProjectVersions = hangarApi.getProjectVersions.bind(hangarApi)

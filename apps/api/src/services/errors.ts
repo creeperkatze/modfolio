@@ -3,12 +3,7 @@ import { USER_AGENT } from '../config/env.js'
 
 const VERSION = packageJson.version
 
-/**
- * A normalized error for any upstream platform API failure. Client (4xx) errors
- * are turned into `null` by `callPlatform` and never reach here; this represents
- * server errors (5xx), network failures, or timeouts, and always surfaces to the
- * caller as a 502 so we never leak an upstream 5xx as our own status.
- */
+// 5xx/network/timeout failures; 4xx becomes null via callPlatform instead. Always surfaces as 502.
 export class PlatformApiError extends Error {
 	platformName: string
 	upstreamStatusCode: number
@@ -33,12 +28,7 @@ export function getDefaultUserAgent() {
 	return `modfolio/${VERSION}`
 }
 
-/**
- * Runs a call against a platform client library, normalizing its thrown error into
- * either `null` (client errors, 4xx - treated as "not found") or a `PlatformApiError`
- * (server errors, 5xx, or network/timeout failures) so callers only ever deal with
- * one error shape regardless of which underlying library raised it.
- */
+// Normalizes any platform library's thrown error: 4xx -> null, 5xx/network -> PlatformApiError.
 export async function callPlatform<T>(
 	platformName: string,
 	fn: () => Promise<T>,

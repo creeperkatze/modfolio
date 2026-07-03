@@ -1,5 +1,5 @@
 import { CARD_LIMITS } from '../../constants/platformConfig.js'
-import { enrichImage, fetchVersionDatesForProjects } from '../../utils/imageFetcher.js'
+import { enrichImage, fetchVersionDatesForProjects } from '../../utils/image.js'
 import {
 	curseforgeApi,
 	extractGameVersions,
@@ -14,12 +14,7 @@ const isNumericId = (id) => /^\d+$/.test(String(id))
 // Twitch-hosted CurseForge avatars use a `{0}` size placeholder.
 const sizedAvatar = (url?: string) => url?.replace('{0}', '300x300')
 
-/**
- * CurseForge assembly layer. CurseForge exposes no listing endpoints, so a user's
- * projects are derived from the mod search API; this layer maps those search results
- * into the same card/badge shapes the other platforms produce. Raw calls and loader
- * parsing live in `clients/curseforge`.
- */
+// Assembles curseforgeApi search results into card/badge payloads. Loader parsing: clients/curseforge.ts.
 export class CurseforgePlatform {
 	getMod = curseforgeApi.getMod.bind(curseforgeApi)
 	getUser = curseforgeApi.getUser.bind(curseforgeApi)
@@ -157,8 +152,7 @@ export class CurseforgePlatform {
 						convertToPng,
 					)
 
-					// Search results already include the mod's latest files, so loaders can be
-					// read from there instead of a per-mod files request.
+					// Avoids a per-mod files request — search results already include latestFiles.
 					const file = latestFile(mod.latestFiles)
 					if (file) project.loaders = extractLoaders(file)
 

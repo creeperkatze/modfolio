@@ -4,12 +4,7 @@ import { callPlatform, getDefaultUserAgent } from '../errors.js'
 
 const PLATFORM = 'Modrinth'
 
-/**
- * Thin, typed wrapper around `@modrinth/api-client`. Every call is normalized
- * through `callPlatform`, so a 4xx resolves to `null` and a 5xx/network error
- * throws a `PlatformApiError`. No image, stats, or timing logic lives here — that
- * is the job of the assembly layer in `modrinthClient.ts`.
- */
+// No image/stats/timing logic here — that's platforms/modrinth.ts.
 class ModrinthApi {
 	private client: GenericModrinthClient
 

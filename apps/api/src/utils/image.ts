@@ -6,16 +6,14 @@ import { MAX_CONCURRENT_REQUESTS, USER_AGENT } from '../config/env.js'
 import { pLimit, requestDeduplicator } from './asyncUtils.js'
 import logger from './logger.js'
 
-/** Detect the real mime type of `buffer` and, if requested, convert it to PNG. */
+// Detects the real mime type and, if requested, converts to PNG.
 async function encodeImageBuffer(buffer: Buffer, convertToPng: boolean) {
-	// Use file-type library for bulletproof file type detection
 	const detectedType = await fileTypeFromBuffer(buffer)
 
 	let finalBuffer: Buffer<ArrayBufferLike> = buffer
 	let mimeType = detectedType?.mime || 'image/png'
 	let conversionTime = 0
 
-	// Only convert to PNG if specifically requested
 	if (convertToPng && detectedType?.mime !== 'image/png') {
 		const startTime = performance.now()
 		finalBuffer = await sharp(buffer).png().toBuffer()
@@ -30,7 +28,6 @@ async function encodeImageBuffer(buffer: Buffer, convertToPng: boolean) {
 export async function fetchImageAsBase64(url, convertToPng = false) {
 	if (!url) return null
 
-	// Use request deduplication to prevent fetching the same image multiple times
 	return requestDeduplicator.dedupe(`image:${url}:${convertToPng}`, async () => {
 		try {
 			const response = await fetch(url, {
@@ -47,12 +44,7 @@ export async function fetchImageAsBase64(url, convertToPng = false) {
 	})
 }
 
-/**
- * Encode a base64 string an upstream API already returned inline (e.g. Spiget's
- * `icon.data`), without an extra network request. Mirrors `fetchImageAsBase64`'s
- * output shape so callers can treat "image already in hand" and "image needs
- * fetching" the same way.
- */
+// Encodes an inline base64 image (e.g. Spiget's icon.data) without a network fetch.
 export async function decodeBase64Image(base64: string | null | undefined, convertToPng = false) {
 	if (!base64) return null
 
@@ -64,12 +56,7 @@ export async function decodeBase64Image(base64: string | null | undefined, conve
 	}
 }
 
-/**
- * Fetch `url`, base64-encode it, and assign the data URI onto `entity[field]`.
- * Returns the PNG-conversion time (0 when nothing was fetched or converted) so
- * callers can accumulate it into their `imageConversion` timing. Falls back to
- * `fallbackUrl` when the primary fetch yields no data (used by Spigot icons).
- */
+// Sets entity[field] to the fetched image's base64 data URI; returns conversion time for timing accumulation.
 export async function enrichImage(
 	entity: Record<string, any>,
 	url: string | null | undefined,
@@ -88,11 +75,7 @@ export async function enrichImage(
 	return result?.conversionTime || 0
 }
 
-/**
- * Like `enrichImage`, but for a base64 string the API already returned inline.
- * Falls back to `enrichImage(entity, fallbackUrl, ...)` when there is no inline
- * data (some Spiget resources genuinely have no icon either way).
- */
+// Like enrichImage, but decodes inline base64 first, falling back to a fetch of fallbackUrl if empty.
 export async function enrichImageFromBase64(
 	entity: Record<string, any>,
 	base64: string | null | undefined,
@@ -112,7 +95,6 @@ export async function enrichImageFromBase64(
 export async function fetchImagesForProjects(projects, convertToPng = false) {
 	let totalConversionTime = 0
 
-	// Use concurrency limiting to prevent overwhelming the API
 	const tasks = projects
 		.filter((project) => project.icon_url)
 		.map((project) => async () => {
@@ -128,7 +110,6 @@ export async function fetchImagesForProjects(projects, convertToPng = false) {
 export async function fetchVersionDatesForProjects(projects, getVersionsFunc) {
 	const allVersionDates = []
 
-	// Use concurrency limiting for version fetches
 	const tasks = projects.map((project) => async () => {
 		try {
 			const cacheKey = `versions:${project.id || project.slug}`

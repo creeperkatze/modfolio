@@ -1,5 +1,5 @@
 import { CARD_LIMITS } from '../../constants/platformConfig.js'
-import { enrichImageFromBase64 } from '../../utils/imageFetcher.js'
+import { enrichImageFromBase64 } from '../../utils/image.js'
 import { authorAvatarUrl, resourceIconFallbackUrl, spigotApi } from '../clients/spigot.js'
 import { startTimer } from '../timing.js'
 
@@ -8,13 +8,7 @@ const isNumericId = (id) => /^\d+$/.test(String(id))
 // Spigot release/update dates are unix seconds; the card system expects ISO strings.
 const secondsToIso = (seconds?: number) => (seconds ? new Date(seconds * 1000).toISOString() : null)
 
-/**
- * Spigot assembly layer. Spiget already inlines `icon.data` (base64) on resources
- * and authors, so image enrichment decodes that instead of making a separate
- * request — the SpigotMC direct-URL fallback is only used on the rare resource
- * where Spiget itself has no icon data. Resources are mapped into the unified
- * project/user shape the card system consumes.
- */
+// Decodes Spiget's inline icon.data instead of a separate request; SpigotMC URL is just the fallback.
 export class SpigotPlatform {
 	getResource = spigotApi.getResource.bind(spigotApi)
 	getResourceVersions = spigotApi.getResourceVersions.bind(spigotApi)

@@ -29,7 +29,6 @@ const GAME_VERSION_TYPE_IDS: Record<number, string> = {
 	68441: 'NeoForge',
 }
 
-/** Extract the deduplicated loader list from a CurseForge file object. */
 export function extractLoaders(file: any): string[] {
 	const fromTypeId = (file.sortableGameVersions || [])
 		.map((v) => GAME_VERSION_TYPE_IDS[v.gameVersionTypeId])
@@ -38,18 +37,14 @@ export function extractLoaders(file: any): string[] {
 	return [...new Set([...fromTypeId, ...fromGameVersions])]
 }
 
-/** Extract only the real Minecraft versions from a file's gameVersions (loaders/tags removed). */
+// Real Minecraft versions only, loaders and tags filtered out of gameVersions.
 export function extractGameVersions(file: any): string[] {
 	return (file.gameVersions || []).filter(
 		(v) => !KNOWN_LOADERS.includes(v) && !FILTERED_TAGS.includes(v),
 	)
 }
 
-/**
- * Pick the truly most recent file out of a mod's `latestFiles`. That array holds
- * one entry per game-version/loader branch and is *not* sorted newest-first, so the
- * overall latest file must be found by date rather than taken as `[0]`.
- */
+// latestFiles is one entry per game-version/loader branch, NOT sorted newest-first — pick max by fileDate, not [0].
 export function latestFile(files: any[] | undefined): any | null {
 	if (!files?.length) return null
 	return files.reduce((latest, f) =>
@@ -67,12 +62,7 @@ type SearchOptions = {
 	sortOrder?: 'asc' | 'desc'
 }
 
-/**
- * Thin wrapper around `curseforge-js`. CurseForge has no user/project-listing
- * endpoints, so "a user's projects" is modelled through the mod search API; the
- * search-shaped lookups live here while the mapping to card/badge shapes lives in
- * the assembly layer.
- */
+// CurseForge has no user/project-listing endpoints; "a user's projects" is modelled via mod search.
 class CurseforgeApi {
 	private client: CurseForgeClient
 
@@ -95,7 +85,7 @@ class CurseforgeApi {
 		return callPlatform(PLATFORM, () => this.client.users.get(Number(userId)))
 	}
 
-	/** Raw Minecraft mod search. Not wrapped in `callPlatform`: callers depend on the thrown error. */
+	// Not wrapped in callPlatform: callers depend on the thrown error.
 	searchMods(options: SearchOptions) {
 		return this.client.mods.search({ gameId: GameId.Minecraft, ...(options as any) })
 	}

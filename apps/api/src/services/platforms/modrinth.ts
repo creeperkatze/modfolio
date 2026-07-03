@@ -3,7 +3,7 @@ import {
 	enrichImage,
 	fetchImagesForProjects,
 	fetchVersionDatesForProjects,
-} from '../../utils/imageFetcher.js'
+} from '../../utils/image.js'
 import {
 	aggregateAllStats,
 	aggregateProjectStats,
@@ -17,14 +17,9 @@ const isServerProjectType = (type) =>
 
 const sumField = (items, field) => items.reduce((sum, item) => sum + (item[field] || 0), 0)
 
-/**
- * Modrinth assembly layer: composes the raw `modrinthApi` reads with shared image
- * enrichment, stats aggregation, and sparkline dates into the card/badge payloads
- * the controllers and generators consume. Raw library calls live in `clients/modrinth`.
- */
+// Assembles modrinthApi reads with image/stats/sparkline enrichment into card/badge payloads.
 export class ModrinthPlatform {
-	// Simple reads delegate straight to the platform layer (used by the meta controller
-	// and internally for sparkline version dates).
+	// Delegates straight to the client layer; also used internally for sparkline version dates.
 	getUser = modrinthApi.getUser.bind(modrinthApi)
 	getUserProjects = modrinthApi.getUserProjects.bind(modrinthApi)
 	getProjectV3 = modrinthApi.getProjectV3.bind(modrinthApi)

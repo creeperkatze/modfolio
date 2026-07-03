@@ -56,8 +56,7 @@ export const getHangarMeta = async (c: AppContext) => {
 			data = projectResponse
 			const projectName = data?.name || slug
 
-			// Hangar project URLs: https://hangar.papermc.io/{owner}/{projectSlug}
-			// Try multiple possible fields for the owner/namespace
+			// Hangar project URL is {owner}/{slug}; try several possible owner field names.
 			const namespace =
 				data?.namespace?.owner ||
 				data?.namespace?.ownerName ||

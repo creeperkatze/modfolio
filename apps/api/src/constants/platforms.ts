@@ -1,9 +1,5 @@
 import { ICONS } from './icons.js'
 
-/**
- * Platform configuration constants.
- * Centralizes platform-specific branding and default styling.
- */
 export const PLATFORMS = {
 	MODRINTH: {
 		id: 'modrinth',
@@ -31,12 +27,6 @@ export const PLATFORMS = {
 	},
 }
 
-/**
- * Get platform configuration by ID.
- *
- * @param {string} platformId - The platform ID (modrinth, curseforge)
- * @returns {Object|null} The platform configuration or null if not found
- */
 export function getPlatform(platformId) {
 	return Object.values(PLATFORMS).find((p) => p.id === platformId) || null
 }

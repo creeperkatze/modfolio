@@ -5,19 +5,14 @@ import { callPlatform, getDefaultUserAgent } from '../errors.js'
 const PLATFORM = 'Spigot'
 const SPIGET_API_URL = 'https://api.spiget.org/v2'
 
-/**
- * Direct SpigotMC icon URL. `Resource.icon.data` / `Author.icon.data` already carry
- * base64 icon data inline on almost every response, so these builders only serve as
- * a last-resort fallback for the rare entity where Spiget itself has no icon data.
- */
+// Fallback only: icon.data is usually inline already; this covers the rare entity with none.
 export const resourceIconFallbackUrl = (resourceId: number | string) =>
 	`https://www.spigotmc.org/data/resource_icons/${Math.floor(Number(resourceId) / 1000)}/${resourceId}.jpg`
 
-/** Spiget's per-author avatar endpoint, used as a fallback when `Author.icon.data` is empty. */
+// Fallback for when Author.icon.data is empty.
 export const authorAvatarUrl = (authorId: number | string) =>
 	`${SPIGET_API_URL}/authors/${authorId}/avatar`
 
-/** Thin wrapper around `spiget-js`. */
 class SpigotApi {
 	private client: SpigetClient
 

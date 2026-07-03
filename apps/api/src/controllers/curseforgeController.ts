@@ -6,21 +6,15 @@ import logger from '../utils/logger.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
 
-/**
- * Get cached username for a user ID, or fetch it via search API
- */
 async function getUsernameSlug(userId) {
-	// Check cache first
 	const cacheKey = curseforgeKeys.userIdLookup(userId)
 	const cached = apiCache.get(cacheKey)
 	if (cached) {
 		return cached
 	}
 
-	// Fetch username by searching for the user's projects
 	const username = await curseforgeClient.getUsernameFromUserId(userId)
 	if (username) {
-		// Cache the username for future use
 		apiCache.set(cacheKey, username)
 	}
 	return username
@@ -208,7 +202,6 @@ export const getCurseforgeMeta = async (c: AppContext) => {
 		let url = null
 
 		if (type === 'user') {
-			// Validate user id is a number
 			if (!/^\d+$/.test(String(id))) {
 				return c.json({ error: 'Invalid curseforge user id: must be a number' }, 400)
 			}
@@ -216,7 +209,6 @@ export const getCurseforgeMeta = async (c: AppContext) => {
 			const user = await curseforgeClient.getUser(id)
 			name = user?.displayName || id
 
-			// Get username slug for profile URL (fetches via search API if not cached)
 			const usernameSlug = await getUsernameSlug(id)
 			if (usernameSlug) {
 				url = `https://www.curseforge.com/members/${usernameSlug}`
@@ -224,7 +216,6 @@ export const getCurseforgeMeta = async (c: AppContext) => {
 				url = null
 			}
 		} else if (type === 'project') {
-			// Validate project id is a number
 			if (!/^\d+$/.test(String(id))) {
 				return c.json({ error: 'Invalid curseforge project id: must be a number' }, 400)
 			}

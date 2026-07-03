@@ -4,12 +4,7 @@ import { callPlatform, getDefaultUserAgent } from '../errors.js'
 
 const PLATFORM = 'Hangar'
 
-/**
- * Thin wrapper around `hangarmc-js`. Hangar addresses projects by `owner/slug`,
- * but every public route only knows the slug, so this layer owns resolving a slug
- * to its owner (and caching that mapping). Everything above the raw library calls
- * — sorting, stats, images — belongs to the assembly layer.
- */
+// Resolves slug -> owner (cached) since routes only ever have the slug.
 class HangarApi {
 	private client: HangarClient
 	private namespaceCache = new Map<string, string>()
