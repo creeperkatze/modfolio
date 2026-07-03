@@ -1,0 +1,263 @@
+{
+  "action.reset": {
+    "message": "Reset"
+  },
+  "app.subtitle": {
+    "message": "Generate fast, beautiful and consistent embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content."
+  },
+  "error.apiDown": {
+    "message": "The {platform} API is currently down."
+  },
+  "field.badgeMetric": {
+    "message": "Badge Metric"
+  },
+  "field.platform": {
+    "message": "Platform"
+  },
+  "field.projectType": {
+    "message": "Project Type"
+  },
+  "field.target": {
+    "message": "Target"
+  },
+  "field.type": {
+    "message": "Type"
+  },
+  "field.url": {
+    "message": "URL"
+  },
+  "footer.credits": {
+    "message": "Made with ♥ by"
+  },
+  "footer.donate": {
+    "message": "Donate"
+  },
+  "footer.github": {
+    "message": "On GitHub"
+  },
+  "footer.notAffiliated": {
+    "message": "Not affiliated with Modrinth, CurseForge, Hangar or Spigot"
+  },
+  "footer.source": {
+    "message": "Source"
+  },
+  "hint.transparentBg": {
+    "message": "Transparent works best in most situations, as it blends in with the background without changing its style."
+  },
+  "metric.downloads": {
+    "message": "Downloads"
+  },
+  "metric.followers": {
+    "message": "Followers"
+  },
+  "metric.likes": {
+    "message": "Likes"
+  },
+  "metric.players": {
+    "message": "Players Online"
+  },
+  "metric.projects": {
+    "message": "Projects"
+  },
+  "metric.rank": {
+    "message": "Rank"
+  },
+  "metric.rating": {
+    "message": "Rating"
+  },
+  "metric.resources": {
+    "message": "Resources"
+  },
+  "metric.stars": {
+    "message": "Stars"
+  },
+  "metric.versions": {
+    "message": "Versions"
+  },
+  "metric.views": {
+    "message": "Views"
+  },
+  "option.accentColor": {
+    "message": "Accent Color"
+  },
+  "option.animations": {
+    "message": "Animations"
+  },
+  "option.bgColor": {
+    "message": "Background Color"
+  },
+  "option.downloadBars": {
+    "message": "Download Bars"
+  },
+  "option.maxFiles": {
+    "message": "Max Files"
+  },
+  "option.maxProjects": {
+    "message": "Max Projects"
+  },
+  "option.maxVersions": {
+    "message": "Max Versions"
+  },
+  "option.relativeTime": {
+    "message": "Relative Time"
+  },
+  "option.showBorder": {
+    "message": "Show Border"
+  },
+  "option.showFiles": {
+    "message": "Show Files"
+  },
+  "option.showIcon": {
+    "message": "Show Platform Icon"
+  },
+  "option.showProjects": {
+    "message": "Show Projects"
+  },
+  "option.showSummary": {
+    "message": "Show Summary"
+  },
+  "option.showVersions": {
+    "message": "Show Versions"
+  },
+  "option.sparklines": {
+    "message": "Sparkline Graphs"
+  },
+  "output.htmlPlaceholder": {
+    "message": "Your HTML code will appear here"
+  },
+  "output.markdownPlaceholder": {
+    "message": "Your markdown code will appear here"
+  },
+  "output.urlPlaceholder": {
+    "message": "Your URL will appear here"
+  },
+  "preview.imageAlt": {
+    "message": "Preview"
+  },
+  "preview.placeholder": {
+    "message": "Your embed will appear here"
+  },
+  "projectType.all": {
+    "message": "All Types"
+  },
+  "projectType.bukkitPlugin": {
+    "message": "Bukkit Plugins"
+  },
+  "projectType.datapack": {
+    "message": "Data Packs"
+  },
+  "projectType.mod": {
+    "message": "Mods"
+  },
+  "projectType.modpack": {
+    "message": "Modpacks"
+  },
+  "projectType.plugin": {
+    "message": "Plugins"
+  },
+  "projectType.resourcepack": {
+    "message": "Resource Packs"
+  },
+  "projectType.shader": {
+    "message": "Shaders"
+  },
+  "projectType.texturePack": {
+    "message": "Texture Packs"
+  },
+  "section.configuration": {
+    "message": "Configuration"
+  },
+  "section.customization": {
+    "message": "Customization"
+  },
+  "section.html": {
+    "message": "HTML"
+  },
+  "section.markdown": {
+    "message": "Markdown"
+  },
+  "section.preview": {
+    "message": "Preview"
+  },
+  "section.url": {
+    "message": "URL"
+  },
+  "target.author": {
+    "message": "Author"
+  },
+  "target.collection": {
+    "message": "Collection"
+  },
+  "target.organization": {
+    "message": "Organization"
+  },
+  "target.project": {
+    "message": "Project"
+  },
+  "target.resource": {
+    "message": "Resource"
+  },
+  "target.user": {
+    "message": "User"
+  },
+  "type.badge": {
+    "message": "Badge"
+  },
+  "type.card": {
+    "message": "Card"
+  },
+  "value.label.author": {
+    "message": "Author ID"
+  },
+  "value.label.collection": {
+    "message": "Collection ID"
+  },
+  "value.label.default": {
+    "message": "Value"
+  },
+  "value.label.organization": {
+    "message": "Organization Slug"
+  },
+  "value.label.project.default": {
+    "message": "Project Slug"
+  },
+  "value.label.project.numeric": {
+    "message": "Project ID"
+  },
+  "value.label.resource": {
+    "message": "Resource ID"
+  },
+  "value.label.user.curseforge": {
+    "message": "User ID"
+  },
+  "value.label.user.default": {
+    "message": "Username"
+  },
+  "value.placeholder.author": {
+    "message": "Enter author ID"
+  },
+  "value.placeholder.collection": {
+    "message": "Enter collection ID"
+  },
+  "value.placeholder.organization": {
+    "message": "Enter organization slug or ID"
+  },
+  "value.placeholder.project.default": {
+    "message": "Enter project ID or slug"
+  },
+  "value.placeholder.project.numeric": {
+    "message": "Enter project ID"
+  },
+  "value.placeholder.resource": {
+    "message": "Enter resource ID"
+  },
+  "value.placeholder.user.curseforge": {
+    "message": "Enter user ID"
+  },
+  "value.placeholder.user.default": {
+    "message": "Enter username or ID"
+  },
+  "warning.apiSlow": {
+    "message": "The {platform} API is responding slowly. Embeds may take longer to load."
+  }
+}

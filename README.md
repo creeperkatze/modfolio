@@ -3,18 +3,17 @@
 Generate fast, beautiful and consistent embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content.
 
 [![Uptime](https://uptime.betterstack.com/status-badges/v2/monitor/2d89t.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
-![GitHub Branch Check Runs](https://img.shields.io/github/check-runs/creeperkatze/modfolio/main)
-![GitHub Issues](https://img.shields.io/github/issues/creeperkatze/modfolio)
-![GitHub Pull Requests](https://img.shields.io/github/issues-pr/creeperkatze/modfolio)
-[![Crowdin](https://badges.crowdin.net/modfolio/localized.svg)](https://crowdin.com/project/modfolio)
-![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modfolio?style=flat)
+[![GitHub Branch Check Runs](https://img.shields.io/github/check-runs/creeperkatze/modfolio/main)](https://github.com/creeperkatze/modfolio/actions)
+[![Codecov](https://img.shields.io/codecov/c/github/creeperkatze/modfolio)](https://codecov.io/github/creeperkatze/modfolio)
+[![GitHub Issues](https://img.shields.io/github/issues/creeperkatze/modfolio)](https://github.com/creeperkatze/modfolio/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/creeperkatze/modfolio)](https://github.com/creeperkatze/modfolio/pulls)
+[![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modfolio?style=flat)](https://github.com/creeperkatze/modfolio/stargazers)
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F11WYJU3)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/creeperkatze)
 
 ## 🚀 Quick Start
 
 Use the **[Website](https://modfolio.creeperkatze.dev)** to visually configure and preview your embeds.
-The api docs can be found at **[here](https://modfolio.creeperkatze.dev/docs)**.
 
 Examples:
 

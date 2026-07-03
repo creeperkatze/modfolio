@@ -1,0 +1,7 @@
+allowBuilds:
+  esbuild: true
+  sharp: true
+minimumReleaseAgeExclude:
+  - curseforge-js@1.1.1
+  - hangarmc-js@1.0.1
+  - spiget-js@1.0.0

@@ -1,6 +1,11 @@
 packages:
   - 'apps/*'
 
+minimumReleaseAgeExclude:
+  - curseforge-js
+  - hangarmc-js
+  - spiget-js
+
 allowBuilds:
   '@scarf/scarf': false
   esbuild: true

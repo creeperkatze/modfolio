@@ -5,8 +5,8 @@ LABEL org.opencontainers.image.source=https://github.com/creeperkatze/modfolio
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/backend/package.json ./apps/backend/
-COPY apps/frontend/package.json ./apps/frontend/
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
 
 RUN corepack enable
 RUN pnpm install --frozen-lockfile
@@ -14,11 +14,11 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 ENV CI=true
-RUN pnpm --filter ./apps/frontend build
-RUN pnpm --filter ./apps/backend build
+RUN pnpm --filter modfolio-web build
+RUN pnpm --filter modfolio-api build
 
 RUN chown -R node:node /app
 
 USER node
 
-CMD ["pnpm", "backend:start"]
+CMD ["pnpm", "api:start"]

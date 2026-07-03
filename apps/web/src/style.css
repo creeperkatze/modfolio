@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/600.css";
+@import "@fontsource/manrope/400.css";
+@import "@fontsource/manrope/500.css";
+@import "@fontsource/manrope/600.css";
+@import "@fontsource/manrope/700.css";
+@import "@fontsource/manrope/800.css";
+
+@theme {
+    --font-display: "Manrope", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    --font-body: "Manrope", sans-serif;
+
+    --color-surface-0: var(--color-neutral-950);
+    --color-surface-1: color-mix(in oklab, var(--color-neutral-950) 85%, var(--color-neutral-900));
+    --color-surface-2: color-mix(in oklab, var(--color-neutral-950) 60%, var(--color-neutral-900));
+    --color-surface-3: color-mix(in oklab, var(--color-neutral-950) 35%, var(--color-neutral-900));
+    --color-surface-4: color-mix(in oklab, var(--color-neutral-950) 10%, var(--color-neutral-900));
+    --color-border: var(--color-neutral-700);
+
+    --color-grid-minor: #ffffff08;
+
+    --color-text-primary: var(--color-neutral-400);
+    --color-text-secondary: var(--color-neutral-300);
+    --color-text-muted: var(--color-neutral-500);
+    --color-text-bright: var(--color-neutral-50);
+
+    --color-yellow: var(--color-amber-400);
+    --color-red: var(--color-red-500);
+
+    --color-preview-well: var(--color-surface-0);
+}
+
+:root {
+    --platform-color: #ffffff;
+    --platform-color-contrast: #0a0a0a;
+    --native-color-scheme: dark;
+}
+
+:root.light {
+    --color-surface-0: var(--color-neutral-200);
+    --color-surface-1: var(--color-neutral-100);
+    --color-surface-2: var(--color-neutral-50);
+    --color-surface-3: #ffffff;
+    --color-surface-4: #ffffff;
+    --color-border: var(--color-neutral-300);
+
+    --color-grid-minor: #00000008;
+
+    --color-text-primary: var(--color-neutral-600);
+    --color-text-secondary: var(--color-neutral-700);
+    --color-text-muted: var(--color-neutral-500);
+    --color-text-bright: var(--color-neutral-900);
+
+    --platform-color: var(--color-neutral-900);
+    --platform-color-contrast: #ffffff;
+    --native-color-scheme: light;
+    --color-preview-well: #ffffff;
+}
+
+* {
+    scrollbar-color: var(--color-border) var(--color-surface-0);
+}
+
+body {
+    background-color: var(--color-surface-1);
+    font-family: var(--font-body);
+    font-weight: 500;
+}
