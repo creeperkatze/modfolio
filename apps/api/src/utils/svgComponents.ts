@@ -76,7 +76,8 @@ export function generateSvgWrapper(
 	const warningBanner = legacyDomainWarning
 		? generateLegacyDomainWarning(width, warningHeight, animations)
 		: ''
-	const shiftedContent = warningHeight > 0 ? `<g transform="translate(0, ${warningHeight})">${content}</g>` : content
+	const shiftedContent =
+		warningHeight > 0 ? `<g transform="translate(0, ${warningHeight})">${content}</g>` : content
 
 	const styleBlock = animations
 		? `
