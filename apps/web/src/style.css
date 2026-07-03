@@ -14,24 +14,22 @@
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
     --font-body: "Manrope", sans-serif;
 
-    --color-surface-0: #0a0a0a;
-    --color-surface-1: #0c0c0c;
-    /* surface-2/3 (the outer card + Configuration/Customization panels) carry a slight warm
-       bias (G one shade below R=B) to counter a perceived green cast on some displays. */
-    --color-surface-2: #151415;
-    --color-surface-3: #191819;
-    --color-surface-4: #1c1c1c;
-    --color-border: #484848;
+    --color-surface-0: var(--color-neutral-950);
+    --color-surface-1: color-mix(in oklab, var(--color-neutral-950) 85%, var(--color-neutral-900));
+    --color-surface-2: color-mix(in oklab, var(--color-neutral-950) 60%, var(--color-neutral-900));
+    --color-surface-3: color-mix(in oklab, var(--color-neutral-950) 35%, var(--color-neutral-900));
+    --color-surface-4: color-mix(in oklab, var(--color-neutral-950) 10%, var(--color-neutral-900));
+    --color-border: var(--color-neutral-700);
 
     --color-grid-minor: #ffffff08;
 
-    --color-text-primary: #acacac;
-    --color-text-secondary: #cacaca;
-    --color-text-muted: #787878;
-    --color-text-bright: #f5f5f5;
+    --color-text-primary: var(--color-neutral-400);
+    --color-text-secondary: var(--color-neutral-300);
+    --color-text-muted: var(--color-neutral-500);
+    --color-text-bright: var(--color-neutral-50);
 
-    --color-yellow: #fbbf24;
-    --color-red: #ef4444;
+    --color-yellow: var(--color-amber-400);
+    --color-red: var(--color-red-500);
 }
 
 :root {
