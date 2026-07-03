@@ -13,19 +13,12 @@ import { callPlatform, getDefaultUserAgent } from './baseClient.js'
 
 dotenv.config({ quiet: true })
 
-const HANGAR_API_URL = process.env.HANGAR_API_URL || 'https://hangar.papermc.io'
-const HANGAR_API_KEY = process.env.HANGAR_API_KEY
-
 export class HangarClientWrapper {
 	private client: HangarClient
-	// hangarmc-js requires an {owner, slug} pair to look up a project, but modfolio's
-	// routes only carry the slug - cache slug -> owner resolutions to avoid re-searching.
 	private namespaceCache = new Map<string, string>()
 
 	constructor() {
 		this.client = new HangarClient({
-			baseUrl: HANGAR_API_URL,
-			apiKey: HANGAR_API_KEY,
 			userAgent: getDefaultUserAgent(),
 		})
 	}
@@ -157,7 +150,8 @@ export class HangarClientWrapper {
 		// Fetch versions
 		try {
 			const versionsResponse = await this.getProjectVersions(projectSlug)
-			stats.versionCount = versionsResponse?.pagination?.count ?? versionsResponse?.result?.length ?? 0
+			stats.versionCount =
+				versionsResponse?.pagination?.count ?? versionsResponse?.result?.length ?? 0
 		} catch {
 			stats.versionCount = 0
 		}
@@ -309,10 +303,6 @@ export class HangarClientWrapper {
 		}
 
 		return { stats, timings: { api: apiTime } }
-	}
-
-	isConfigured() {
-		return !!HANGAR_API_KEY
 	}
 }
 

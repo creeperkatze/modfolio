@@ -1,4 +1,4 @@
-import CurseForgeClient, { ModsSearchSortField } from 'curseforge-js'
+import CurseForgeClient, { GameId, ModsSearchSortField } from 'curseforge-js'
 import dotenv from 'dotenv'
 import { performance } from 'perf_hooks'
 
@@ -7,12 +7,6 @@ import { fetchImageAsBase64, fetchVersionDatesForProjects } from '../utils/image
 import { callPlatform, getDefaultUserAgent } from './baseClient.js'
 
 dotenv.config({ quiet: true })
-
-const CURSEFORGE_API_URL = process.env.CURSEFORGE_API_URL || 'https://api.curseforge.com'
-const CURSEFORGE_API_KEY = process.env.CURSEFORGE_API_KEY
-
-// Minecraft's game id on CurseForge
-const MINECRAFT_GAME_ID = 432
 
 // Known loader names (for detecting loaders in gameVersions array)
 const KNOWN_LOADERS = [
@@ -43,8 +37,7 @@ export class CurseforgeClient {
 
 	constructor() {
 		this.client = new CurseForgeClient({
-			baseUrl: CURSEFORGE_API_URL,
-			apiKey: CURSEFORGE_API_KEY,
+			apiKey: process.env.CURSEFORGE_API_KEY,
 			userAgent: getDefaultUserAgent(),
 		})
 	}
@@ -178,7 +171,7 @@ export class CurseforgeClient {
 	}
 
 	async searchModBySlug(slug) {
-		const response = await this.client.mods.search({ gameId: MINECRAFT_GAME_ID, slug })
+		const response = await this.client.mods.search({ gameId: GameId.Minecraft, slug })
 		const data = response.data
 
 		if (!data || data.length === 0) {
@@ -190,7 +183,7 @@ export class CurseforgeClient {
 
 	async getUserIdFromUsername(username) {
 		const response = await this.client.mods.search({
-			gameId: MINECRAFT_GAME_ID,
+			gameId: GameId.Minecraft,
 			searchFilter: username,
 			pageSize: 50,
 			sortField: ModsSearchSortField.Popularity,
@@ -234,7 +227,7 @@ export class CurseforgeClient {
 
 	async getUsernameFromUserId(userId) {
 		const response = await this.client.mods.search({
-			gameId: MINECRAFT_GAME_ID,
+			gameId: GameId.Minecraft,
 			authorId: Number(userId),
 			pageSize: 1,
 		})
@@ -283,7 +276,7 @@ export class CurseforgeClient {
 		let projectCount = 0
 		try {
 			const searchResponse = await this.client.mods.search({
-				gameId: MINECRAFT_GAME_ID,
+				gameId: GameId.Minecraft,
 				authorId: Number(userId),
 				pageSize: CARD_LIMITS.MAX_COUNT,
 				sortField: ModsSearchSortField.TotalDownloads,
@@ -411,7 +404,7 @@ export class CurseforgeClient {
 		let projectCount = 0
 		try {
 			const searchResponse = await this.client.mods.search({
-				gameId: MINECRAFT_GAME_ID,
+				gameId: GameId.Minecraft,
 				authorId: Number(userId),
 				pageSize: 1,
 			})
@@ -430,10 +423,6 @@ export class CurseforgeClient {
 			},
 			timings: { api: apiTime },
 		}
-	}
-
-	isConfigured() {
-		return !!CURSEFORGE_API_KEY
 	}
 }
 

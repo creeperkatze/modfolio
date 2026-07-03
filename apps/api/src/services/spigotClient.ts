@@ -8,14 +8,13 @@ import { callPlatform, getDefaultUserAgent } from './baseClient.js'
 
 dotenv.config({ quiet: true })
 
-const SPIGOT_API_URL = process.env.SPIGOT_API_URL || 'https://api.spiget.org/v2'
+const SPIGOT_API_URL = 'https://api.spiget.org/v2'
 
 export class SpigotClientWrapper {
 	private client: SpigetClient
 
 	constructor() {
 		this.client = new SpigetClient({
-			baseUrl: SPIGOT_API_URL,
 			userAgent: getDefaultUserAgent(),
 		})
 	}

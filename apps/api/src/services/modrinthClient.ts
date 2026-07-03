@@ -17,8 +17,6 @@ import { callPlatform, getDefaultUserAgent } from './baseClient.js'
 
 dotenv.config({ quiet: true })
 
-const MODRINTH_API_URL = process.env.MODRINTH_API_URL || 'https://api.modrinth.com'
-
 const isServerProjectType = (type) =>
 	type === 'minecraft_java_server' || type === 'minecraft_bedrock_server'
 
@@ -27,7 +25,6 @@ export class ModrinthClient {
 
 	constructor() {
 		this.client = new GenericModrinthClient({
-			labrinthBaseUrl: MODRINTH_API_URL,
 			userAgent: getDefaultUserAgent(),
 		})
 	}
