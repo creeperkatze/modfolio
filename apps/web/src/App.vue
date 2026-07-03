@@ -1,5 +1,5 @@
 <template>
-	<div class="flex min-h-screen flex-col items-center px-4 pt-10 pb-6 sm:px-6">
+	<div class="app-grid-bg flex min-h-screen flex-col items-center px-4 pt-10 pb-6 sm:px-6">
 		<div
 			class="border-border bg-surface-2 w-full max-w-300 rounded-2xl border p-4 shadow-[0_4px_24px_rgba(0,0,0,0.5)] lg:p-8"
 		>
@@ -137,3 +137,14 @@ onMounted(async () => {
 	skipNextSync = false
 })
 </script>
+
+<style scoped>
+.app-grid-bg {
+	background-color: var(--color-surface-1);
+	background-image:
+		linear-gradient(var(--color-grid-minor) 1px, transparent 1px),
+		linear-gradient(90deg, var(--color-grid-minor) 1px, transparent 1px);
+	background-size: 16px 16px;
+	background-position: center;
+}
+</style>

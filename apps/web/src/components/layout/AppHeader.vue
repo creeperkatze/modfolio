@@ -5,7 +5,11 @@
 				<h1 class="sr-only">Modfolio</h1>
 				<Logo class="h-9 w-auto" role="img" aria-label="Modfolio" />
 			</a>
-			<select v-if="LOCALES.length > 1" v-model="locale" class="field-input w-auto py-2 text-sm">
+			<select
+				v-if="LOCALES.length > 1"
+				v-model="locale"
+				class="bg-surface-4 border-border text-text-bright w-auto rounded border px-3 py-2 text-sm font-medium outline-none transition-colors duration-100 focus:border-(--platform-color)"
+			>
 				<option v-for="loc in LOCALES" :key="loc.code" :value="loc.code">{{ loc.name }}</option>
 			</select>
 		</div>

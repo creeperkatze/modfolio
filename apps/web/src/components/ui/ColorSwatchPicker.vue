@@ -1,14 +1,17 @@
 <template>
 	<div>
-		<span class="label-tag mb-1.5 block">{{ label }}</span>
+		<span
+			class="font-mono text-text-muted mb-1.5 block text-[0.6875rem] font-semibold tracking-[0.12em] uppercase"
+			>{{ label }}</span
+		>
 		<div class="flex flex-wrap items-center gap-2">
 			<div class="flex flex-wrap gap-2">
 				<button
 					v-for="color in presetColors"
 					:key="String(color.value)"
 					type="button"
-					class="color-btn"
-					:class="{ 'color-btn-selected': modelValue === color.value }"
+					class="size-9 shrink-0 cursor-pointer rounded-md border-2 p-0"
+					:class="modelValue === color.value ? 'border-white' : 'border-border'"
 					:style="colorButtonStyle(color)"
 					:title="color.name"
 					@click="$emit('update:modelValue', color.value)"
@@ -16,8 +19,8 @@
 			</div>
 
 			<div
-				class="color-btn border-border relative flex items-center justify-center overflow-hidden border-2"
-				:class="{ 'color-btn-selected': isCustom }"
+				class="relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md border-2"
+				:class="isCustom ? 'border-white' : 'border-border'"
 				:style="{ background: customPickerBg }"
 			>
 				<input

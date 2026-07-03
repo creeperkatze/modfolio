@@ -1,6 +1,9 @@
 <template>
 	<div>
-		<span class="label-tag mb-1.5 block">{{ t(m.platform.id) }}</span>
+		<span
+			class="font-mono text-text-muted mb-1.5 block text-[0.6875rem] font-semibold tracking-[0.12em] uppercase"
+			>{{ t(m.platform.id) }}</span
+		>
 		<div class="grid grid-cols-2 gap-2">
 			<button
 				v-for="platform in platforms"

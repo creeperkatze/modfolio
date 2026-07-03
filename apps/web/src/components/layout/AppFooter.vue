@@ -6,14 +6,14 @@
 		<a
 			href="https://github.com/creeperkatze"
 			target="_blank"
-			class="dynamic-link no-underline transition-opacity hover:opacity-70"
+			class="text-(--platform-color) no-underline transition-opacity hover:opacity-70"
 			>Creeperkatze</a
 		>
 		·
 		<a
 			href="https://github.com/creeperkatze/modfolio"
 			target="_blank"
-			class="dynamic-link no-underline transition-opacity hover:opacity-70"
+			class="text-(--platform-color) no-underline transition-opacity hover:opacity-70"
 			>{{ t(m.source.id) }}</a
 		>
 		·

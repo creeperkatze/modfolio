@@ -6,7 +6,7 @@
 			}}</span>
 			<span class="flex items-center gap-1.5 font-mono text-xs">
 				<Zap v-if="!loading && generationTime" class="text-yellow size-3.5" aria-hidden="true" />
-				<Loader2 v-if="loading" class="text-yellow loader-icon size-3.5" aria-hidden="true" />
+				<Loader2 v-if="loading" class="text-yellow size-3.5 animate-spin" aria-hidden="true" />
 				<span v-if="generationTime" class="text-yellow">{{ generationTime }}ms</span>
 			</span>
 		</h2>
