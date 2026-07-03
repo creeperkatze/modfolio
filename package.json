@@ -18,6 +18,7 @@
         "api:test": "turbo run test --filter=modfolio-api",
         "api:test:coverage": "pnpm --filter modfolio-api test:coverage",
         "test": "turbo run test",
+        "test:coverage": "turbo run test:coverage",
         "lint": "turbo run lint",
         "lint:fix": "turbo run lint:fix",
         "release:patch": "pnpm version patch && git push && git push --tags",
