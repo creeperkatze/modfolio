@@ -5,23 +5,19 @@ import { callPlatform, getDefaultUserAgent } from '../errors.js'
 const PLATFORM = 'Spigot'
 const SPIGET_API_URL = 'https://api.spiget.org/v2'
 
-/** Spiget's per-resource icon endpoint. Returns 404 for some resources that do have icons on SpigotMC. */
-export const resourceIconUrl = (resourceId: number | string) =>
-	`${SPIGET_API_URL}/resources/${resourceId}/icon`
-
-/** Direct SpigotMC icon URL, used as a fallback when the Spiget icon endpoint 404s. */
+/**
+ * Direct SpigotMC icon URL. `Resource.icon.data` / `Author.icon.data` already carry
+ * base64 icon data inline on almost every response, so these builders only serve as
+ * a last-resort fallback for the rare entity where Spiget itself has no icon data.
+ */
 export const resourceIconFallbackUrl = (resourceId: number | string) =>
 	`https://www.spigotmc.org/data/resource_icons/${Math.floor(Number(resourceId) / 1000)}/${resourceId}.jpg`
 
-/** Spiget's per-author avatar endpoint. */
+/** Spiget's per-author avatar endpoint, used as a fallback when `Author.icon.data` is empty. */
 export const authorAvatarUrl = (authorId: number | string) =>
 	`${SPIGET_API_URL}/authors/${authorId}/avatar`
 
-/**
- * Thin wrapper around `spiget-js`. Spiget serves icons/avatars from separate
- * endpoints rather than fields on the entity, so the URL builders above are
- * exported for the assembly layer to enrich with.
- */
+/** Thin wrapper around `spiget-js`. */
 class SpigotApi {
 	private client: SpigetClient
 

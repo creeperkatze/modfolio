@@ -4,6 +4,7 @@ import {
 	curseforgeApi,
 	extractGameVersions,
 	extractLoaders,
+	latestFile,
 	ModsSearchSortField,
 } from '../clients/curseforge.js'
 import { startTimer } from '../timing.js'
@@ -156,14 +157,10 @@ export class CurseforgePlatform {
 						convertToPng,
 					)
 
-					// Read the latest file just to surface which loaders the mod targets.
-					try {
-						const filesResponse = await this.getModFiles(mod.id, 1)
-						const latestFile = filesResponse?.data?.[0]
-						if (latestFile) project.loaders = extractLoaders(latestFile)
-					} catch {
-						// Continue without loaders.
-					}
+					// Search results already include the mod's latest files, so loaders can be
+					// read from there instead of a per-mod files request.
+					const file = latestFile(mod.latestFiles)
+					if (file) project.loaders = extractLoaders(file)
 
 					return project
 				}),

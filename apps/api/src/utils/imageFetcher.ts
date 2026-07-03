@@ -6,6 +6,27 @@ import { MAX_CONCURRENT_REQUESTS, USER_AGENT } from '../config/env.js'
 import { pLimit, requestDeduplicator } from './asyncUtils.js'
 import logger from './logger.js'
 
+/** Detect the real mime type of `buffer` and, if requested, convert it to PNG. */
+async function encodeImageBuffer(buffer: Buffer, convertToPng: boolean) {
+	// Use file-type library for bulletproof file type detection
+	const detectedType = await fileTypeFromBuffer(buffer)
+
+	let finalBuffer: Buffer<ArrayBufferLike> = buffer
+	let mimeType = detectedType?.mime || 'image/png'
+	let conversionTime = 0
+
+	// Only convert to PNG if specifically requested
+	if (convertToPng && detectedType?.mime !== 'image/png') {
+		const startTime = performance.now()
+		finalBuffer = await sharp(buffer).png().toBuffer()
+		conversionTime = performance.now() - startTime
+		mimeType = 'image/png'
+	}
+
+	const base64 = finalBuffer.toString('base64')
+	return { data: `data:${mimeType};base64,${base64}`, conversionTime }
+}
+
 export async function fetchImageAsBase64(url, convertToPng = false) {
 	if (!url) return null
 
@@ -18,30 +39,29 @@ export async function fetchImageAsBase64(url, convertToPng = false) {
 			if (!response.ok) return null
 
 			const arrayBuffer = await response.arrayBuffer()
-			const buffer = Buffer.from(arrayBuffer)
-
-			// Use file-type library for bulletproof file type detection
-			const detectedType = await fileTypeFromBuffer(buffer)
-
-			let finalBuffer: Buffer<ArrayBufferLike> = buffer
-			let mimeType = detectedType?.mime || 'image/png'
-			let conversionTime = 0
-
-			// Only convert to PNG if specifically requested
-			if (convertToPng && detectedType?.mime !== 'image/png') {
-				const startTime = performance.now()
-				finalBuffer = await sharp(buffer).png().toBuffer()
-				conversionTime = performance.now() - startTime
-				mimeType = 'image/png'
-			}
-
-			const base64 = finalBuffer.toString('base64')
-			return { data: `data:${mimeType};base64,${base64}`, conversionTime }
+			return await encodeImageBuffer(Buffer.from(arrayBuffer), convertToPng)
 		} catch (error) {
 			logger.warn({ err: error, url, convertToPng }, 'Error fetching image')
 			return null
 		}
 	})
+}
+
+/**
+ * Encode a base64 string an upstream API already returned inline (e.g. Spiget's
+ * `icon.data`), without an extra network request. Mirrors `fetchImageAsBase64`'s
+ * output shape so callers can treat "image already in hand" and "image needs
+ * fetching" the same way.
+ */
+export async function decodeBase64Image(base64: string | null | undefined, convertToPng = false) {
+	if (!base64) return null
+
+	try {
+		return await encodeImageBuffer(Buffer.from(base64, 'base64'), convertToPng)
+	} catch (error) {
+		logger.warn({ err: error, convertToPng }, 'Error decoding inline image data')
+		return null
+	}
 }
 
 /**
@@ -66,6 +86,27 @@ export async function enrichImage(
 
 	entity[field] = result?.data
 	return result?.conversionTime || 0
+}
+
+/**
+ * Like `enrichImage`, but for a base64 string the API already returned inline.
+ * Falls back to `enrichImage(entity, fallbackUrl, ...)` when there is no inline
+ * data (some Spiget resources genuinely have no icon either way).
+ */
+export async function enrichImageFromBase64(
+	entity: Record<string, any>,
+	base64: string | null | undefined,
+	field: string,
+	convertToPng = false,
+	fallbackUrl: string | null = null,
+): Promise<number> {
+	const result = await decodeBase64Image(base64, convertToPng)
+	if (result?.data) {
+		entity[field] = result.data
+		return result.conversionTime || 0
+	}
+
+	return enrichImage(entity, fallbackUrl, field, convertToPng)
 }
 
 export async function fetchImagesForProjects(projects, convertToPng = false) {

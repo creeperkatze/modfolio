@@ -1,11 +1,6 @@
 import { CARD_LIMITS } from '../../constants/platformConfig.js'
-import { enrichImage } from '../../utils/imageFetcher.js'
-import {
-	authorAvatarUrl,
-	resourceIconFallbackUrl,
-	resourceIconUrl,
-	spigotApi,
-} from '../clients/spigot.js'
+import { enrichImageFromBase64 } from '../../utils/imageFetcher.js'
+import { authorAvatarUrl, resourceIconFallbackUrl, spigotApi } from '../clients/spigot.js'
 import { startTimer } from '../timing.js'
 
 const isNumericId = (id) => /^\d+$/.test(String(id))
@@ -14,9 +9,11 @@ const isNumericId = (id) => /^\d+$/.test(String(id))
 const secondsToIso = (seconds?: number) => (seconds ? new Date(seconds * 1000).toISOString() : null)
 
 /**
- * Spigot assembly layer. Spiget serves icons/avatars from separate endpoints (with a
- * SpigotMC fallback), so image enrichment here passes both URLs to `enrichImage`.
- * Resources are mapped into the unified project/user shape the card system consumes.
+ * Spigot assembly layer. Spiget already inlines `icon.data` (base64) on resources
+ * and authors, so image enrichment decodes that instead of making a separate
+ * request — the SpigotMC direct-URL fallback is only used on the rare resource
+ * where Spiget itself has no icon data. Resources are mapped into the unified
+ * project/user shape the card system consumes.
  */
 export class SpigotPlatform {
 	getResource = spigotApi.getResource.bind(spigotApi)
@@ -32,9 +29,9 @@ export class SpigotPlatform {
 		const resource = await this.getResource(resourceId)
 		if (!resource) return null
 
-		const imageConversionTime = await enrichImage(
+		const imageConversionTime = await enrichImageFromBase64(
 			resource,
-			resourceIconUrl(resourceId),
+			resource.icon?.data,
 			'icon_url_base64',
 			convertToPng,
 			resourceIconFallbackUrl(resourceId),
@@ -86,11 +83,12 @@ export class SpigotPlatform {
 		if (!author) return null
 
 		let imageConversionTime = 0
-		imageConversionTime += await enrichImage(
+		imageConversionTime += await enrichImageFromBase64(
 			author,
-			authorAvatarUrl(authorId),
+			author.icon?.data,
 			'avatar_url_base64',
 			convertToPng,
+			authorAvatarUrl(authorId),
 		)
 
 		let resources = []
@@ -116,7 +114,7 @@ export class SpigotPlatform {
 					date_created: secondsToIso(r?.releaseDate),
 					createdAt: secondsToIso(r?.releaseDate),
 					lastUpdated: secondsToIso(r?.updateDate),
-					icon_url: resourceIconUrl(r.id),
+					icon_data: r?.icon?.data || null,
 					icon_url_fallback: resourceIconFallbackUrl(r.id),
 					project_type: 'plugin',
 					category: r?.category,
@@ -215,13 +213,14 @@ export class SpigotPlatform {
 	private async enrichResourceIcons(resources, convertToPng) {
 		let totalConversionTime = 0
 		for (const resource of resources) {
-			totalConversionTime += await enrichImage(
+			totalConversionTime += await enrichImageFromBase64(
 				resource,
-				resource.icon_url,
+				resource.icon_data,
 				'icon_url_base64',
 				convertToPng,
 				resource.icon_url_fallback,
 			)
+			delete resource.icon_data
 		}
 		return totalConversionTime
 	}

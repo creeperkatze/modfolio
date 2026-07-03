@@ -45,6 +45,18 @@ export function extractGameVersions(file: any): string[] {
 	)
 }
 
+/**
+ * Pick the truly most recent file out of a mod's `latestFiles`. That array holds
+ * one entry per game-version/loader branch and is *not* sorted newest-first, so the
+ * overall latest file must be found by date rather than taken as `[0]`.
+ */
+export function latestFile(files: any[] | undefined): any | null {
+	if (!files?.length) return null
+	return files.reduce((latest, f) =>
+		!latest || new Date(f.fileDate).getTime() > new Date(latest.fileDate).getTime() ? f : latest,
+	)
+}
+
 type SearchOptions = {
 	authorId?: number
 	searchFilter?: string
