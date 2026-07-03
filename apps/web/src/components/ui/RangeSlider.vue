@@ -12,7 +12,7 @@
 			:value="modelValue"
 			:min="min"
 			:max="max"
-			class="range-input w-full"
+			class="range-input bg-border h-1 w-full appearance-none rounded-full outline-none"
 			@input="$emit('update:modelValue', Number(($event.target as HTMLInputElement).value))"
 		/>
 	</div>
@@ -42,7 +42,7 @@ defineEmits<{
 	-webkit-appearance: none;
 	appearance: none;
 	height: 4px;
-	background: var(--color-surface-4);
+	background: var(--color-border);
 	border-radius: 2px;
 	outline: none;
 }
