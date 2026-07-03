@@ -4,6 +4,7 @@ import path from 'path'
 
 import { FRONTEND_DEV_URL, NODE_ENV } from './config/env.js'
 import { checkCrawlerMiddleware } from './middleware/checkCrawler.js'
+import { checkLegacyDomainMiddleware } from './middleware/checkLegacyDomain.js'
 import { errorHandler } from './middleware/errorHandler.js'
 import curseforgeRoutes from './routes/curseforge/index.js'
 import hangarRoutes from './routes/hangar/index.js'
@@ -24,6 +25,7 @@ if (NODE_ENV !== 'development') {
 app.use('*', serveStatic({ root: publicDir }))
 
 app.use('*', checkCrawlerMiddleware)
+app.use('*', checkLegacyDomainMiddleware)
 
 app.route('/', modrinthRoutes)
 app.route('/', curseforgeRoutes)

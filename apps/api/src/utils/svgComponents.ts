@@ -39,6 +39,22 @@ export function getThemeColors(customColor = null, backgroundColor = null) {
 	}
 }
 
+const LEGACY_DOMAIN_WARNING_HEIGHT = 24
+
+function generateLegacyDomainWarning(width, height, animations) {
+	return `
+  <!-- Legacy domain warning -->
+  <g${animations ? ' class="fade-in-delayed"' : ''}>
+    <rect x="0" y="0" width="${width}" height="${height}" fill="#7a2323"/>
+    <g transform="translate(10, ${(height - 14) / 2}) scale(${14 / 24})">
+      ${ICONS['triangle-alert']('#fff')}
+    </g>
+    <text x="32" y="${height / 2 + 4}" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#fff">
+      This domain is deprecated, please migrate to modfolio.creeperkatze.dev
+    </text>
+  </g>`
+}
+
 export function generateSvgWrapper(
 	width,
 	height,
@@ -46,12 +62,21 @@ export function generateSvgWrapper(
 	content,
 	showBorder = true,
 	animations = true,
+	legacyDomainWarning = false,
 ) {
+	const warningHeight = legacyDomainWarning ? LEGACY_DOMAIN_WARNING_HEIGHT : 0
+	const totalHeight = height + warningHeight
+
 	const borderRect = showBorder
-		? `    <rect stroke="${colors.borderColor}" fill="${colors.bgColor}" rx="4.5" x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" vector-effect="non-scaling-stroke"/>
+		? `    <rect stroke="${colors.borderColor}" fill="${colors.bgColor}" rx="4.5" x="0.5" y="0.5" width="${width - 1}" height="${totalHeight - 1}" vector-effect="non-scaling-stroke"/>
 `
-		: `    <rect fill="${colors.bgColor}" rx="4.5" width="${width}" height="${height}"/>
+		: `    <rect fill="${colors.bgColor}" rx="4.5" width="${width}" height="${totalHeight}"/>
 `
+
+	const warningBanner = legacyDomainWarning
+		? generateLegacyDomainWarning(width, warningHeight, animations)
+		: ''
+	const shiftedContent = warningHeight > 0 ? `<g transform="translate(0, ${warningHeight})">${content}</g>` : content
 
 	const styleBlock = animations
 		? `
@@ -122,15 +147,15 @@ export function generateSvgWrapper(
 		: ''
 
 	return `
-<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+<svg width="${width}" height="${totalHeight}" xmlns="http://www.w3.org/2000/svg">
 ${styleBlock}
   <defs>
     <clipPath id="outer_rectangle_summary">
-      <rect width="${width}" height="${height}" rx="4.5"/>
+      <rect width="${width}" height="${totalHeight}" rx="4.5"/>
     </clipPath>
   </defs>
   <g clip-path="url(#outer_rectangle_summary)">
-${borderRect}${content}
+${borderRect}${warningBanner}${shiftedContent}
   </g>
 </svg>`.trim()
 }

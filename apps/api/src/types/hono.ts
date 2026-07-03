@@ -4,6 +4,7 @@ export type AppEnv = {
 	Variables: {
 		isImageCrawler: boolean
 		crawlerType: string | null
+		isLegacyDomain: boolean
 	}
 }
 

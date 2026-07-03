@@ -128,6 +128,10 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 		// Determine if we need to render the svg as a image
 		const renderImage = isImageCrawler || format === 'png'
 
+		// Warn when the card was requested from the deprecated .de domain. The
+		// query param override lets this be exercised without spoofing the Host header.
+		const legacyDomain = c.get('isLegacyDomain') || c.req.query('legacyDomain') === 'true'
+
 		// Parse customization options
 		const options: any = {
 			showProjects: c.req.query('showProjects') !== 'false',
@@ -151,6 +155,7 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 				? `#${c.req.query('backgroundColor').replace(/^#/, '')}`
 				: null,
 			projectType: c.req.query('projectType') || null,
+			legacyDomain,
 		}
 
 		// API data cache key - includes filter to avoid serving wrong cached data

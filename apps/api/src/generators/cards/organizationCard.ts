@@ -28,6 +28,7 @@ export function generateOrganizationCard(data, options, platformConfig) {
 		fromCache = false,
 		showBorder = true,
 		animations = true,
+		legacyDomain = false,
 	} = options
 
 	// Use platform default color if no custom color specified
@@ -101,5 +102,5 @@ ${generateInfo(height, colors, fromCache, animations, bottomDelay)}
 ${generateAttribution(height, colors, animations, bottomDelay)}
 `
 
-	return generateSvgWrapper(450, height, colors, content, showBorder, animations)
+	return generateSvgWrapper(450, height, colors, content, showBorder, animations, legacyDomain)
 }
