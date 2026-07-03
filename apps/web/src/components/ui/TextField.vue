@@ -31,7 +31,7 @@ defineEmits<{
 
 <style scoped>
 .text-input {
-	color-scheme: dark;
+	color-scheme: var(--native-color-scheme, dark);
 }
 
 .text-input:-webkit-autofill,
@@ -39,6 +39,6 @@ defineEmits<{
 .text-input:-webkit-autofill:focus,
 .text-input:-webkit-autofill:active {
 	-webkit-box-shadow: 0 0 0px 1000px var(--color-surface-4) inset !important;
-	-webkit-text-fill-color: #ffffff !important;
+	-webkit-text-fill-color: var(--color-text-bright) !important;
 }
 </style>

@@ -19,7 +19,7 @@
 		</StatusBanner>
 
 		<div
-			class="bg-surface-0 border-border text-text-muted flex min-h-105 items-center justify-center rounded-xl border p-4"
+			class="bg-preview-well border-border text-text-muted flex min-h-105 items-center justify-center rounded-xl border p-4"
 		>
 			<span v-if="!previewSrc" class="font-mono text-sm">{{ t(m.placeholder.id) }}</span>
 			<a v-else :href="targetUrl" target="_blank" rel="noopener">

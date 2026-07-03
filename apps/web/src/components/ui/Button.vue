@@ -40,7 +40,7 @@ withDefaults(
 
 .btn-primary {
 	background-color: var(--platform-color);
-	color: #0a0a0a;
+	color: var(--platform-color-contrast);
 }
 
 .btn-secondary {

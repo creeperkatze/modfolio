@@ -1,8 +1,6 @@
 <template>
 	<div class="app-grid-bg flex min-h-screen flex-col items-center px-4 pt-10 pb-6 sm:px-6">
-		<div
-			class="border-border bg-surface-2 w-full max-w-300 rounded-2xl border p-4 shadow-[0_4px_24px_rgba(0,0,0,0.5)] lg:p-8"
-		>
+		<div class="border-border bg-surface-2 w-full max-w-300 rounded-2xl border p-4 lg:p-8">
 			<AppHeader />
 
 			<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">

@@ -110,7 +110,7 @@
      inkscape:current-layer="svg3" />
   <text
      xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-size:100px;line-height:1;font-family:Manrope;-inkscape-font-specification:'Manrope Ultra-Bold';text-align:start;letter-spacing:-3px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:3.75;stroke-linejoin:round;stroke-miterlimit:0;paint-order:markers fill stroke"
+     style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-size:100px;line-height:1;font-family:Manrope;-inkscape-font-specification:'Manrope Ultra-Bold';text-align:start;letter-spacing:-3px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:currentColor;fill-opacity:1;stroke:none;stroke-width:3.75;stroke-linejoin:round;stroke-miterlimit:0;paint-order:markers fill stroke"
      x="87.599777"
      y="73.500061"
      id="text1"><tspan

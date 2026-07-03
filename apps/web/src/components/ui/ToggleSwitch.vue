@@ -38,7 +38,7 @@ defineEmits<{
 	top: 50%;
 	width: 6px;
 	height: 12px;
-	border: solid #000;
+	border: solid var(--platform-color-contrast);
 	border-width: 0 2.5px 2.5px 0;
 	transform: translate(-50%, -50%) rotate(45deg);
 }
