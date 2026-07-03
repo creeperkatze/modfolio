@@ -635,16 +635,7 @@ export function generateInfo(
 	animations = true,
 	animationDelay = 0,
 ) {
-	const now = new Date()
-	const dateTimeStr = now.toLocaleString('en-US', {
-		year: 'numeric',
-		month: 'short',
-		day: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-	})
-
-	const versionText = `v${VERSION} • ${dateTimeStr}`
+	const versionText = `v${VERSION}`
 	const cacheHtml = fromCache
 		? `
   <!-- Cache icon -->
