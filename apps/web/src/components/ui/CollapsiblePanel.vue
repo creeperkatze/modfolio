@@ -11,8 +11,15 @@
 				:class="{ 'rotate-180': expanded }"
 			/>
 		</button>
-		<div v-show="expanded" class="mt-3 space-y-3">
-			<slot />
+		<div
+			class="grid transition-[grid-template-rows] duration-300 ease-in-out"
+			:class="expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+		>
+			<div class="overflow-hidden">
+				<div class="mt-3 space-y-3" :inert="!expanded">
+					<slot />
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
