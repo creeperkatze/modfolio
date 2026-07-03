@@ -43,4 +43,5 @@
 body {
     background-color: var(--color-surface-1);
     font-family: var(--font-body);
+    font-weight: 500;
 }
