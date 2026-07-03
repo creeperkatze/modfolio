@@ -133,21 +133,19 @@ export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
 	},
 }
 
-export const METRIC_LABELS = {
-	downloads: 'Downloads',
-	followers: 'Followers',
-	projects: 'Projects',
-	rank: 'Rank',
-	stars: 'Stars',
-	versions: 'Versions',
-	views: 'Views',
-	likes: 'Likes',
-	resources: 'Resources',
-	rating: 'Rating',
-	players: 'Players Online',
-} satisfies Record<BadgeMetric, string>
+export const PLATFORM_ORDER: PlatformId[] = ['modrinth', 'curseforge', 'hangar', 'spigot']
 
-export function hslToHex(h: number): string {
+export const BG_COLORS: ColorOption[] = [
+	{ name: 'transparent', value: null },
+	{ name: 'white', value: 'ffffff' },
+	{ name: 'github-dark', value: '0d1117' },
+]
+
+export function isPlatformId(value: string): value is PlatformId {
+	return value in PLATFORMS
+}
+
+function hslToHex(h: number): string {
 	const s = 1,
 		l = 0.75
 	const c = (1 - Math.abs(2 * l - 1)) * s
@@ -188,21 +186,10 @@ export function hslToHex(h: number): string {
 	return toHex(r) + toHex(g) + toHex(b)
 }
 
+const HUE_PRESETS = [0, 30, 60, 150, 180, 210, 240, 270, 330]
+
 export function getAccentColors(platformId: PlatformId): string[] {
-	return [
-		PLATFORMS[platformId].defaultColor,
-		...[0, 30, 60, 150, 180, 210, 240, 270, 330].map(hslToHex),
-	]
-}
-
-export const BG_COLORS: ColorOption[] = [
-	{ name: 'transparent', value: null },
-	{ name: 'white', value: 'ffffff' },
-	{ name: 'github-dark', value: '0d1117' },
-]
-
-export function isPlatformId(value: string): value is PlatformId {
-	return value in PLATFORMS
+	return [PLATFORMS[platformId].defaultColor, ...HUE_PRESETS.map(hslToHex)]
 }
 
 export function parseUrl(urlString: string): ParsedUrl | null {
@@ -282,7 +269,7 @@ export function parseUrl(urlString: string): ParsedUrl | null {
 		}
 		const mappedType = typeMap[pathParts[0]]
 		if (!mappedType) return null
-		// Check for optional project type filter segment: /user/name/mods or /organization/slug/resourcepacks
+		// Optional project type filter segment: /user/name/mods or /organization/slug/resourcepacks
 		const projectType = pathParts[2]
 			? MODRINTH_PROJECT_TYPE_SEGMENTS[
 					pathParts[2] as keyof typeof MODRINTH_PROJECT_TYPE_SEGMENTS
@@ -292,4 +279,13 @@ export function parseUrl(urlString: string): ParsedUrl | null {
 	} catch {
 		return null
 	}
+}
+
+export function isUserLikeTarget(platform: PlatformId, target: TargetType): boolean {
+	if (['user', 'organization', 'collection'].includes(target)) return true
+	return platform === 'spigot' && target === 'author'
+}
+
+export function isProjectLikeTarget(target: TargetType): boolean {
+	return target === 'project' || target === 'resource'
 }

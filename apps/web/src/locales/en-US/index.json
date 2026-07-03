@@ -1,16 +1,4 @@
 {
-  "action.copied": {
-    "message": "Copied!"
-  },
-  "action.copyHtml": {
-    "message": "Copy HTML"
-  },
-  "action.copyMarkdown": {
-    "message": "Copy Markdown"
-  },
-  "action.copyUrl": {
-    "message": "Copy URL"
-  },
   "action.reset": {
     "message": "Reset"
   },
@@ -22,6 +10,9 @@
   },
   "field.badgeMetric": {
     "message": "Badge Metric"
+  },
+  "field.platform": {
+    "message": "Platform"
   },
   "field.projectType": {
     "message": "Project Type"
@@ -35,9 +26,6 @@
   "field.url": {
     "message": "URL"
   },
-  "footer.apiDocs": {
-    "message": "API Docs"
-  },
   "footer.credits": {
     "message": "Made with ♥ by"
   },
@@ -45,16 +33,13 @@
     "message": "Donate"
   },
   "footer.github": {
-    "message": "On Github"
+    "message": "On GitHub"
   },
   "footer.notAffiliated": {
     "message": "Not affiliated with Modrinth, CurseForge, Hangar or Spigot"
   },
   "footer.source": {
     "message": "Source"
-  },
-  "footer.translate": {
-    "message": "Help Translate"
   },
   "hint.transparentBg": {
     "message": "Transparent works best in most situations, as it blends in with the background without changing its style."
@@ -146,33 +131,6 @@
   "output.urlPlaceholder": {
     "message": "Your URL will appear here"
   },
-  "placeholder.author": {
-    "message": "Enter author ID"
-  },
-  "placeholder.collection": {
-    "message": "Enter collection ID"
-  },
-  "placeholder.organization": {
-    "message": "Enter organization slug or ID"
-  },
-  "placeholder.project.curseforge": {
-    "message": "Enter project ID"
-  },
-  "placeholder.project.default": {
-    "message": "Enter project ID or slug"
-  },
-  "placeholder.resource": {
-    "message": "Enter resource ID"
-  },
-  "placeholder.server": {
-    "message": "Enter server slug"
-  },
-  "placeholder.user.curseforge": {
-    "message": "Enter user ID"
-  },
-  "placeholder.user.default": {
-    "message": "Enter username or ID"
-  },
   "preview.imageAlt": {
     "message": "Preview"
   },
@@ -239,9 +197,6 @@
   "target.resource": {
     "message": "Resource"
   },
-  "target.server": {
-    "message": "Server"
-  },
   "target.user": {
     "message": "User"
   },
@@ -251,38 +206,56 @@
   "type.card": {
     "message": "Card"
   },
-  "valueLabel.author": {
+  "value.label.author": {
     "message": "Author ID"
   },
-  "valueLabel.collection": {
+  "value.label.collection": {
     "message": "Collection ID"
   },
-  "valueLabel.default": {
+  "value.label.default": {
     "message": "Value"
   },
-  "valueLabel.organization": {
+  "value.label.organization": {
     "message": "Organization Slug"
   },
-  "valueLabel.project.curseforge": {
-    "message": "Project ID"
-  },
-  "valueLabel.project.default": {
+  "value.label.project.default": {
     "message": "Project Slug"
   },
-  "valueLabel.project.spigot": {
+  "value.label.project.numeric": {
     "message": "Project ID"
   },
-  "valueLabel.resource": {
+  "value.label.resource": {
     "message": "Resource ID"
   },
-  "valueLabel.server": {
-    "message": "Server Slug"
-  },
-  "valueLabel.user.curseforge": {
+  "value.label.user.curseforge": {
     "message": "User ID"
   },
-  "valueLabel.user.default": {
+  "value.label.user.default": {
     "message": "Username"
+  },
+  "value.placeholder.author": {
+    "message": "Enter author ID"
+  },
+  "value.placeholder.collection": {
+    "message": "Enter collection ID"
+  },
+  "value.placeholder.organization": {
+    "message": "Enter organization slug or ID"
+  },
+  "value.placeholder.project.default": {
+    "message": "Enter project ID or slug"
+  },
+  "value.placeholder.project.numeric": {
+    "message": "Enter project ID"
+  },
+  "value.placeholder.resource": {
+    "message": "Enter resource ID"
+  },
+  "value.placeholder.user.curseforge": {
+    "message": "Enter user ID"
+  },
+  "value.placeholder.user.default": {
+    "message": "Enter username or ID"
   },
   "warning.apiSlow": {
     "message": "The {platform} API is responding slowly. Embeds may take longer to load."
