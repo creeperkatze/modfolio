@@ -7,11 +7,11 @@ import type { AppEnv } from '../../types/hono.js'
 const router = new Hono<AppEnv>()
 
 // Card routes
-router.get('/hangar/project/:slug', cardController.getHangarProject)
+router.get('/hangar/project/:slug', ...cardController.getHangarProject)
 
 // Badge routes
-router.get('/hangar/project/:slug/downloads', badgeController.getHangarProjectDownloads)
-router.get('/hangar/project/:slug/versions', badgeController.getHangarProjectVersions)
-router.get('/hangar/project/:slug/views', badgeController.getHangarProjectViews)
+router.get('/hangar/project/:slug/downloads', ...badgeController.getHangarProjectDownloads)
+router.get('/hangar/project/:slug/versions', ...badgeController.getHangarProjectVersions)
+router.get('/hangar/project/:slug/views', ...badgeController.getHangarProjectViews)
 
 export default router

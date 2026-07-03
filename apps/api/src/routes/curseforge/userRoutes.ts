@@ -7,11 +7,11 @@ import type { AppEnv } from '../../types/hono.js'
 const router = new Hono<AppEnv>()
 
 // Card routes
-router.get('/curseforge/user/:id', cardController.getCfUser)
+router.get('/curseforge/user/:id', ...cardController.getCfUser)
 
 // Badge routes
-router.get('/curseforge/user/:id/downloads', badgeController.getCfUserDownloads)
-router.get('/curseforge/user/:id/projects', badgeController.getCfUserProjects)
-router.get('/curseforge/user/:id/followers', badgeController.getCfUserFollowers)
+router.get('/curseforge/user/:id/downloads', ...badgeController.getCfUserDownloads)
+router.get('/curseforge/user/:id/projects', ...badgeController.getCfUserProjects)
+router.get('/curseforge/user/:id/followers', ...badgeController.getCfUserFollowers)
 
 export default router

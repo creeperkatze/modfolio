@@ -1,3 +1,5 @@
+import { createFactory } from 'hono/factory'
+
 import { CARD_LIMITS, getErrorMessage } from '../constants/platformConfig.js'
 import { generateCard } from '../generators/card.js'
 import { generateErrorCard } from '../middleware/errorHandler.js'
@@ -5,13 +7,14 @@ import curseforgeClient from '../services/platforms/curseforge.js'
 import hangarClient from '../services/platforms/hangar.js'
 import modrinthClient from '../services/platforms/modrinth.js'
 import spigotClient from '../services/platforms/spigot.js'
-import type { AppContext } from '../types/hono.js'
+import type { AppContext, AppEnv } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cacheKeys.js'
 import { generatePng } from '../utils/generateImage.js'
 import logger from '../utils/logger.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
+const factory = createFactory<AppEnv>()
 
 // Map card types to their API clients
 const CARD_CLIENTS = {
@@ -271,25 +274,33 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 	}
 }
 
-export const getUser = (c: AppContext) => handleCardRequest(c, 'modrinth_user')
-export const getProject = (c: AppContext) => handleCardRequest(c, 'modrinth_project')
-export const getOrganization = (c: AppContext) => handleCardRequest(c, 'modrinth_organization')
-export const getCollection = (c: AppContext) => handleCardRequest(c, 'modrinth_collection')
+export const getUser = factory.createHandlers((c) => handleCardRequest(c, 'modrinth_user'))
+export const getProject = factory.createHandlers((c) => handleCardRequest(c, 'modrinth_project'))
+export const getOrganization = factory.createHandlers((c) =>
+	handleCardRequest(c, 'modrinth_organization'),
+)
+export const getCollection = factory.createHandlers((c) =>
+	handleCardRequest(c, 'modrinth_collection'),
+)
 
 // CurseForge project card
-export const getCfMod = (c: AppContext) => handleCardRequest(c, 'curseforge_project')
+export const getCfMod = factory.createHandlers((c) => handleCardRequest(c, 'curseforge_project'))
 
 // CurseForge user card
-export const getCfUser = (c: AppContext) => handleCardRequest(c, 'curseforge_user')
+export const getCfUser = factory.createHandlers((c) => handleCardRequest(c, 'curseforge_user'))
 
 // Hangar project card
-export const getHangarProject = (c: AppContext) => handleCardRequest(c, 'hangar_project')
+export const getHangarProject = factory.createHandlers((c) =>
+	handleCardRequest(c, 'hangar_project'),
+)
 
 // Hangar user card
-export const getHangarUser = (c: AppContext) => handleCardRequest(c, 'hangar_user')
+export const getHangarUser = factory.createHandlers((c) => handleCardRequest(c, 'hangar_user'))
 
 // Spigot resource card
-export const getSpigotResource = (c: AppContext) => handleCardRequest(c, 'spigot_resource')
+export const getSpigotResource = factory.createHandlers((c) =>
+	handleCardRequest(c, 'spigot_resource'),
+)
 
 // Spigot author card
-export const getSpigotAuthor = (c: AppContext) => handleCardRequest(c, 'spigot_author')
+export const getSpigotAuthor = factory.createHandlers((c) => handleCardRequest(c, 'spigot_author'))

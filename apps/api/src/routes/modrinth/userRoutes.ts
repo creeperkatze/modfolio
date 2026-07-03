@@ -11,14 +11,14 @@ router.get('/card/summary/:username', (c) => c.redirect('/')) // Deprecated
 router.get('/card/user/:username', (c) => c.redirect('/')) // Deprecated
 
 // Card routes
-router.get('/modrinth/user/:username', cardController.getUser)
+router.get('/modrinth/user/:username', ...cardController.getUser)
 
 router.get('/user/:username', (c) => c.redirect(`/modrinth/user/${c.req.param('username')}`, 301)) // Deprecated
 
 // Badge routes
-router.get('/modrinth/user/:username/downloads', badgeController.getUserDownloads)
-router.get('/modrinth/user/:username/projects', badgeController.getUserProjects)
-router.get('/modrinth/user/:username/followers', badgeController.getUserFollowers)
+router.get('/modrinth/user/:username/downloads', ...badgeController.getUserDownloads)
+router.get('/modrinth/user/:username/projects', ...badgeController.getUserProjects)
+router.get('/modrinth/user/:username/followers', ...badgeController.getUserFollowers)
 
 router.get('/user/:username/downloads', (c) =>
 	c.redirect(`/modrinth/user/${c.req.param('username')}/downloads`, 301),

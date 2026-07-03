@@ -1,3 +1,5 @@
+import { createFactory } from 'hono/factory'
+
 import { getErrorMessage } from '../constants/platformConfig.js'
 import { PLATFORMS } from '../constants/platforms.js'
 import { generateBadge } from '../generators/badge.js'
@@ -5,7 +7,7 @@ import curseforgeClient from '../services/platforms/curseforge.js'
 import hangarClient from '../services/platforms/hangar.js'
 import modrinthClient from '../services/platforms/modrinth.js'
 import spigotClient from '../services/platforms/spigot.js'
-import type { AppContext } from '../types/hono.js'
+import type { AppContext, AppEnv } from '../types/hono.js'
 import { apiCache } from '../utils/cache.js'
 import { curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cacheKeys.js'
 import { formatNumber } from '../utils/formatters.js'
@@ -13,6 +15,7 @@ import { generatePng } from '../utils/generateImage.js'
 import logger from '../utils/logger.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
+const factory = createFactory<AppEnv>()
 
 const BADGE_CONFIGS = {
 	// Modrinth entities
@@ -320,75 +323,114 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 }
 
 // User badges
-export const getUserDownloads = (c: AppContext) => handleBadgeRequest(c, 'user', 'downloads')
-export const getUserProjects = (c: AppContext) => handleBadgeRequest(c, 'user', 'projects')
-export const getUserFollowers = (c: AppContext) => handleBadgeRequest(c, 'user', 'followers')
+export const getUserDownloads = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'user', 'downloads'),
+)
+export const getUserProjects = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'user', 'projects'),
+)
+export const getUserFollowers = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'user', 'followers'),
+)
 
 // Project badges
-export const getProjectDownloads = (c: AppContext) => handleBadgeRequest(c, 'project', 'downloads')
-export const getProjectFollowers = (c: AppContext) => handleBadgeRequest(c, 'project', 'followers')
-export const getProjectVersions = (c: AppContext) => handleBadgeRequest(c, 'project', 'versions')
+export const getProjectDownloads = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'project', 'downloads'),
+)
+export const getProjectFollowers = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'project', 'followers'),
+)
+export const getProjectVersions = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'project', 'versions'),
+)
 
 // Organization badges
-export const getOrganizationDownloads = (c: AppContext) =>
-	handleBadgeRequest(c, 'organization', 'downloads')
-export const getOrganizationProjects = (c: AppContext) =>
-	handleBadgeRequest(c, 'organization', 'projects')
-export const getOrganizationFollowers = (c: AppContext) =>
-	handleBadgeRequest(c, 'organization', 'followers')
+export const getOrganizationDownloads = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'organization', 'downloads'),
+)
+export const getOrganizationProjects = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'organization', 'projects'),
+)
+export const getOrganizationFollowers = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'organization', 'followers'),
+)
 
 // Collection badges
-export const getCollectionDownloads = (c: AppContext) =>
-	handleBadgeRequest(c, 'collection', 'downloads')
-export const getCollectionProjects = (c: AppContext) =>
-	handleBadgeRequest(c, 'collection', 'projects')
-export const getCollectionFollowers = (c: AppContext) =>
-	handleBadgeRequest(c, 'collection', 'followers')
+export const getCollectionDownloads = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'collection', 'downloads'),
+)
+export const getCollectionProjects = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'collection', 'projects'),
+)
+export const getCollectionFollowers = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'collection', 'followers'),
+)
 
 // CurseForge mod badges
-export const getCfModDownloads = (c: AppContext) =>
-	handleBadgeRequest(c, 'curseforge_project', 'downloads')
-export const getCfModVersions = (c: AppContext) =>
-	handleBadgeRequest(c, 'curseforge_project', 'versions')
-export const getCfModRank = (c: AppContext) => handleBadgeRequest(c, 'curseforge_project', 'rank')
+export const getCfModDownloads = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'curseforge_project', 'downloads'),
+)
+export const getCfModVersions = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'curseforge_project', 'versions'),
+)
+export const getCfModRank = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'curseforge_project', 'rank'),
+)
 
 // CurseForge user badges
-export const getCfUserDownloads = (c: AppContext) =>
-	handleBadgeRequest(c, 'curseforge_user', 'downloads')
-export const getCfUserProjects = (c: AppContext) =>
-	handleBadgeRequest(c, 'curseforge_user', 'projects')
-export const getCfUserFollowers = (c: AppContext) =>
-	handleBadgeRequest(c, 'curseforge_user', 'followers')
+export const getCfUserDownloads = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'curseforge_user', 'downloads'),
+)
+export const getCfUserProjects = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'curseforge_user', 'projects'),
+)
+export const getCfUserFollowers = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'curseforge_user', 'followers'),
+)
 
 // Hangar project badges
-export const getHangarProjectDownloads = (c: AppContext) =>
-	handleBadgeRequest(c, 'hangar_project', 'downloads')
-export const getHangarProjectVersions = (c: AppContext) =>
-	handleBadgeRequest(c, 'hangar_project', 'versions')
-export const getHangarProjectViews = (c: AppContext) =>
-	handleBadgeRequest(c, 'hangar_project', 'views')
+export const getHangarProjectDownloads = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'hangar_project', 'downloads'),
+)
+export const getHangarProjectVersions = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'hangar_project', 'versions'),
+)
+export const getHangarProjectViews = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'hangar_project', 'views'),
+)
 
 // Hangar user badges
-export const getHangarUserDownloads = (c: AppContext) =>
-	handleBadgeRequest(c, 'hangar_user', 'downloads')
-export const getHangarUserProjects = (c: AppContext) =>
-	handleBadgeRequest(c, 'hangar_user', 'projects')
-export const getHangarUserStars = (c: AppContext) => handleBadgeRequest(c, 'hangar_user', 'stars')
+export const getHangarUserDownloads = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'hangar_user', 'downloads'),
+)
+export const getHangarUserProjects = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'hangar_user', 'projects'),
+)
+export const getHangarUserStars = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'hangar_user', 'stars'),
+)
 
 // Spigot resource badges
-export const getSpigotResourceDownloads = (c: AppContext) =>
-	handleBadgeRequest(c, 'spigot_resource', 'downloads')
-export const getSpigotResourceLikes = (c: AppContext) =>
-	handleBadgeRequest(c, 'spigot_resource', 'likes')
-export const getSpigotResourceRating = (c: AppContext) =>
-	handleBadgeRequest(c, 'spigot_resource', 'rating')
-export const getSpigotResourceVersions = (c: AppContext) =>
-	handleBadgeRequest(c, 'spigot_resource', 'versions')
+export const getSpigotResourceDownloads = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'spigot_resource', 'downloads'),
+)
+export const getSpigotResourceLikes = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'spigot_resource', 'likes'),
+)
+export const getSpigotResourceRating = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'spigot_resource', 'rating'),
+)
+export const getSpigotResourceVersions = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'spigot_resource', 'versions'),
+)
 
 // Spigot author badges
-export const getSpigotAuthorDownloads = (c: AppContext) =>
-	handleBadgeRequest(c, 'spigot_author', 'downloads')
-export const getSpigotAuthorResources = (c: AppContext) =>
-	handleBadgeRequest(c, 'spigot_author', 'resources')
-export const getSpigotAuthorRating = (c: AppContext) =>
-	handleBadgeRequest(c, 'spigot_author', 'rating')
+export const getSpigotAuthorDownloads = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'spigot_author', 'downloads'),
+)
+export const getSpigotAuthorResources = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'spigot_author', 'resources'),
+)
+export const getSpigotAuthorRating = factory.createHandlers((c) =>
+	handleBadgeRequest(c, 'spigot_author', 'rating'),
+)

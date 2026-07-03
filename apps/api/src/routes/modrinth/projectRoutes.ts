@@ -7,14 +7,14 @@ import type { AppEnv } from '../../types/hono.js'
 const router = new Hono<AppEnv>()
 
 // Card routes
-router.get('/modrinth/project/:slug', cardController.getProject)
+router.get('/modrinth/project/:slug', ...cardController.getProject)
 
 router.get('/project/:slug', (c) => c.redirect(`/modrinth/project/${c.req.param('slug')}`, 301)) // Deprecated
 
 // Badge routes
-router.get('/modrinth/project/:slug/downloads', badgeController.getProjectDownloads)
-router.get('/modrinth/project/:slug/followers', badgeController.getProjectFollowers)
-router.get('/modrinth/project/:slug/versions', badgeController.getProjectVersions)
+router.get('/modrinth/project/:slug/downloads', ...badgeController.getProjectDownloads)
+router.get('/modrinth/project/:slug/followers', ...badgeController.getProjectFollowers)
+router.get('/modrinth/project/:slug/versions', ...badgeController.getProjectVersions)
 
 router.get('/project/:slug/downloads', (c) =>
 	c.redirect(`/modrinth/project/${c.req.param('slug')}/downloads`, 301),
