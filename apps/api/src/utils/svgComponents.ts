@@ -67,11 +67,12 @@ export function generateSvgWrapper(
 	const warningHeight = legacyDomainWarning ? LEGACY_DOMAIN_WARNING_HEIGHT : 0
 	const totalHeight = height + warningHeight
 
-	const borderRect = showBorder
-		? `    <rect stroke="${colors.borderColor}" fill="${colors.bgColor}" rx="4.5" x="0.5" y="0.5" width="${width - 1}" height="${totalHeight - 1}" vector-effect="non-scaling-stroke"/>
+	const backgroundRect = `    <rect fill="${colors.bgColor}" rx="4.5" width="${width}" height="${totalHeight}"/>
 `
-		: `    <rect fill="${colors.bgColor}" rx="4.5" width="${width}" height="${totalHeight}"/>
+	const borderStroke = showBorder
+		? `    <rect stroke="${colors.borderColor}" fill="none" rx="4.5" x="0.5" y="0.5" width="${width - 1}" height="${totalHeight - 1}" vector-effect="non-scaling-stroke"/>
 `
+		: ''
 
 	const warningBanner = legacyDomainWarning
 		? generateLegacyDomainWarning(width, warningHeight, animations)
@@ -156,7 +157,7 @@ ${styleBlock}
     </clipPath>
   </defs>
   <g clip-path="url(#outer_rectangle_summary)">
-${borderRect}${warningBanner}${shiftedContent}
+${backgroundRect}${warningBanner}${shiftedContent}${borderStroke}
   </g>
 </svg>`.trim()
 }
