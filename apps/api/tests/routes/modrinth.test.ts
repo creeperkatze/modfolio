@@ -58,7 +58,10 @@ describe('Modrinth routes', () => {
 		expect(res.status).toBe(200)
 		expect(res.headers.get('content-type')).toContain('application/json')
 		const body = await res.json()
-		expect(body).toMatchObject({ name: expect.any(String), url: expect.stringContaining('modrinth.com') })
+		expect(body).toMatchObject({
+			name: expect.any(String),
+			url: expect.stringContaining('modrinth.com'),
+		})
 	})
 
 	it('serves user meta as JSON', async () => {
