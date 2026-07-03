@@ -67,7 +67,7 @@ const icons: Record<PlatformId, Component> = {
 }
 
 .platform-btn-selected {
-	color: #06060a;
+	color: #0a0a0a;
 }
 
 .platform-btn-idle {
