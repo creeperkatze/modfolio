@@ -30,9 +30,17 @@ jobs:
         with:
             images: ghcr.io/creeperkatze/modfolio
             tags: |
-                type=semver,pattern={{version}}
-                type=semver,pattern={{major}}.{{minor}}
-                type=semver,pattern={{major}}
+                type=raw,value=latest
+                type=ref,event=tag
+            labels: |
+                org.opencontainers.image.title=modfolio
+                org.opencontainers.image.description=Flex your modding stats anywhere
+                org.opencontainers.image.licenses=AGPL-3.0-only
+                org.opencontainers.image.source=https://github.com/creeperkatze/modfolio
+            annotations: |
+                org.opencontainers.image.title=modfolio
+                org.opencontainers.image.description=Flex your modding stats anywhere
+                org.opencontainers.image.licenses=AGPL-3.0-only
       - name: 🔑 Login to GitHub Packages
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
