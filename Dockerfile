@@ -1,23 +1,32 @@
-FROM node:22-slim
-
-LABEL org.opencontainers.image.source=https://github.com/creeperkatze/modfolio
+FROM node:22-slim AS builder
 
 WORKDIR /app
+
+RUN corepack enable
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
-
-RUN corepack enable
 RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-ENV CI=true
-RUN pnpm --filter modfolio-web build
-RUN pnpm --filter modfolio-api build
+RUN pnpm web:build
+RUN pnpm api:build
 
-RUN chown -R node:node /app
+RUN pnpm install --prod --frozen-lockfile
+
+FROM node:22-slim AS runner
+
+WORKDIR /app
+
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/public ./apps/api/public
+COPY --from=builder /app/apps/web/dist ./apps/web/dist
 
 USER node
 
