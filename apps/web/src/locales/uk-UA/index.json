@@ -1,0 +1,197 @@
+{
+  "action.reset": {
+    "message": "Скинути"
+  },
+  "app.subtitle": {
+    "message": "Миттєво створюйте красиві та стилістично узгоджені вбудовані картки та значки для контенту платформ Modrinth, CurseForge, Hangar і Spigot."
+  },
+  "error.apiDown": {
+    "message": "API {platform} наразі недоступне."
+  },
+  "field.badgeMetric": {
+    "message": "Показник значка"
+  },
+  "field.projectType": {
+    "message": "Тип проєкту"
+  },
+  "field.target": {
+    "message": "Цільова платформа"
+  },
+  "field.type": {
+    "message": "Тип"
+  },
+  "field.url": {
+    "message": "URL"
+  },
+  "footer.notAffiliated": {
+    "message": "Не пов'язано з Modrinth, CurseForge, Hangar або Spigot"
+  },
+  "hint.transparentBg": {
+    "message": "Прозорий фон найкраще підходить у більшості випадків, оскільки він зливається з фоном без зміни його стилю."
+  },
+  "metric.downloads": {
+    "message": "Завантажень"
+  },
+  "metric.followers": {
+    "message": "Підписників"
+  },
+  "metric.likes": {
+    "message": "Вподобайки"
+  },
+  "metric.players": {
+    "message": "Гравців онлайн"
+  },
+  "metric.projects": {
+    "message": "Проєкти"
+  },
+  "metric.rank": {
+    "message": "Ранг"
+  },
+  "metric.rating": {
+    "message": "Рейтинг"
+  },
+  "metric.resources": {
+    "message": "Ресурси"
+  },
+  "metric.stars": {
+    "message": "Зірок"
+  },
+  "metric.versions": {
+    "message": "Версії"
+  },
+  "metric.views": {
+    "message": "Переглядiв"
+  },
+  "option.accentColor": {
+    "message": "Акцентний колір"
+  },
+  "option.animations": {
+    "message": "Анімації"
+  },
+  "option.bgColor": {
+    "message": "Колір фону"
+  },
+  "option.downloadBars": {
+    "message": "Індикатори завантажень"
+  },
+  "option.maxFiles": {
+    "message": "Макс. файлів"
+  },
+  "option.maxProjects": {
+    "message": "Макс. проєктів"
+  },
+  "option.maxVersions": {
+    "message": "Макс. версій"
+  },
+  "option.relativeTime": {
+    "message": "Відносний час"
+  },
+  "option.showBorder": {
+    "message": "Показувати рамку"
+  },
+  "option.showFiles": {
+    "message": "Показувати файли"
+  },
+  "option.showIcon": {
+    "message": "Показувати іконку платформи"
+  },
+  "option.showProjects": {
+    "message": "Показувати проєкти"
+  },
+  "option.showSummary": {
+    "message": "Показувати підсумок"
+  },
+  "option.showVersions": {
+    "message": "Показувати версії"
+  },
+  "option.sparklines": {
+    "message": "Спарклайн-графіки"
+  },
+  "output.htmlPlaceholder": {
+    "message": "Тут з'явиться ваш HTML-код"
+  },
+  "output.markdownPlaceholder": {
+    "message": "Тут з'явиться ваш Markdown-код"
+  },
+  "output.urlPlaceholder": {
+    "message": "Тут з'явиться ваш URL"
+  },
+  "preview.imageAlt": {
+    "message": "Попередній перегляд"
+  },
+  "preview.placeholder": {
+    "message": "Тут з'явиться ваш віджет"
+  },
+  "projectType.all": {
+    "message": "Усі типи"
+  },
+  "projectType.bukkitPlugin": {
+    "message": "Плагіни Bukkit"
+  },
+  "projectType.datapack": {
+    "message": "Датапаки"
+  },
+  "projectType.mod": {
+    "message": "Моди"
+  },
+  "projectType.modpack": {
+    "message": "Модпаки"
+  },
+  "projectType.plugin": {
+    "message": "Плагіни"
+  },
+  "projectType.resourcepack": {
+    "message": "Ресурспаки"
+  },
+  "projectType.shader": {
+    "message": "Шейдери"
+  },
+  "projectType.texturePack": {
+    "message": "Текстурпаки"
+  },
+  "section.configuration": {
+    "message": "Налаштування"
+  },
+  "section.customization": {
+    "message": "Оформлення"
+  },
+  "section.html": {
+    "message": "HTML"
+  },
+  "section.markdown": {
+    "message": "Markdown"
+  },
+  "section.preview": {
+    "message": "Попередній перегляд"
+  },
+  "section.url": {
+    "message": "URL"
+  },
+  "target.author": {
+    "message": "Автор"
+  },
+  "target.collection": {
+    "message": "Колекція"
+  },
+  "target.organization": {
+    "message": "Організація"
+  },
+  "target.project": {
+    "message": "Проєкт"
+  },
+  "target.resource": {
+    "message": "Ресурс"
+  },
+  "target.user": {
+    "message": "Користувач"
+  },
+  "type.badge": {
+    "message": "Значок"
+  },
+  "type.card": {
+    "message": "Картка"
+  },
+  "warning.apiSlow": {
+    "message": "API {platform} відповідає із затримкою. Вбудовані об'єкти можуть завантажуватися довше."
+  }
+}
