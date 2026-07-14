@@ -1,0 +1,194 @@
+{
+  "action.reset": {
+    "message": "Resetta"
+  },
+  "app.subtitle": {
+    "message": "Genera belli, veloce e consistenti incorporazioni di schede e icone per i contenuti di: \nModrinth, Curseforge, Hangar e Spigot."
+  },
+  "error.apiDown": {
+    "message": "L'API {platform} è attualmente non disponibile."
+  },
+  "field.badgeMetric": {
+    "message": "Distintivo Metrico"
+  },
+  "field.projectType": {
+    "message": "Tipo di progetto"
+  },
+  "field.target": {
+    "message": "Bersaglio"
+  },
+  "field.type": {
+    "message": "Tipo"
+  },
+  "field.url": {
+    "message": "URL"
+  },
+  "footer.notAffiliated": {
+    "message": "Non affiliato con Modrinth, CurseForge, Hangar o Spigot"
+  },
+  "hint.transparentBg": {
+    "message": "L'opzione \"Trasparente\" funziona meglio nella maggior parte dei casi, poiché si fonde con lo sfondo senza modificarne lo stile."
+  },
+  "metric.downloads": {
+    "message": "Downloads"
+  },
+  "metric.followers": {
+    "message": "Followers"
+  },
+  "metric.likes": {
+    "message": "Mi piace"
+  },
+  "metric.players": {
+    "message": "Giocatori Online"
+  },
+  "metric.projects": {
+    "message": "Progetti"
+  },
+  "metric.rank": {
+    "message": "Grado"
+  },
+  "metric.rating": {
+    "message": "Punti"
+  },
+  "metric.resources": {
+    "message": "Risorse"
+  },
+  "metric.stars": {
+    "message": "Stelle"
+  },
+  "metric.versions": {
+    "message": "Versioni"
+  },
+  "metric.views": {
+    "message": "Visualizzazioni"
+  },
+  "option.accentColor": {
+    "message": "Colore Accento"
+  },
+  "option.animations": {
+    "message": "Animazioni"
+  },
+  "option.bgColor": {
+    "message": "Colore dello sfondo"
+  },
+  "option.downloadBars": {
+    "message": "Scarica le barre"
+  },
+  "option.maxFiles": {
+    "message": "Numero massimo di file"
+  },
+  "option.maxProjects": {
+    "message": "Progetti Massimi"
+  },
+  "option.maxVersions": {
+    "message": "Versioni massime"
+  },
+  "option.relativeTime": {
+    "message": "Tempo relativo"
+  },
+  "option.showBorder": {
+    "message": "Mostra i Bordi"
+  },
+  "option.showFiles": {
+    "message": "Mostra i files"
+  },
+  "option.showIcon": {
+    "message": "Mostra l'icona della piattaforma"
+  },
+  "option.showProjects": {
+    "message": "Mostra i progetti"
+  },
+  "option.showVersions": {
+    "message": "Mostra le versioni"
+  },
+  "option.sparklines": {
+    "message": "Grafici sparkline"
+  },
+  "output.htmlPlaceholder": {
+    "message": "Il tuo codice HTML apparirà qui"
+  },
+  "output.markdownPlaceholder": {
+    "message": "Il tuo codice Markdown apparirà qui"
+  },
+  "output.urlPlaceholder": {
+    "message": "Il tuo URL apparirà qui"
+  },
+  "preview.imageAlt": {
+    "message": "Anteprima"
+  },
+  "preview.placeholder": {
+    "message": "Il tuo contenuto incorporato apparirà qui"
+  },
+  "projectType.all": {
+    "message": "Tutti i tipi"
+  },
+  "projectType.bukkitPlugin": {
+    "message": "Bukkit Plugins"
+  },
+  "projectType.datapack": {
+    "message": "Pacchetti Dati"
+  },
+  "projectType.mod": {
+    "message": "Mods"
+  },
+  "projectType.modpack": {
+    "message": "Pacchetto Mod"
+  },
+  "projectType.plugin": {
+    "message": "Plugin"
+  },
+  "projectType.resourcepack": {
+    "message": "Pacchetti risorse"
+  },
+  "projectType.shader": {
+    "message": "Shaders"
+  },
+  "projectType.texturePack": {
+    "message": "Pacchetti texture"
+  },
+  "section.configuration": {
+    "message": "Configurazione"
+  },
+  "section.customization": {
+    "message": "Personalizzazione"
+  },
+  "section.html": {
+    "message": "HTML"
+  },
+  "section.markdown": {
+    "message": "Markdown"
+  },
+  "section.preview": {
+    "message": "Anteprima"
+  },
+  "section.url": {
+    "message": "URL"
+  },
+  "target.author": {
+    "message": "Autore"
+  },
+  "target.collection": {
+    "message": "Collezione"
+  },
+  "target.organization": {
+    "message": "Organizzazione"
+  },
+  "target.project": {
+    "message": "Progetto"
+  },
+  "target.resource": {
+    "message": "Risorsa"
+  },
+  "target.user": {
+    "message": "Utente"
+  },
+  "type.badge": {
+    "message": "Distintivo"
+  },
+  "type.card": {
+    "message": "Scheda "
+  },
+  "warning.apiSlow": {
+    "message": "L'API {platform} risponde lentamente. Il caricamento degli elementi incorporati potrebbe richiedere più tempo."
+  }
+}
