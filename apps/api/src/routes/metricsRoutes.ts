@@ -2,15 +2,15 @@ import { timingSafeEqual } from 'node:crypto'
 
 import { Hono } from 'hono'
 
-import { METRICS_TOKEN } from '../config/env.js'
 import type { AppEnv } from '../types/hono.js'
 import { register } from '../utils/metrics.js'
 
 function isAuthorizedMetricsRequest(authHeader: string | undefined): boolean {
-	if (!METRICS_TOKEN || !authHeader?.startsWith('Bearer ')) return false
+	const metricsToken = process.env.METRICS_TOKEN
+	if (!metricsToken || !authHeader?.startsWith('Bearer ')) return false
 
 	const provided = Buffer.from(authHeader.slice('Bearer '.length))
-	const expected = Buffer.from(METRICS_TOKEN)
+	const expected = Buffer.from(metricsToken)
 
 	return provided.length === expected.length && timingSafeEqual(provided, expected)
 }

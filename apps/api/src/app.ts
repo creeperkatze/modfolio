@@ -2,7 +2,6 @@ import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import path from 'path'
 
-import { FRONTEND_DEV_URL, NODE_ENV } from './config/env.js'
 import { checkCrawlerMiddleware } from './middleware/checkCrawler.js'
 import { checkLegacyDomainMiddleware } from './middleware/checkLegacyDomain.js'
 import { errorHandler } from './middleware/errorHandler.js'
@@ -21,7 +20,7 @@ const publicDir = path.resolve(root, '..', 'public')
 const webDist = path.resolve(root, '..', '..', 'web', 'dist')
 
 // In dev, Vite serves the frontend with hot reload. Production serves the built Vue app here.
-if (NODE_ENV !== 'development') {
+if (process.env.NODE_ENV !== 'development') {
 	app.use('*', serveStatic({ root: webDist }))
 }
 app.use('*', serveStatic({ root: publicDir }))
@@ -29,7 +28,6 @@ app.use('*', serveStatic({ root: publicDir }))
 app.use('*', checkCrawlerMiddleware)
 app.use('*', checkLegacyDomainMiddleware)
 
-// Registered before metricsMiddleware so scraping /metrics doesn't instrument itself
 app.route('/', metricsRoutes)
 app.use('*', metricsMiddleware)
 
@@ -40,9 +38,10 @@ app.route('/', spigotRoutes)
 
 app.get('/', (c, next) => {
 	const accept = c.req.header('accept') || ''
-	if (NODE_ENV === 'development' && accept.includes('html')) {
+	if (process.env.NODE_ENV === 'development' && accept.includes('html')) {
+		const frontendDevUrl = process.env.FRONTEND_DEV_URL || 'http://localhost:5173'
 		const url = new URL(c.req.url)
-		return c.redirect(`${FRONTEND_DEV_URL}${url.pathname}${url.search}`)
+		return c.redirect(`${frontendDevUrl}${url.pathname}${url.search}`)
 	}
 	return next()
 })

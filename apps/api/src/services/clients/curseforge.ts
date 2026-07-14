@@ -1,6 +1,5 @@
 import CurseForgeClient, { GameId, ModsSearchSortField } from 'curseforge-js'
 
-import { CURSEFORGE_API_KEY } from '../../config/env.js'
 import { callPlatform, getDefaultUserAgent } from '../errors.js'
 
 const PLATFORM = 'CurseForge'
@@ -68,7 +67,7 @@ class CurseforgeApi {
 
 	constructor() {
 		this.client = new CurseForgeClient({
-			apiKey: CURSEFORGE_API_KEY,
+			apiKey: process.env.CURSEFORGE_API_KEY,
 			userAgent: getDefaultUserAgent(),
 		})
 	}

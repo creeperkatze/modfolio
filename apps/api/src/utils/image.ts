@@ -2,9 +2,10 @@ import { fileTypeFromBuffer } from 'file-type'
 import { performance } from 'perf_hooks'
 import sharp from 'sharp'
 
-import { MAX_CONCURRENT_REQUESTS, USER_AGENT } from '../config/env.js'
 import { pLimit, requestDeduplicator } from './asyncUtils.js'
 import logger from './logger.js'
+
+const MAX_CONCURRENT_REQUESTS = parseInt(process.env.MAX_CONCURRENT_REQUESTS || '10', 10)
 
 // Detects the real mime type and, if requested, converts to PNG.
 async function encodeImageBuffer(buffer: Buffer, convertToPng: boolean) {
@@ -31,7 +32,7 @@ export async function fetchImageAsBase64(url, convertToPng = false) {
 	return requestDeduplicator.dedupe(`image:${url}:${convertToPng}`, async () => {
 		try {
 			const response = await fetch(url, {
-				headers: { 'User-Agent': USER_AGENT },
+				headers: { 'User-Agent': process.env.USER_AGENT },
 			})
 			if (!response.ok) return null
 

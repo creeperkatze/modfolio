@@ -1,10 +1,8 @@
 import packageJson from '../../../../package.json' with { type: 'json' }
-import { USER_AGENT } from '../config/env.js'
 import { upstreamApiDurationSeconds, upstreamApiRequestsTotal } from '../utils/metrics.js'
 
 const VERSION = packageJson.version
 
-// 5xx/network/timeout failures; 4xx becomes null via callPlatform instead. Always surfaces as 502.
 export class PlatformApiError extends Error {
 	platformName: string
 	upstreamStatusCode: number
@@ -22,14 +20,13 @@ export class PlatformApiError extends Error {
 }
 
 export function getDefaultUserAgent() {
-	if (USER_AGENT) {
-		return USER_AGENT.replace('{version}', VERSION)
+	if (process.env.USER_AGENT) {
+		return process.env.USER_AGENT.replace('{version}', VERSION)
 	}
 	// Minimal fallback
 	return `modfolio/${VERSION}`
 }
 
-// Normalizes any platform library's thrown error: 4xx -> null, 5xx/network -> PlatformApiError.
 export async function callPlatform<T>(
 	platformName: string,
 	fn: () => Promise<T>,
