@@ -6,15 +6,17 @@ import { FRONTEND_DEV_URL, NODE_ENV } from './config/env.js'
 import { checkCrawlerMiddleware } from './middleware/checkCrawler.js'
 import { checkLegacyDomainMiddleware } from './middleware/checkLegacyDomain.js'
 import { errorHandler } from './middleware/errorHandler.js'
+import { metricsMiddleware } from './middleware/metrics.js'
 import curseforgeRoutes from './routes/curseforge/index.js'
 import hangarRoutes from './routes/hangar/index.js'
+import metricsRoutes from './routes/metricsRoutes.js'
 import modrinthRoutes from './routes/modrinth/index.js'
 import spigotRoutes from './routes/spigot/index.js'
 import type { AppEnv } from './types/hono.js'
 
 export const app = new Hono<AppEnv>()
 
-const root = import.meta.dirname // apps/api/src
+const root = import.meta.dirname
 const publicDir = path.resolve(root, '..', 'public')
 const webDist = path.resolve(root, '..', '..', 'web', 'dist')
 
@@ -26,6 +28,10 @@ app.use('*', serveStatic({ root: publicDir }))
 
 app.use('*', checkCrawlerMiddleware)
 app.use('*', checkLegacyDomainMiddleware)
+
+// Registered before metricsMiddleware so scraping /metrics doesn't instrument itself
+app.route('/', metricsRoutes)
+app.use('*', metricsMiddleware)
 
 app.route('/', modrinthRoutes)
 app.route('/', curseforgeRoutes)

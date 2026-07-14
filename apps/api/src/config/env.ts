@@ -9,5 +9,6 @@ export const CURSEFORGE_API_KEY = process.env.CURSEFORGE_API_KEY
 export const PORT = Number(process.env.PORT) || 3000
 export const NODE_ENV = process.env.NODE_ENV
 export const FRONTEND_DEV_URL = process.env.FRONTEND_DEV_URL || 'http://localhost:5173'
+export const METRICS_TOKEN = process.env.METRICS_TOKEN
 
 export const API_CACHE_TTL = 3600 // 1 hour

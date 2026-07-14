@@ -3,6 +3,8 @@ import { readdirSync } from 'fs'
 import path from 'path'
 import { performance } from 'perf_hooks'
 
+import { pngRenderDurationSeconds } from './metrics.js'
+
 // Load font files
 const fontsDir = path.join(process.cwd(), 'public', 'fonts')
 
@@ -30,6 +32,7 @@ export async function generatePng(svgString: string) {
 	const pngBuffer = pngData.asPng()
 
 	const renderTime = performance.now() - startTime
+	pngRenderDurationSeconds.observe(renderTime / 1000)
 
 	return { buffer: pngBuffer, renderTime }
 }

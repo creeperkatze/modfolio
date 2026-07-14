@@ -1,3 +1,5 @@
+import { cacheOperationsTotal, cacheSize } from './metrics.js'
+
 export class Cache {
 	cache: Map<string, { value: any; cachedAt: number; expiry: number }>
 	ttl: number
@@ -11,15 +13,19 @@ export class Cache {
 		const item = this.cache.get(key)
 
 		if (!item) {
+			cacheOperationsTotal.inc({ result: 'miss' })
 			return null
 		}
 
 		// Check if expired
 		if (Date.now() > item.expiry) {
 			this.cache.delete(key)
+			cacheSize.set(this.cache.size)
+			cacheOperationsTotal.inc({ result: 'miss' })
 			return null
 		}
 
+		cacheOperationsTotal.inc({ result: 'hit' })
 		return item.value
 	}
 
@@ -28,15 +34,19 @@ export class Cache {
 		const item = this.cache.get(key)
 
 		if (!item) {
+			cacheOperationsTotal.inc({ result: 'miss' })
 			return null
 		}
 
 		// Check if expired
 		if (Date.now() > item.expiry) {
 			this.cache.delete(key)
+			cacheSize.set(this.cache.size)
+			cacheOperationsTotal.inc({ result: 'miss' })
 			return null
 		}
 
+		cacheOperationsTotal.inc({ result: 'hit' })
 		return { value: item.value, cachedAt: item.cachedAt }
 	}
 
@@ -46,10 +56,12 @@ export class Cache {
 			cachedAt: Date.now(),
 			expiry: Date.now() + this.ttl,
 		})
+		cacheSize.set(this.cache.size)
 	}
 
 	clear() {
 		this.cache.clear()
+		cacheSize.set(0)
 	}
 
 	size() {

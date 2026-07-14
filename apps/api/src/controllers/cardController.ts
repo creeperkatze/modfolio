@@ -12,6 +12,7 @@ import { apiCache } from '../utils/cache.js'
 import { curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cacheKeys.js'
 import { generatePng } from '../utils/generateImage.js'
 import logger from '../utils/logger.js'
+import { embedRequestsTotal } from '../utils/metrics.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
 const factory = createFactory<AppEnv>()
@@ -116,6 +117,20 @@ const CARD_CONFIGS = {
 	},
 }
 
+const recordEmbedRequest = (
+	config: { platformId: string; entityName: string },
+	format: 'svg' | 'png',
+	status: 'success' | 'not_found' | 'error',
+) => {
+	embedRequestsTotal.inc({
+		platform: config.platformId,
+		surface: 'card',
+		entity: config.entityName,
+		format,
+		status,
+	})
+}
+
 const handleCardRequest = async (c: AppContext, cardType: string) => {
 	const config = CARD_CONFIGS[cardType]
 	const identifier = c.req.param(config.paramKey)
@@ -202,12 +217,14 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 					const { buffer: pngBuffer } = await generatePng(errorSvg)
 					c.header('Content-Type', 'image/png')
 					c.header('Cache-Control', 'no-cache')
+					recordEmbedRequest(config, 'png', 'not_found')
 					return c.body(pngBuffer as any, isImageCrawler ? 200 : 404)
 				}
 
 				c.header('Content-Type', 'image/svg+xml')
 				c.header('Cache-Control', 'no-cache')
 				c.header('X-Error-Status', '404')
+				recordEmbedRequest(config, 'svg', 'not_found')
 				return c.body(errorSvg, isImageCrawler ? 200 : 404)
 			}
 			apiCache.set(apiCacheKey, data)
@@ -251,6 +268,7 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 			c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
 			c.header('X-Cache', fromCache ? 'HIT' : 'MISS')
 			c.header('X-API-Time', apiTimeHeader)
+			recordEmbedRequest(config, 'png', 'success')
 			return c.body(pngBuffer as any)
 		}
 
@@ -260,6 +278,7 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 		c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
 		c.header('X-Cache', fromCache ? 'HIT' : 'MISS')
 		c.header('X-API-Time', apiTimeHeader)
+		recordEmbedRequest(config, 'svg', 'success')
 		return c.body(svg)
 	} catch (err) {
 		const message = `Could not show ${config.platformId} ${config.entityName} card`
@@ -275,6 +294,8 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 			},
 			message,
 		)
+		const format = c.get('isImageCrawler') || c.req.query('format') === 'png' ? 'png' : 'svg'
+		recordEmbedRequest(config, format, 'error')
 		throw err
 	}
 }

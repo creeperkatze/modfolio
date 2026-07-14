@@ -13,6 +13,7 @@ import { curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/c
 import { formatNumber } from '../utils/formatters.js'
 import { generatePng } from '../utils/generateImage.js'
 import logger from '../utils/logger.js'
+import { embedRequestsTotal } from '../utils/metrics.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
 const factory = createFactory<AppEnv>()
@@ -162,6 +163,20 @@ const ENTITY_CONFIG = {
 	},
 }
 
+const recordEmbedRequest = (
+	entityConfig: { platformName: string; entityName: string },
+	format: 'svg' | 'png',
+	status: 'success' | 'not_found' | 'error',
+) => {
+	embedRequestsTotal.inc({
+		platform: entityConfig.platformName,
+		surface: 'badge',
+		entity: entityConfig.entityName,
+		format,
+		status,
+	})
+}
+
 const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: string) => {
 	const entityConfig = ENTITY_CONFIG[entityType]
 	const params = c.req.param()
@@ -235,12 +250,14 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 					const { buffer: pngBuffer } = await generatePng(notFoundSvg)
 					c.header('Content-Type', 'image/png')
 					c.header('Cache-Control', 'no-cache, no-store, must-revalidate')
+					recordEmbedRequest(entityConfig, 'png', 'not_found')
 					return c.body(pngBuffer as any, isImageCrawler ? 200 : 404)
 				}
 
 				c.header('Content-Type', 'image/svg+xml')
 				c.header('Cache-Control', 'no-cache, no-store, must-revalidate')
 				c.header('X-Error-Status', '404')
+				recordEmbedRequest(entityConfig, 'svg', 'not_found')
 				return c.body(notFoundSvg, isImageCrawler ? 200 : 404)
 			}
 			apiCache.set(apiCacheKey, data)
@@ -292,6 +309,7 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 			c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
 			c.header('X-Cache', fromCache ? 'HIT' : 'MISS')
 			c.header('X-API-Time', apiTimeHeader)
+			recordEmbedRequest(entityConfig, 'png', 'success')
 			return c.body(pngBuffer as any)
 		}
 
@@ -302,6 +320,7 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 		c.header('Cache-Control', `public, max-age=${API_CACHE_TTL}`)
 		c.header('X-Cache', fromCache ? 'HIT' : 'MISS')
 		c.header('X-API-Time', apiTimeHeader)
+		recordEmbedRequest(entityConfig, 'svg', 'success')
 		return c.body(svg)
 	} catch (err) {
 		const message = `Could not show ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge`
@@ -318,6 +337,8 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 			},
 			message,
 		)
+		const format = c.get('isImageCrawler') || c.req.query('format') === 'png' ? 'png' : 'svg'
+		recordEmbedRequest(entityConfig, format, 'error')
 		throw err
 	}
 }

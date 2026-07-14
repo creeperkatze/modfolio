@@ -1,5 +1,6 @@
 import packageJson from '../../../../package.json' with { type: 'json' }
 import { USER_AGENT } from '../config/env.js'
+import { upstreamApiDurationSeconds, upstreamApiRequestsTotal } from '../utils/metrics.js'
 
 const VERSION = packageJson.version
 
@@ -33,13 +34,20 @@ export async function callPlatform<T>(
 	platformName: string,
 	fn: () => Promise<T>,
 ): Promise<T | null> {
+	const stopTimer = upstreamApiDurationSeconds.startTimer({ platform: platformName })
 	try {
-		return await fn()
+		const result = await fn()
+		upstreamApiRequestsTotal.inc({ platform: platformName, status: 'success' })
+		return result
 	} catch (err) {
 		const status = err?.status ?? err?.statusCode
 		if (status >= 400 && status < 500) {
+			upstreamApiRequestsTotal.inc({ platform: platformName, status: 'client_error' })
 			return null
 		}
+		upstreamApiRequestsTotal.inc({ platform: platformName, status: 'error' })
 		throw new PlatformApiError(platformName, status || 502, err?.message || 'Unknown error')
+	} finally {
+		stopTimer()
 	}
 }
