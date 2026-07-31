@@ -7,7 +7,7 @@ const logger = pino({
 	},
 	transport: {
 		target: 'pino-pretty',
-		options: { colorize: true, singleLine: true },
+		options: { colorize: true, singleLine: true, ignore: 'pid,hostname' },
 	},
 })
 
