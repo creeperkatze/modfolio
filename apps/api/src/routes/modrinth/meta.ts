@@ -2,8 +2,7 @@ import { Hono } from 'hono'
 
 import modrinthClient from '../../services/platforms/modrinth.js'
 import type { AppEnv } from '../../types/hono.js'
-import { apiCache } from '../../utils/cache.js'
-import { metaKey, PLATFORM } from '../../utils/cacheKeys.js'
+import { apiCache, metaKey, PLATFORM } from '../../utils/cache.js'
 import logger from '../../utils/logger.js'
 
 const API_CACHE_TTL = 3600 // 1 hour

@@ -1,11 +1,10 @@
 import { Hono } from 'hono'
 
-import * as badgeController from '../../controllers/badgeController.js'
-import * as cardController from '../../controllers/cardController.js'
+import * as badgeController from '../../controllers/badge.js'
+import * as cardController from '../../controllers/card.js'
 import curseforgeClient from '../../services/platforms/curseforge.js'
 import type { AppEnv } from '../../types/hono.js'
-import { apiCache } from '../../utils/cache.js'
-import { curseforgeKeys, PLATFORM } from '../../utils/cacheKeys.js'
+import { apiCache, curseforgeKeys, PLATFORM } from '../../utils/cache.js'
 import logger from '../../utils/logger.js'
 
 const router = new Hono<AppEnv>()

@@ -8,12 +8,11 @@ import hangarClient from '../services/platforms/hangar.js'
 import modrinthClient from '../services/platforms/modrinth.js'
 import spigotClient from '../services/platforms/spigot.js'
 import type { AppContext, AppEnv } from '../types/hono.js'
-import { apiCache } from '../utils/cache.js'
-import { curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cacheKeys.js'
-import { formatNumber } from '../utils/formatters.js'
-import { generatePng } from '../utils/generateImage.js'
+import { apiCache, curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cache.js'
+import { formatNumber } from '../utils/format.js'
 import logger from '../utils/logger.js'
 import { embedRequestsTotal } from '../utils/metrics.js'
+import { generatePng } from '../utils/render.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
 const factory = createFactory<AppEnv>()

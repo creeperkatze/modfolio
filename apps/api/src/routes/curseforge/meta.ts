@@ -2,8 +2,7 @@ import { Hono } from 'hono'
 
 import curseforgeClient from '../../services/platforms/curseforge.js'
 import type { AppEnv } from '../../types/hono.js'
-import { apiCache } from '../../utils/cache.js'
-import { curseforgeKeys, metaKey, PLATFORM } from '../../utils/cacheKeys.js'
+import { apiCache, curseforgeKeys, metaKey, PLATFORM } from '../../utils/cache.js'
 import logger from '../../utils/logger.js'
 
 const API_CACHE_TTL = 3600 // 1 hour

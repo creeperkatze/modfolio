@@ -8,7 +8,7 @@ import {
 	aggregateAllStats,
 	aggregateProjectStats,
 	normalizeV3ProjectFields,
-} from '../../utils/statsAggregator.js'
+} from '../../utils/stats.js'
 import { modrinthApi } from '../clients/modrinth.js'
 import { startTimer } from '../timing.js'
 

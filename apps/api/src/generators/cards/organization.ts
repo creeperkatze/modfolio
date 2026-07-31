@@ -1,5 +1,5 @@
 import { CARD_LIMITS, getStatConfigs } from '../../constants/platformConfig.js'
-import { formatNumber } from '../../utils/formatters.js'
+import { formatNumber } from '../../utils/format.js'
 import {
 	calculateBottomDelay,
 	generateActivitySparkline,
@@ -13,7 +13,7 @@ import {
 	generateSummary,
 	generateSvgWrapper,
 	getThemeColors,
-} from '../../utils/svgComponents.js'
+} from '../../utils/svg.js'
 
 export function generateOrganizationCard(data, options, platformConfig) {
 	const { organization, projects, stats } = data

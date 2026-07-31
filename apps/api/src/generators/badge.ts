@@ -1,5 +1,5 @@
 import { getPlatform, PLATFORMS } from '../constants/platforms.js'
-import { escapeXml } from '../utils/formatters.js'
+import { escapeXml } from '../utils/format.js'
 
 // Janky af
 function estimateTextWidth(text, fontSize) {

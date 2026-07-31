@@ -1,6 +1,6 @@
 import { getProjectTypeIcon } from '../../constants/loaderConfig.js'
 import { CARD_LIMITS, getEntityIcon, getStatConfigs } from '../../constants/platformConfig.js'
-import { formatNumber } from '../../utils/formatters.js'
+import { formatNumber } from '../../utils/format.js'
 import {
 	calculateBottomDelay,
 	generateActivitySparkline,
@@ -14,7 +14,7 @@ import {
 	generateSvgWrapper,
 	generateVersionList,
 	getThemeColors,
-} from '../../utils/svgComponents.js'
+} from '../../utils/svg.js'
 
 export function generateProjectCard(data, options, platformConfig, entityType = 'project') {
 	const { project, versions, stats } = data
