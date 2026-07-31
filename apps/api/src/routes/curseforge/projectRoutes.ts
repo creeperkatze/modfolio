@@ -26,12 +26,7 @@ router.get('/curseforge/lookup/:slug', async (c) => {
 			const cacheAgeMs = Date.now() - cached.cachedAt
 			logger.info(
 				{
-					target: {
-						platform: PLATFORM.CURSEFORGE,
-						entity: 'project',
-						identifier: slug,
-						surface: 'lookup',
-					},
+					identifier: slug,
 					cache: {
 						hit: true,
 						cachedAt: cached.cachedAt,
@@ -49,12 +44,7 @@ router.get('/curseforge/lookup/:slug', async (c) => {
 		const message = `Showing ${PLATFORM.CURSEFORGE} project lookup`
 		logger.info(
 			{
-				target: {
-					platform: PLATFORM.CURSEFORGE,
-					entity: 'project',
-					identifier: slug,
-					surface: 'lookup',
-				},
+				identifier: slug,
 				cache: { hit: false },
 			},
 			message,
@@ -65,12 +55,7 @@ router.get('/curseforge/lookup/:slug', async (c) => {
 		const message = `Could not show ${PLATFORM.CURSEFORGE} project lookup`
 		logger.warn(
 			{
-				target: {
-					platform: PLATFORM.CURSEFORGE,
-					entity: 'project',
-					identifier: slug,
-					surface: 'lookup',
-				},
+				identifier: slug,
 				err,
 			},
 			message,
@@ -99,12 +84,7 @@ router.get('/curseforge/lookup/user/:username', async (c) => {
 			const cacheAgeMs = Date.now() - cached.cachedAt
 			logger.info(
 				{
-					target: {
-						platform: PLATFORM.CURSEFORGE,
-						entity: 'user',
-						identifier: username,
-						surface: 'lookup',
-					},
+					identifier: username,
 					cache: {
 						hit: true,
 						cachedAt: cached.cachedAt,
@@ -122,12 +102,7 @@ router.get('/curseforge/lookup/user/:username', async (c) => {
 		const message = `Showing ${PLATFORM.CURSEFORGE} user lookup`
 		logger.info(
 			{
-				target: {
-					platform: PLATFORM.CURSEFORGE,
-					entity: 'user',
-					identifier: username,
-					surface: 'lookup',
-				},
+				identifier: username,
 				cache: { hit: false },
 			},
 			message,
@@ -142,12 +117,7 @@ router.get('/curseforge/lookup/user/:username', async (c) => {
 		const message = `Could not show ${PLATFORM.CURSEFORGE} user lookup`
 		logger.warn(
 			{
-				target: {
-					platform: PLATFORM.CURSEFORGE,
-					entity: 'user',
-					identifier: username,
-					surface: 'lookup',
-				},
+				identifier: username,
 				err,
 			},
 			message,

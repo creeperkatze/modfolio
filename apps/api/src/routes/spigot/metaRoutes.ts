@@ -30,12 +30,7 @@ router.get('/spigot/meta/:id', async (c) => {
 			const cacheAgeMs = Date.now() - cached.cachedAt
 			logger.info(
 				{
-					target: {
-						platform: PLATFORM.SPIGOT,
-						entity: entityType,
-						identifier: id,
-						surface: 'meta',
-					},
+					identifier: id,
 					cache: {
 						hit: true,
 						cachedAt: cached.cachedAt,
@@ -79,7 +74,7 @@ router.get('/spigot/meta/:id', async (c) => {
 		const message = `Showing ${PLATFORM.SPIGOT} ${entityType} meta`
 		logger.info(
 			{
-				target: { platform: PLATFORM.SPIGOT, entity: entityType, identifier: id, surface: 'meta' },
+				identifier: id,
 				cache: { hit: false },
 			},
 			message,
@@ -92,7 +87,7 @@ router.get('/spigot/meta/:id', async (c) => {
 		const message = `Could not show ${PLATFORM.SPIGOT} ${entity} meta`
 		logger.warn(
 			{
-				target: { platform: PLATFORM.SPIGOT, entity, identifier: id, surface: 'meta' },
+				identifier: id,
 				err,
 			},
 			message,

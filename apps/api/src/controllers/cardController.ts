@@ -193,12 +193,7 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 				const message = `Could not show ${config.platformId} ${config.entityName} card`
 				logger.warn(
 					{
-						target: {
-							platform: config.platformId,
-							entity: config.entityName,
-							identifier,
-							type: 'card',
-						},
+						identifier,
 						error: { message: errorMessage },
 					},
 					message,
@@ -236,12 +231,7 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 		const cacheAgeMs = fromCache ? Date.now() - cached.cachedAt : null
 		logger.info(
 			{
-				target: {
-					platform: config.platformId,
-					entity: config.entityName,
-					identifier,
-					type: 'card',
-				},
+				identifier,
 				cache: fromCache
 					? {
 							hit: true,
@@ -284,12 +274,7 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 		const message = `Could not show ${config.platformId} ${config.entityName} card`
 		logger.warn(
 			{
-				target: {
-					platform: config.platformId,
-					entity: config.entityName,
-					identifier,
-					type: 'card',
-				},
+				identifier,
 				err,
 			},
 			message,

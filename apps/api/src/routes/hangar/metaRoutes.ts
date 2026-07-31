@@ -26,12 +26,7 @@ router.get('/hangar/meta/:slug', async (c) => {
 			const cacheAgeMs = Date.now() - cached.cachedAt
 			logger.info(
 				{
-					target: {
-						platform: PLATFORM.HANGAR,
-						entity: entityType,
-						identifier: slug,
-						surface: 'meta',
-					},
+					identifier: slug,
 					cache: {
 						hit: true,
 						cachedAt: cached.cachedAt,
@@ -83,12 +78,7 @@ router.get('/hangar/meta/:slug', async (c) => {
 		const message = `Showing ${PLATFORM.HANGAR} ${entityType} meta`
 		logger.info(
 			{
-				target: {
-					platform: PLATFORM.HANGAR,
-					entity: entityType,
-					identifier: slug,
-					surface: 'meta',
-				},
+				identifier: slug,
 				cache: { hit: false },
 			},
 			message,
@@ -100,12 +90,7 @@ router.get('/hangar/meta/:slug', async (c) => {
 		const message = `Could not show ${PLATFORM.HANGAR} ${entityType} meta`
 		logger.warn(
 			{
-				target: {
-					platform: PLATFORM.HANGAR,
-					entity: entityType,
-					identifier: slug,
-					surface: 'meta',
-				},
+				identifier: slug,
 				err,
 			},
 			message,

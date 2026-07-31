@@ -43,7 +43,7 @@ router.get('/curseforge/meta/:type/:id', async (c) => {
 			const cacheAgeMs = Date.now() - cached.cachedAt
 			logger.info(
 				{
-					target: { platform: PLATFORM.CURSEFORGE, entity: type, identifier: id, surface: 'meta' },
+					identifier: id,
 					cache: {
 						hit: true,
 						cachedAt: cached.cachedAt,
@@ -89,7 +89,7 @@ router.get('/curseforge/meta/:type/:id', async (c) => {
 		const message = `Showing ${PLATFORM.CURSEFORGE} ${type} meta`
 		logger.info(
 			{
-				target: { platform: PLATFORM.CURSEFORGE, entity: type, identifier: id, surface: 'meta' },
+				identifier: id,
 				cache: { hit: false },
 			},
 			message,
@@ -101,12 +101,7 @@ router.get('/curseforge/meta/:type/:id', async (c) => {
 		const message = `Could not show ${PLATFORM.CURSEFORGE} ${type} meta`
 		logger.warn(
 			{
-				target: {
-					platform: PLATFORM.CURSEFORGE,
-					entity: type,
-					identifier: id,
-					surface: 'meta',
-				},
+				identifier: id,
 				err,
 			},
 			message,

@@ -223,13 +223,7 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 				const message = `Could not show ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge`
 				logger.warn(
 					{
-						target: {
-							platform: entityConfig.platformName,
-							entity: entityConfig.entityName,
-							identifier,
-							type: 'badge',
-							badge: badgeType,
-						},
+						identifier,
 						error: { message: errorMessage },
 					},
 					message,
@@ -268,13 +262,7 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 		const cacheAgeMs = fromCache ? Date.now() - cached.cachedAt : null
 		logger.info(
 			{
-				target: {
-					platform: entityConfig.platformName,
-					entity: entityConfig.entityName,
-					identifier,
-					type: 'badge',
-					badge: badgeType,
-				},
+				identifier,
 				cache: fromCache
 					? {
 							hit: true,
@@ -326,13 +314,7 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 		const message = `Could not show ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge`
 		logger.warn(
 			{
-				target: {
-					platform: entityConfig.platformName,
-					entity: entityConfig.entityName,
-					identifier,
-					type: 'badge',
-					badge: badgeType,
-				},
+				identifier,
 				err,
 			},
 			message,
