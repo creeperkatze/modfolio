@@ -2,8 +2,7 @@ import { Hono } from 'hono'
 
 import curseforgeClient from '../../services/platforms/curseforge.js'
 import type { AppEnv } from '../../types/hono.js'
-import { apiCache } from '../../utils/cache.js'
-import { curseforgeKeys, metaKey, PLATFORM } from '../../utils/cacheKeys.js'
+import { apiCache, curseforgeKeys, metaKey, PLATFORM } from '../../utils/cache.js'
 import logger from '../../utils/logger.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
@@ -43,7 +42,7 @@ router.get('/curseforge/meta/:type/:id', async (c) => {
 			const cacheAgeMs = Date.now() - cached.cachedAt
 			logger.info(
 				{
-					target: { platform: PLATFORM.CURSEFORGE, entity: type, identifier: id, surface: 'meta' },
+					identifier: id,
 					cache: {
 						hit: true,
 						cachedAt: cached.cachedAt,
@@ -89,7 +88,7 @@ router.get('/curseforge/meta/:type/:id', async (c) => {
 		const message = `Showing ${PLATFORM.CURSEFORGE} ${type} meta`
 		logger.info(
 			{
-				target: { platform: PLATFORM.CURSEFORGE, entity: type, identifier: id, surface: 'meta' },
+				identifier: id,
 				cache: { hit: false },
 			},
 			message,
@@ -101,12 +100,7 @@ router.get('/curseforge/meta/:type/:id', async (c) => {
 		const message = `Could not show ${PLATFORM.CURSEFORGE} ${type} meta`
 		logger.warn(
 			{
-				target: {
-					platform: PLATFORM.CURSEFORGE,
-					entity: type,
-					identifier: id,
-					surface: 'meta',
-				},
+				identifier: id,
 				err,
 			},
 			message,

@@ -2,8 +2,7 @@ import { Hono } from 'hono'
 
 import hangarClient from '../../services/platforms/hangar.js'
 import type { AppEnv } from '../../types/hono.js'
-import { apiCache } from '../../utils/cache.js'
-import { metaKey, PLATFORM } from '../../utils/cacheKeys.js'
+import { apiCache, metaKey, PLATFORM } from '../../utils/cache.js'
 import logger from '../../utils/logger.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
@@ -26,12 +25,7 @@ router.get('/hangar/meta/:slug', async (c) => {
 			const cacheAgeMs = Date.now() - cached.cachedAt
 			logger.info(
 				{
-					target: {
-						platform: PLATFORM.HANGAR,
-						entity: entityType,
-						identifier: slug,
-						surface: 'meta',
-					},
+					identifier: slug,
 					cache: {
 						hit: true,
 						cachedAt: cached.cachedAt,
@@ -83,12 +77,7 @@ router.get('/hangar/meta/:slug', async (c) => {
 		const message = `Showing ${PLATFORM.HANGAR} ${entityType} meta`
 		logger.info(
 			{
-				target: {
-					platform: PLATFORM.HANGAR,
-					entity: entityType,
-					identifier: slug,
-					surface: 'meta',
-				},
+				identifier: slug,
 				cache: { hit: false },
 			},
 			message,
@@ -100,12 +89,7 @@ router.get('/hangar/meta/:slug', async (c) => {
 		const message = `Could not show ${PLATFORM.HANGAR} ${entityType} meta`
 		logger.warn(
 			{
-				target: {
-					platform: PLATFORM.HANGAR,
-					entity: entityType,
-					identifier: slug,
-					surface: 'meta',
-				},
+				identifier: slug,
 				err,
 			},
 			message,

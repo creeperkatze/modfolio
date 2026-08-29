@@ -8,12 +8,11 @@ import hangarClient from '../services/platforms/hangar.js'
 import modrinthClient from '../services/platforms/modrinth.js'
 import spigotClient from '../services/platforms/spigot.js'
 import type { AppContext, AppEnv } from '../types/hono.js'
-import { apiCache } from '../utils/cache.js'
-import { curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cacheKeys.js'
-import { formatNumber } from '../utils/formatters.js'
-import { generatePng } from '../utils/generateImage.js'
+import { apiCache, curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cache.js'
+import { formatNumber } from '../utils/format.js'
 import logger from '../utils/logger.js'
 import { embedRequestsTotal } from '../utils/metrics.js'
+import { generatePng } from '../utils/render.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
 const factory = createFactory<AppEnv>()
@@ -223,13 +222,7 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 				const message = `Could not show ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge`
 				logger.warn(
 					{
-						target: {
-							platform: entityConfig.platformName,
-							entity: entityConfig.entityName,
-							identifier,
-							type: 'badge',
-							badge: badgeType,
-						},
+						identifier,
 						error: { message: errorMessage },
 					},
 					message,
@@ -268,13 +261,7 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 		const cacheAgeMs = fromCache ? Date.now() - cached.cachedAt : null
 		logger.info(
 			{
-				target: {
-					platform: entityConfig.platformName,
-					entity: entityConfig.entityName,
-					identifier,
-					type: 'badge',
-					badge: badgeType,
-				},
+				identifier,
 				cache: fromCache
 					? {
 							hit: true,
@@ -326,13 +313,7 @@ const handleBadgeRequest = async (c: AppContext, entityType: string, badgeType: 
 		const message = `Could not show ${entityConfig.platformName} ${entityConfig.entityName} ${badgeType} badge`
 		logger.warn(
 			{
-				target: {
-					platform: entityConfig.platformName,
-					entity: entityConfig.entityName,
-					identifier,
-					type: 'badge',
-					badge: badgeType,
-				},
+				identifier,
 				err,
 			},
 			message,

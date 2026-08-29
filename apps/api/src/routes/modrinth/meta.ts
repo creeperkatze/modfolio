@@ -2,8 +2,7 @@ import { Hono } from 'hono'
 
 import modrinthClient from '../../services/platforms/modrinth.js'
 import type { AppEnv } from '../../types/hono.js'
-import { apiCache } from '../../utils/cache.js'
-import { metaKey, PLATFORM } from '../../utils/cacheKeys.js'
+import { apiCache, metaKey, PLATFORM } from '../../utils/cache.js'
 import logger from '../../utils/logger.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
@@ -30,7 +29,7 @@ router.get('/modrinth/meta/:type/:id', async (c) => {
 			const cacheAgeMs = Date.now() - cached.cachedAt
 			logger.info(
 				{
-					target: { platform: PLATFORM.MODRINTH, entity: type, identifier: id, surface: 'meta' },
+					identifier: id,
 					cache: {
 						hit: true,
 						cachedAt: cached.cachedAt,
@@ -89,7 +88,7 @@ router.get('/modrinth/meta/:type/:id', async (c) => {
 		const message = `Showing ${PLATFORM.MODRINTH} ${type} meta`
 		logger.info(
 			{
-				target: { platform: PLATFORM.MODRINTH, entity: type, identifier: id, surface: 'meta' },
+				identifier: id,
 				cache: { hit: false },
 			},
 			message,
@@ -101,12 +100,7 @@ router.get('/modrinth/meta/:type/:id', async (c) => {
 		const message = `Could not show ${PLATFORM.MODRINTH} ${type} meta`
 		logger.warn(
 			{
-				target: {
-					platform: PLATFORM.MODRINTH,
-					entity: type,
-					identifier: id,
-					surface: 'meta',
-				},
+				identifier: id,
 				err,
 			},
 			message,

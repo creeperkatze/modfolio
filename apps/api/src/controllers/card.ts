@@ -8,11 +8,10 @@ import hangarClient from '../services/platforms/hangar.js'
 import modrinthClient from '../services/platforms/modrinth.js'
 import spigotClient from '../services/platforms/spigot.js'
 import type { AppContext, AppEnv } from '../types/hono.js'
-import { apiCache } from '../utils/cache.js'
-import { curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cacheKeys.js'
-import { generatePng } from '../utils/generateImage.js'
+import { apiCache, curseforgeKeys, hangarKeys, modrinthKeys, spigotKeys } from '../utils/cache.js'
 import logger from '../utils/logger.js'
 import { embedRequestsTotal } from '../utils/metrics.js'
+import { generatePng } from '../utils/render.js'
 
 const API_CACHE_TTL = 3600 // 1 hour
 const factory = createFactory<AppEnv>()
@@ -193,12 +192,7 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 				const message = `Could not show ${config.platformId} ${config.entityName} card`
 				logger.warn(
 					{
-						target: {
-							platform: config.platformId,
-							entity: config.entityName,
-							identifier,
-							type: 'card',
-						},
+						identifier,
 						error: { message: errorMessage },
 					},
 					message,
@@ -236,12 +230,7 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 		const cacheAgeMs = fromCache ? Date.now() - cached.cachedAt : null
 		logger.info(
 			{
-				target: {
-					platform: config.platformId,
-					entity: config.entityName,
-					identifier,
-					type: 'card',
-				},
+				identifier,
 				cache: fromCache
 					? {
 							hit: true,
@@ -284,12 +273,7 @@ const handleCardRequest = async (c: AppContext, cardType: string) => {
 		const message = `Could not show ${config.platformId} ${config.entityName} card`
 		logger.warn(
 			{
-				target: {
-					platform: config.platformId,
-					entity: config.entityName,
-					identifier,
-					type: 'card',
-				},
+				identifier,
 				err,
 			},
 			message,

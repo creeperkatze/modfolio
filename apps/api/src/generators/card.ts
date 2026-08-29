@@ -1,8 +1,8 @@
 import { getPlatformConfig } from '../constants/platformConfig.js'
-import { generateCollectionCard } from './cards/collectionCard.js'
-import { generateOrganizationCard } from './cards/organizationCard.js'
-import { generateProjectCard } from './cards/projectCard.js'
-import { generateUserCard } from './cards/userCard.js'
+import { generateCollectionCard } from './cards/collection.js'
+import { generateOrganizationCard } from './cards/organization.js'
+import { generateProjectCard } from './cards/project.js'
+import { generateUserCard } from './cards/user.js'
 
 export function generateCard(data, platformId, entityType, options = {}) {
 	const platformConfig = getPlatformConfig(platformId)

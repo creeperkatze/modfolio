@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 
 import type { AppEnv } from '../../types/hono.js'
-import metaRoutes from './metaRoutes.js'
-import projectRoutes from './projectRoutes.js'
-import userRoutes from './userRoutes.js'
+import metaRoutes from './meta.js'
+import projectRoutes from './project.js'
+import userRoutes from './user.js'
 
 const router = new Hono<AppEnv>()
 

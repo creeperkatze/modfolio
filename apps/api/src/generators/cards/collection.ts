@@ -1,5 +1,5 @@
 import { CARD_LIMITS, getStatConfigs } from '../../constants/platformConfig.js'
-import { formatNumber } from '../../utils/formatters.js'
+import { formatNumber } from '../../utils/format.js'
 import {
 	calculateBottomDelay,
 	generateActivitySparkline,
@@ -13,10 +13,10 @@ import {
 	generateSummary,
 	generateSvgWrapper,
 	getThemeColors,
-} from '../../utils/svgComponents.js'
+} from '../../utils/svg.js'
 
-export function generateUserCard(data, options, platformConfig) {
-	const { user, projects, stats } = data
+export function generateCollectionCard(data, options, platformConfig) {
+	const { collection, stats } = data
 	const {
 		showProjects = true,
 		maxProjects = CARD_LIMITS.DEFAULT_COUNT,
@@ -36,13 +36,12 @@ export function generateUserCard(data, options, platformConfig) {
 	const colors = getThemeColors(accentColor, backgroundColor)
 	colors.accentColor = accentColor
 
-	// Use stats.topProjects for Modrinth (sorted by downloads), or fall back to projects (already sorted for Hangar)
-	const projectsToUse = stats.topProjects || projects
-	const topProjects = showProjects ? projectsToUse.slice(0, maxProjects) : []
+	// Use stats.topProjects since that's where icons were fetched
+	const topProjects = showProjects ? (stats.topProjects || []).slice(0, maxProjects) : []
 	const hasProjects = showProjects && topProjects.length > 0
 
 	// Calculate summary
-	const summaryText = user.bio
+	const summaryText = collection.description
 	const { svg: summarySvg, height: summaryHeight } = generateSummary(
 		summaryText,
 		colors,
@@ -62,7 +61,7 @@ export function generateUserCard(data, options, platformConfig) {
 		slug: project.slug,
 		description: project.description,
 		downloads: project.downloads,
-		followers: project.followers || project.stars || 0,
+		followers: project.followers || 0,
 		date: project.date_created || project.createdAt,
 		icon_url_base64: project.icon_url_base64 || project.icon || null,
 		project_type: project.project_type || 'mod',
@@ -76,7 +75,7 @@ export function generateUserCard(data, options, platformConfig) {
 	const allVersionDates = stats.allVersionDates || []
 
 	// Get stat configs from platform config
-	const statConfigs = getStatConfigs(platformConfig.id, 'user')
+	const statConfigs = getStatConfigs(platformConfig.id, 'collection')
 	const statsData = statConfigs
 		? statConfigs.map((config, index) => {
 				const xPositions = [15, 155, 270]
@@ -86,14 +85,14 @@ export function generateUserCard(data, options, platformConfig) {
 			})
 		: []
 
-	const title = user.name || user.username || 'Unknown User'
+	const title = collection.name || collection.title || 'Unknown Collection'
 
-	const bottomDelay = calculateBottomDelay(topProjects.length)
+	const bottomDelay = calculateBottomDelay(mappedProjects.length)
 
 	const content = `
 ${showSparklines ? generateActivitySparkline(allVersionDates, colors, animations) : ''}
-${generateHeader('user', 'user', title, colors, platformConfig.icon(colors.accentColor), platformConfig.iconViewBox)}
-${generateProfileImage(user.avatar_url_base64 || user.avatarUrl || null, 'profile-clip', 400, 60, 35, colors, animations)}
+${generateHeader('collection', 'collection', title, colors, platformConfig.icon(colors.accentColor), platformConfig.iconViewBox)}
+${generateProfileImage(collection.icon_url_base64 || collection.icon || null, 'profile-clip', 400, 60, 35, colors, animations)}
 ${generateStatsGrid(statsData, colors, animations)}
 ${generateDivider(colors, animations)}
 ${showSummary ? summarySvg : ''}

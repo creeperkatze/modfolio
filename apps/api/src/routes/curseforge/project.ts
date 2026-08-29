@@ -1,11 +1,10 @@
 import { Hono } from 'hono'
 
-import * as badgeController from '../../controllers/badgeController.js'
-import * as cardController from '../../controllers/cardController.js'
+import * as badgeController from '../../controllers/badge.js'
+import * as cardController from '../../controllers/card.js'
 import curseforgeClient from '../../services/platforms/curseforge.js'
 import type { AppEnv } from '../../types/hono.js'
-import { apiCache } from '../../utils/cache.js'
-import { curseforgeKeys, PLATFORM } from '../../utils/cacheKeys.js'
+import { apiCache, curseforgeKeys, PLATFORM } from '../../utils/cache.js'
 import logger from '../../utils/logger.js'
 
 const router = new Hono<AppEnv>()
@@ -26,12 +25,7 @@ router.get('/curseforge/lookup/:slug', async (c) => {
 			const cacheAgeMs = Date.now() - cached.cachedAt
 			logger.info(
 				{
-					target: {
-						platform: PLATFORM.CURSEFORGE,
-						entity: 'project',
-						identifier: slug,
-						surface: 'lookup',
-					},
+					identifier: slug,
 					cache: {
 						hit: true,
 						cachedAt: cached.cachedAt,
@@ -49,12 +43,7 @@ router.get('/curseforge/lookup/:slug', async (c) => {
 		const message = `Showing ${PLATFORM.CURSEFORGE} project lookup`
 		logger.info(
 			{
-				target: {
-					platform: PLATFORM.CURSEFORGE,
-					entity: 'project',
-					identifier: slug,
-					surface: 'lookup',
-				},
+				identifier: slug,
 				cache: { hit: false },
 			},
 			message,
@@ -65,12 +54,7 @@ router.get('/curseforge/lookup/:slug', async (c) => {
 		const message = `Could not show ${PLATFORM.CURSEFORGE} project lookup`
 		logger.warn(
 			{
-				target: {
-					platform: PLATFORM.CURSEFORGE,
-					entity: 'project',
-					identifier: slug,
-					surface: 'lookup',
-				},
+				identifier: slug,
 				err,
 			},
 			message,
@@ -99,12 +83,7 @@ router.get('/curseforge/lookup/user/:username', async (c) => {
 			const cacheAgeMs = Date.now() - cached.cachedAt
 			logger.info(
 				{
-					target: {
-						platform: PLATFORM.CURSEFORGE,
-						entity: 'user',
-						identifier: username,
-						surface: 'lookup',
-					},
+					identifier: username,
 					cache: {
 						hit: true,
 						cachedAt: cached.cachedAt,
@@ -122,12 +101,7 @@ router.get('/curseforge/lookup/user/:username', async (c) => {
 		const message = `Showing ${PLATFORM.CURSEFORGE} user lookup`
 		logger.info(
 			{
-				target: {
-					platform: PLATFORM.CURSEFORGE,
-					entity: 'user',
-					identifier: username,
-					surface: 'lookup',
-				},
+				identifier: username,
 				cache: { hit: false },
 			},
 			message,
@@ -142,12 +116,7 @@ router.get('/curseforge/lookup/user/:username', async (c) => {
 		const message = `Could not show ${PLATFORM.CURSEFORGE} user lookup`
 		logger.warn(
 			{
-				target: {
-					platform: PLATFORM.CURSEFORGE,
-					entity: 'user',
-					identifier: username,
-					surface: 'lookup',
-				},
+				identifier: username,
 				err,
 			},
 			message,
