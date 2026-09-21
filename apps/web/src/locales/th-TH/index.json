@@ -1,1 +1,14 @@
-{}
+{
+  "action.reset": {
+    "message": "รีเซ็ต"
+  },
+  "field.platform": {
+    "message": "แพลตฟอร์ม"
+  },
+  "field.type": {
+    "message": "ประเภท"
+  },
+  "output.urlPlaceholder": {
+    "message": "URL ของคุณจะปรากฏที่นี่"
+  }
+}
