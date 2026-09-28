@@ -5,10 +5,115 @@
   "field.platform": {
     "message": "แพลตฟอร์ม"
   },
+  "field.target": {
+    "message": "เป้าหมาย"
+  },
   "field.type": {
     "message": "ประเภท"
   },
+  "field.url": {
+    "message": "URL"
+  },
+  "footer.credits": {
+    "message": "ทำด้วย ♥ โดย"
+  },
+  "footer.donate": {
+    "message": "สนับสนุน"
+  },
+  "footer.github": {
+    "message": "บน GitHub"
+  },
+  "footer.notAffiliated": {
+    "message": "ไม่มีความเกี่ยวข้องกับ Modrinth, CurseForge, Hangar หรือ Spigot"
+  },
+  "footer.source": {
+    "message": "ที่มา"
+  },
+  "metric.downloads": {
+    "message": "ดาวน์โหลด"
+  },
+  "metric.followers": {
+    "message": "ผู้ติดตาม"
+  },
+  "metric.likes": {
+    "message": "ชอบ"
+  },
+  "metric.players": {
+    "message": "ผู้เล่นออนไลน์"
+  },
+  "metric.projects": {
+    "message": "Projects"
+  },
+  "metric.rank": {
+    "message": "อันดับ"
+  },
+  "metric.rating": {
+    "message": "คะแนน"
+  },
+  "metric.resources": {
+    "message": "แหล่งข้อมูล"
+  },
+  "metric.stars": {
+    "message": "ดาว"
+  },
+  "metric.versions": {
+    "message": "เวอร์ชัน"
+  },
+  "metric.views": {
+    "message": "จำนวนการดู"
+  },
+  "option.accentColor": {
+    "message": ""
+  },
+  "option.maxFiles": {
+    "message": "จํานวนไฟล์สูงสุด"
+  },
+  "option.showFiles": {
+    "message": "แสดงไฟล์"
+  },
   "output.urlPlaceholder": {
     "message": "URL ของคุณจะปรากฏที่นี่"
+  },
+  "preview.imageAlt": {
+    "message": "ตัวอย่าง"
+  },
+  "projectType.all": {
+    "message": "ทุกประเภท"
+  },
+  "section.configuration": {
+    "message": "การตั้งค่า"
+  },
+  "section.customization": {
+    "message": "ปรับแต่ง"
+  },
+  "section.html": {
+    "message": "HTML"
+  },
+  "section.markdown": {
+    "message": "Markdown"
+  },
+  "section.preview": {
+    "message": "แสดงตัวอย่าง"
+  },
+  "section.url": {
+    "message": "URL"
+  },
+  "target.organization": {
+    "message": "องค์กร"
+  },
+  "target.user": {
+    "message": "ผู้ใช้"
+  },
+  "type.badge": {
+    "message": "เหรียญตรา"
+  },
+  "type.card": {
+    "message": "บัตร"
+  },
+  "value.label.default": {
+    "message": "ค่า"
+  },
+  "value.label.user.default": {
+    "message": "ชื่อผู้ใช้"
   }
 }
