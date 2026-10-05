@@ -8,7 +8,7 @@
 		</Alert>
 
 		<div
-			class="flex min-h-80 items-center justify-center overflow-x-auto rounded-lg border border-border bg-surface-2 p-6 transition-opacity"
+			class="flex min-h-80 items-center justify-center overflow-x-auto rounded-lg border border-border bg-surface-3 p-6 transition-opacity"
 			:class="loading && previewSrc ? 'opacity-60' : ''"
 		>
 			<a v-if="previewSrc" :href="targetUrl" target="_blank" rel="noopener">

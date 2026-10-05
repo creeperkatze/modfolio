@@ -62,9 +62,6 @@
   "footer.kofi.title": {
     "message": "Support me"
   },
-  "footer.notAffiliated": {
-    "message": "Not affiliated with Modrinth, CurseForge, Hangar or Spigot"
-  },
   "hint.accentColor": {
     "message": "Used for highlights and graphs"
   },
