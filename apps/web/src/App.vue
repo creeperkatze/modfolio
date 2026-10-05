@@ -36,16 +36,23 @@
 				<section class="flex flex-col gap-2">
 					<h2 class="m-0 px-1 text-sm font-semibold">{{ t(m.embedCode.id) }}</h2>
 					<OutputBlock
+						:icon="FileCode"
 						:label="t(m.markdown.id)"
 						:text="markdownText"
 						:placeholder="t(m.markdownPlaceholder.id)"
 					/>
 					<OutputBlock
+						:icon="Code"
 						:label="t(m.html.id)"
 						:text="htmlText"
 						:placeholder="t(m.htmlPlaceholder.id)"
 					/>
-					<OutputBlock :label="t(m.url.id)" :text="urlText" :placeholder="t(m.urlPlaceholder.id)" />
+					<OutputBlock
+						:icon="Link"
+						:label="t(m.url.id)"
+						:text="urlText"
+						:placeholder="t(m.urlPlaceholder.id)"
+					/>
 				</section>
 			</div>
 		</main>
@@ -53,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { Palette, RotateCcw, SlidersHorizontal } from '@lucide/vue'
+import { Code, FileCode, Link, Palette, RotateCcw, SlidersHorizontal } from '@lucide/vue'
 import { computed, nextTick, onMounted, provide, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

@@ -1,14 +1,5 @@
 <template>
-	<div class="flex items-center gap-3 rounded-lg border border-border bg-surface-3 py-2 ps-3 pe-2">
-		<div class="min-w-0 flex-1">
-			<p class="m-0 text-xs font-medium text-secondary">{{ label }}</p>
-			<code
-				class="mt-0.5 block font-mono text-xs break-all"
-				:class="text ? 'text-primary' : 'text-muted'"
-			>
-				{{ text || placeholder }}
-			</code>
-		</div>
+	<OptionRow :icon="icon" :label="label">
 		<Button
 			size="icon"
 			:disabled="!text"
@@ -19,18 +10,28 @@
 			<Check v-if="copied" class="size-4" aria-hidden="true" />
 			<Copy v-else class="size-4" aria-hidden="true" />
 		</Button>
-	</div>
+		<template #below>
+			<code
+				class="block rounded-md border border-border bg-surface-control px-3 py-2 font-mono text-sm break-all"
+				:class="text ? 'text-primary' : 'text-muted'"
+				>{{ text || placeholder }}</code
+			>
+		</template>
+	</OptionRow>
 </template>
 
 <script setup lang="ts">
 import { Check, Copy } from '@lucide/vue'
+import type { Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useClipboard } from '../../composables/useClipboard'
 import { defineMessages } from '../../helpers/i18n'
+import OptionRow from '../options/OptionRow.vue'
 import Button from '../ui/Button.vue'
 
 defineProps<{
+	icon: Component
 	label: string
 	text: string
 	placeholder: string
