@@ -74,6 +74,7 @@
 			:description="t(m.showBorderHint.id)"
 		/>
 		<OptionToggle
+			v-if="builder.embedType.value === 'card'"
 			v-model="builder.animations.value"
 			:icon="Sparkles"
 			:label="t(m.animations.id)"

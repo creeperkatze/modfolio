@@ -1,4 +1,4 @@
-import { computed, type InjectionKey, ref } from 'vue'
+import { computed, type InjectionKey, type Ref, ref } from 'vue'
 
 import { lookupCurseForgeProjectId, lookupCurseForgeUserId } from '../lib/curseforgeLookup'
 import type { BadgeMetric, ColorValue, EmbedType, PlatformId, TargetType } from '../platforms'
@@ -12,10 +12,25 @@ import {
 	PLATFORMS,
 } from '../platforms'
 
+type OptionValue = boolean | number | string | null
+
+/** An embed query param. Only written when it applies to the current embed and differs from its default. */
+interface EmbedOption {
+	key: string
+	value: Ref<OptionValue>
+	fallback: () => OptionValue
+	applies: () => boolean
+}
+
+const HEX_COLOR = /^[0-9a-f]{6}$/i
+
 /**
  * Owns every piece of embed configuration state, the embed-URL/target-URL builders,
  * URL-paste auto-detection, and the shareable browser-URL query-param sync.
  * Does not touch the DOM or fetch the preview image — see useEmbedPreview.
+ *
+ * The browser URL mirrors the embed: `platform`, `type`, `target`, `metric` and `id`
+ * describe what to embed, everything else uses the same params as the embed URL.
  */
 export function useEmbedBuilder() {
 	const selectedPlatform = ref<PlatformId>('modrinth')
@@ -43,71 +58,121 @@ export function useEmbedBuilder() {
 
 	const platformConfig = computed(() => PLATFORMS[selectedPlatform.value])
 
-	const availableMetrics = computed<BadgeMetric[]>(() => {
-		const metrics =
-			platformConfig.value.badgeMetrics[targetType.value] ||
-			platformConfig.value.badgeMetrics[platformConfig.value.targets[0]]
-		return metrics || ['downloads']
-	})
+	const availableMetrics = computed<BadgeMetric[]>(() => metricsFor(targetType.value))
 
 	const accentPresets = computed(() =>
 		getAccentColors(selectedPlatform.value).map((c) => ({ name: c, value: c })),
 	)
 
+	const isCard = computed(() => embedType.value === 'card')
 	const isProject = computed(() => isProjectLikeTarget(targetType.value))
 	const isUserLike = computed(() => isUserLikeTarget(selectedPlatform.value, targetType.value))
 
-	const showProjectsVisible = computed(() => embedType.value === 'card' && isUserLike.value)
-	const showVersionsVisible = computed(() => embedType.value === 'card' && isProject.value)
-	const relativeTimeVisible = computed(
-		() => embedType.value === 'card' && isProject.value && showVersions.value,
-	)
-	const sparklinesVisible = computed(() => embedType.value === 'card' && isUserLike.value)
+	const showProjectsVisible = computed(() => isCard.value && isUserLike.value)
+	const showVersionsVisible = computed(() => isCard.value && isProject.value)
+	const relativeTimeVisible = computed(() => showVersionsVisible.value && showVersions.value)
+	const sparklinesVisible = computed(() => isCard.value && isUserLike.value)
+
+	const options: EmbedOption[] = [
+		{
+			key: 'showProjects',
+			value: showProjects,
+			fallback: () => true,
+			applies: () => showProjectsVisible.value,
+		},
+		{
+			key: 'maxProjects',
+			value: maxProjects,
+			fallback: () => CARD_LIMITS.DEFAULT_COUNT,
+			applies: () => showProjectsVisible.value && showProjects.value,
+		},
+		{
+			key: 'showVersions',
+			value: showVersions,
+			fallback: () => true,
+			applies: () => showVersionsVisible.value,
+		},
+		{
+			key: 'maxVersions',
+			value: maxVersions,
+			fallback: () => CARD_LIMITS.DEFAULT_COUNT,
+			applies: () => showVersionsVisible.value && showVersions.value,
+		},
+		{
+			key: 'relativeTime',
+			value: relativeTime,
+			fallback: () => true,
+			applies: () => relativeTimeVisible.value,
+		},
+		{
+			key: 'showSparklines',
+			value: showSparklines,
+			fallback: () => true,
+			applies: () => sparklinesVisible.value,
+		},
+		{
+			key: 'showDownloadBars',
+			value: showDownloadBars,
+			fallback: () => true,
+			applies: () => sparklinesVisible.value,
+		},
+		{
+			key: 'projectType',
+			value: projectTypeFilter,
+			fallback: () => '',
+			applies: () => showProjectsVisible.value,
+		},
+		{ key: 'showSummary', value: showSummary, fallback: () => false, applies: () => isCard.value },
+		{ key: 'showIcon', value: showIcon, fallback: () => true, applies: () => !isCard.value },
+		{ key: 'showBorder', value: showBorder, fallback: () => true, applies: () => true },
+		{ key: 'animations', value: animations, fallback: () => true, applies: () => isCard.value },
+		{
+			key: 'color',
+			value: selectedColor,
+			fallback: () => platformConfig.value.defaultColor,
+			applies: () => true,
+		},
+		{ key: 'backgroundColor', value: selectedBgColor, fallback: () => null, applies: () => true },
+	]
+
+	function metricsFor(target: TargetType): BadgeMetric[] {
+		const config = platformConfig.value
+		return config.badgeMetrics[target] || config.badgeMetrics[config.targets[0]] || ['downloads']
+	}
+
+	function embedParams() {
+		const params = new URLSearchParams()
+		for (const option of options) {
+			if (option.applies() && option.value.value !== option.fallback()) {
+				params.set(option.key, String(option.value.value))
+			}
+		}
+		return params
+	}
+
+	function parseOption(option: EmbedOption, raw: string): OptionValue {
+		const fallback = option.fallback()
+		if (typeof fallback === 'boolean')
+			return raw === 'true' ? true : raw === 'false' ? false : fallback
+		if (typeof fallback === 'number') {
+			const n = parseInt(raw)
+			return Number.isNaN(n) ? fallback : Math.min(Math.max(n, 1), CARD_LIMITS.MAX_COUNT)
+		}
+		if (option.key === 'color' || option.key === 'backgroundColor') {
+			return HEX_COLOR.test(raw) ? raw : fallback
+		}
+		return raw
+	}
 
 	const embedUrl = computed(() => {
 		const id = identifier.value.trim()
 		if (!id) return null
 
-		const config = platformConfig.value
-		const platform = selectedPlatform.value
-		const type = targetType.value
+		const path = [selectedPlatform.value, targetType.value, encodeURIComponent(id)]
+		if (!isCard.value) path.push(badgeMetric.value)
 
-		if (embedType.value === 'badge') {
-			const params = new URLSearchParams()
-			if (selectedColor.value !== config.defaultColor) params.set('color', selectedColor.value)
-			if (selectedBgColor.value !== null) params.set('backgroundColor', selectedBgColor.value)
-			if (!showIcon.value) params.set('showIcon', 'false')
-			if (!showBorder.value) params.set('showBorder', 'false')
-			const q = params.toString()
-			return `${window.location.origin}/${platform}/${type}/${id}/${badgeMetric.value}${q ? '?' + q : ''}`
-		}
-
-		const params = new URLSearchParams()
-
-		if (isUserLike.value) {
-			if (!showProjects.value) params.set('showProjects', 'false')
-			if (maxProjects.value !== CARD_LIMITS.DEFAULT_COUNT)
-				params.set('maxProjects', String(maxProjects.value))
-		}
-		if (isProject.value) {
-			if (!showVersions.value) params.set('showVersions', 'false')
-			if (maxVersions.value !== CARD_LIMITS.DEFAULT_COUNT)
-				params.set('maxVersions', String(maxVersions.value))
-			if (!relativeTime.value) params.set('relativeTime', 'false')
-		}
-		if (isUserLike.value) {
-			if (!showSparklines.value) params.set('showSparklines', 'false')
-			if (!showDownloadBars.value) params.set('showDownloadBars', 'false')
-			if (projectTypeFilter.value) params.set('projectType', projectTypeFilter.value)
-		}
-		if (showSummary.value) params.set('showSummary', 'true')
-		if (!showBorder.value) params.set('showBorder', 'false')
-		if (!animations.value) params.set('animations', 'false')
-		if (selectedColor.value !== config.defaultColor) params.set('color', selectedColor.value)
-		if (selectedBgColor.value !== null) params.set('backgroundColor', selectedBgColor.value)
-
-		const q = params.toString()
-		return `${window.location.origin}/${platform}/${type}/${id}${q ? '?' + q : ''}`
+		const query = embedParams().toString()
+		return `${window.location.origin}/${path.join('/')}${query ? '?' + query : ''}`
 	})
 
 	/**
@@ -122,20 +187,7 @@ export function useEmbedBuilder() {
 			targetType.value,
 			badgeMetric.value,
 			identifier.value,
-			projectTypeFilter.value,
-			showProjects.value,
-			maxProjects.value,
-			showVersions.value,
-			maxVersions.value,
-			relativeTime.value,
-			showSummary.value,
-			showSparklines.value,
-			showDownloadBars.value,
-			showIcon.value,
-			showBorder.value,
-			animations.value,
-			selectedColor.value,
-			selectedBgColor.value,
+			...options.map((option) => option.value.value),
 		]),
 	)
 
@@ -164,36 +216,17 @@ export function useEmbedBuilder() {
 
 	function setPlatform(platform: PlatformId) {
 		selectedPlatform.value = platform
-		selectedColor.value = PLATFORMS[platform].defaultColor
-		targetType.value = PLATFORMS[platform].targets[0]
-		badgeMetric.value = (PLATFORMS[platform].badgeMetrics[PLATFORMS[platform].targets[0]] || [
-			'downloads',
-		])[0]
 		resetToDefaults()
 	}
 
 	function resetToDefaults() {
-		const config = platformConfig.value
 		curseforgeSlug.value = null
 		embedType.value = 'card'
-		targetType.value = config.targets[0]
-		badgeMetric.value = (config.badgeMetrics[config.targets[0]] || ['downloads'])[0]
+		targetType.value = platformConfig.value.targets[0]
+		badgeMetric.value = metricsFor(targetType.value)[0]
 		identifier.value = ''
 		urlInput.value = ''
-		projectTypeFilter.value = ''
-		showProjects.value = true
-		maxProjects.value = CARD_LIMITS.DEFAULT_COUNT
-		showVersions.value = true
-		maxVersions.value = CARD_LIMITS.DEFAULT_COUNT
-		relativeTime.value = true
-		showSummary.value = false
-		showSparklines.value = true
-		showDownloadBars.value = true
-		showIcon.value = true
-		showBorder.value = true
-		animations.value = true
-		selectedColor.value = config.defaultColor
-		selectedBgColor.value = null
+		for (const option of options) option.value.value = option.fallback()
 	}
 
 	/** Wire this to the target-type <select>'s change event only (not programmatic sets). */
@@ -244,87 +277,58 @@ export function useEmbedBuilder() {
 		}
 	}
 
+	/** Writes the current configuration to the address bar, omitting every default. */
 	function updateBrowserUrl() {
 		const params = new URLSearchParams()
-		const config = platformConfig.value
-		const type = targetType.value
 		const id = identifier.value.trim()
 
 		if (selectedPlatform.value !== 'modrinth') params.set('platform', selectedPlatform.value)
-		if (embedType.value !== 'card') params.set('type', embedType.value)
-		params.set('target', type)
-		if (badgeMetric.value !== 'downloads') params.set('metric', badgeMetric.value)
-		if (id) params.set('value', id)
-
-		if (embedType.value === 'card') {
-			if (isUserLike.value && !showProjects.value) params.set('showProjects', 'false')
-			if (isUserLike.value && maxProjects.value !== CARD_LIMITS.DEFAULT_COUNT)
-				params.set('maxProjects', String(maxProjects.value))
-			if (!showVersions.value) params.set('showVersions', 'false')
-			if (maxVersions.value !== CARD_LIMITS.DEFAULT_COUNT)
-				params.set('maxVersions', String(maxVersions.value))
-			if (!relativeTime.value) params.set('relativeTime', 'false')
-			if (!showSparklines.value) params.set('showSparklines', 'false')
-			if (!showDownloadBars.value) params.set('showDownloadBars', 'false')
-			if (isUserLike.value && projectTypeFilter.value)
-				params.set('projectType', projectTypeFilter.value)
-			if (showSummary.value) params.set('showSummary', 'true')
-			if (!showBorder.value) params.set('showBorder', 'false')
-			if (!animations.value) params.set('animations', 'false')
-			if (selectedColor.value !== config.defaultColor) params.set('color', selectedColor.value)
-			if (selectedBgColor.value !== null) params.set('backgroundColor', selectedBgColor.value)
-		} else {
-			if (selectedColor.value !== config.defaultColor) params.set('color', selectedColor.value)
-			if (selectedBgColor.value !== null) params.set('backgroundColor', selectedBgColor.value)
-			if (!showIcon.value) params.set('showIcon', 'false')
-			if (!showBorder.value) params.set('showBorder', 'false')
+		if (!isCard.value) params.set('type', embedType.value)
+		if (targetType.value !== platformConfig.value.targets[0]) params.set('target', targetType.value)
+		if (!isCard.value && badgeMetric.value !== availableMetrics.value[0]) {
+			params.set('metric', badgeMetric.value)
 		}
+		if (id) params.set('id', id)
+		for (const [key, value] of embedParams()) params.set(key, value)
 
-		const newUrl = params.toString()
-			? `${window.location.pathname}?${params.toString()}`
-			: window.location.pathname
-		window.history.replaceState(null, '', newUrl)
+		const query = params.toString()
+		window.history.replaceState(
+			null,
+			'',
+			query ? `${window.location.pathname}?${query}` : window.location.pathname,
+		)
 	}
 
-	/** Restores state from the shareable browser URL. */
+	/** Restores state from the address bar. `?url=` pre-fills from a platform link instead. */
 	function loadFromUrl() {
-		const rawParams = new URLSearchParams(window.location.search)
+		const params = new URLSearchParams(window.location.search)
 
-		const urlParam = rawParams.get('url')
-		if (urlParam) {
-			urlInput.value = urlParam
+		const url = params.get('url')
+		if (url) {
+			urlInput.value = url
 			void onUrlInput()
 			return
 		}
 
-		const platformParam = rawParams.get('platform') || 'modrinth'
-		const platform = isPlatformId(platformParam) ? platformParam : 'modrinth'
-		const config = PLATFORMS[platform]
+		const platform = params.get('platform') ?? ''
+		selectedPlatform.value = isPlatformId(platform) ? platform : 'modrinth'
+		resetToDefaults()
 
-		selectedPlatform.value = platform
-		embedType.value = rawParams.get('type') === 'badge' ? 'badge' : 'card'
-		const targetParam = rawParams.get('target') as TargetType | null
-		targetType.value =
-			targetParam && config.targets.includes(targetParam) ? targetParam : config.targets[0]
-		const metricParam = rawParams.get('metric') as BadgeMetric | null
-		badgeMetric.value = metricParam || 'downloads'
-		identifier.value = rawParams.get('value') || ''
+		if (params.get('type') === 'badge') embedType.value = 'badge'
 
-		projectTypeFilter.value = rawParams.get('projectType') || ''
+		const target = params.get('target') as TargetType | null
+		if (target && platformConfig.value.targets.includes(target)) targetType.value = target
 
-		showProjects.value = rawParams.get('showProjects') !== 'false'
-		maxProjects.value = parseInt(rawParams.get('maxProjects') || '') || CARD_LIMITS.DEFAULT_COUNT
-		showVersions.value = rawParams.get('showVersions') !== 'false'
-		maxVersions.value = parseInt(rawParams.get('maxVersions') || '') || CARD_LIMITS.DEFAULT_COUNT
-		relativeTime.value = rawParams.get('relativeTime') !== 'false'
-		showSummary.value = rawParams.get('showSummary') === 'true'
-		showSparklines.value = rawParams.get('showSparklines') !== 'false'
-		showDownloadBars.value = rawParams.get('showDownloadBars') !== 'false'
-		showIcon.value = rawParams.get('showIcon') !== 'false'
-		showBorder.value = rawParams.get('showBorder') !== 'false'
-		animations.value = rawParams.get('animations') !== 'false'
-		selectedColor.value = rawParams.get('color') || config.defaultColor
-		selectedBgColor.value = rawParams.get('backgroundColor') || null
+		const metrics = metricsFor(targetType.value)
+		const metric = params.get('metric') as BadgeMetric | null
+		badgeMetric.value = metric && metrics.includes(metric) ? metric : metrics[0]
+
+		identifier.value = params.get('id') ?? ''
+
+		for (const option of options) {
+			const raw = params.get(option.key)
+			if (raw !== null) option.value.value = parseOption(option, raw)
+		}
 	}
 
 	return {
@@ -334,7 +338,6 @@ export function useEmbedBuilder() {
 		badgeMetric,
 		identifier,
 		urlInput,
-		curseforgeSlug,
 		projectTypeFilter,
 
 		showProjects,
@@ -354,7 +357,6 @@ export function useEmbedBuilder() {
 		platformConfig,
 		availableMetrics,
 		accentPresets,
-		isProject,
 		isUserLike,
 		showProjectsVisible,
 		showVersionsVisible,
@@ -375,5 +377,5 @@ export function useEmbedBuilder() {
 
 export type EmbedBuilder = ReturnType<typeof useEmbedBuilder>
 
-/** Shares the single builder instance across the tightly-coupled ConfigurationPanel/CustomizationPanel subtree. */
+/** Shares the single builder instance across the EmbedSettings/CustomizationSettings subtree. */
 export const EmbedBuilderKey: InjectionKey<EmbedBuilder> = Symbol('embedBuilder')
