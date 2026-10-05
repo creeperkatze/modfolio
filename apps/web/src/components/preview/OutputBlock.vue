@@ -12,7 +12,7 @@
 		</Button>
 		<template #below>
 			<code
-				class="block rounded-md border border-border bg-surface-control px-3 py-2 font-mono text-sm break-all"
+				class="block rounded-md border border-border bg-surface-control px-3 py-2 font-mono text-xs break-all"
 				:class="text ? 'text-primary' : 'text-muted'"
 				>{{ text || placeholder }}</code
 			>
