@@ -1,20 +1,28 @@
 <template>
-	<TextField
-		v-model="model"
-		:label="valueLabel"
-		:placeholder="valuePlaceholder"
-		@input="$emit('input')"
-		@paste="$emit('paste')"
-	/>
+	<OptionRow :icon="AtSign" :label="valueLabel" label-for="identifier">
+		<template #below>
+			<Input
+				id="identifier"
+				v-model="model"
+				type="text"
+				autocomplete="off"
+				spellcheck="false"
+				class="w-full"
+				:placeholder="valuePlaceholder"
+			/>
+		</template>
+	</OptionRow>
 </template>
 
 <script setup lang="ts">
+import { AtSign } from '@lucide/vue'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { defineMessages } from '../../helpers/i18n'
 import type { PlatformId, TargetType } from '../../platforms'
-import TextField from '../ui/TextField.vue'
+import OptionRow from '../options/OptionRow.vue'
+import Input from '../ui/Input.vue'
 
 const props = defineProps<{
 	platform: PlatformId
@@ -22,11 +30,6 @@ const props = defineProps<{
 }>()
 
 const model = defineModel<string>({ default: '' })
-
-defineEmits<{
-	input: []
-	paste: []
-}>()
 
 const { t } = useI18n()
 

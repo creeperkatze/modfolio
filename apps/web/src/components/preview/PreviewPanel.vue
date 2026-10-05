@@ -1,44 +1,37 @@
 <template>
-	<div>
-		<h2 class="mb-2 flex items-center justify-between">
-			<span class="font-display text-text-secondary text-sm font-bold tracking-wide uppercase">{{
-				t(m.title.id)
-			}}</span>
-			<span class="flex items-center gap-1.5 font-mono text-xs">
-				<Zap v-if="!loading && generationTime" class="text-yellow size-3.5" aria-hidden="true" />
-				<Loader2 v-if="loading" class="text-yellow size-3.5 animate-spin" aria-hidden="true" />
-				<span v-if="generationTime" class="text-yellow">{{ generationTime }}ms</span>
-			</span>
-		</h2>
-
-		<StatusBanner v-if="apiSlow" variant="warning" class="mb-3">
+	<div class="flex flex-col gap-2">
+		<Alert v-if="apiSlow" variant="warning">
 			{{ t(m.apiSlow.id, { platform: platformName }) }}
-		</StatusBanner>
-		<StatusBanner v-if="apiError" variant="error" class="mb-3">
+		</Alert>
+		<Alert v-if="apiError" variant="danger">
 			{{ t(m.apiDown.id, { platform: platformName }) }}
-		</StatusBanner>
+		</Alert>
 
 		<div
-			class="bg-preview-well border-border text-text-muted flex min-h-105 items-center justify-center rounded-xl border p-4"
+			class="flex min-h-80 items-center justify-center overflow-x-auto rounded-lg border border-border bg-surface-2 p-6 transition-opacity"
+			:class="loading && previewSrc ? 'opacity-60' : ''"
 		>
-			<span v-if="!previewSrc" class="font-mono text-sm">{{ t(m.placeholder.id) }}</span>
-			<a v-else :href="targetUrl" target="_blank" rel="noopener">
+			<a v-if="previewSrc" :href="targetUrl" target="_blank" rel="noopener">
 				<img :src="previewSrc" :alt="t(m.imageAlt.id)" class="max-w-full" />
 			</a>
+			<div v-else class="flex flex-col items-center gap-2 text-center text-muted">
+				<LoaderCircle v-if="loading" class="size-6 animate-spin" aria-hidden="true" />
+				<ImageIcon v-else class="size-6" aria-hidden="true" />
+				<span class="text-sm">{{ t(m.placeholder.id) }}</span>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Loader2, Zap } from '@lucide/vue'
+import { Image as ImageIcon, LoaderCircle } from '@lucide/vue'
 import { useI18n } from 'vue-i18n'
 
 import { defineMessages } from '../../helpers/i18n'
-import StatusBanner from './StatusBanner.vue'
+import Alert from '../ui/Alert.vue'
 
 defineProps<{
 	loading: boolean
-	generationTime: number | null
 	apiSlow: boolean
 	apiError: boolean
 	previewSrc: string | null
@@ -48,7 +41,6 @@ defineProps<{
 
 const { t } = useI18n()
 const m = defineMessages({
-	title: { id: 'section.preview', defaultMessage: 'Preview' },
 	placeholder: { id: 'preview.placeholder', defaultMessage: 'Your embed will appear here' },
 	imageAlt: { id: 'preview.imageAlt', defaultMessage: 'Preview' },
 	apiSlow: {

@@ -1,25 +1,40 @@
 <template>
-	<div class="app-grid-bg flex min-h-screen flex-col items-center px-4 pt-10 pb-6 sm:px-6">
-		<div class="border-border bg-surface-2 w-full max-w-300 rounded-2xl border p-4 lg:p-8">
-			<AppHeader />
+	<div
+		class="flex min-h-screen flex-col bg-surface-1 lg:h-screen lg:flex-row lg:overflow-hidden"
+		:style="{ '--color-accent': '#' + builder.platformConfig.value.defaultColor }"
+	>
+		<AppSidebar v-model:tab="tab" :tabs="tabs" />
 
-			<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
-				<div class="space-y-4">
-					<ConfigurationPanel />
-					<CustomizationPanel v-model:expanded="customizationExpanded" />
-				</div>
+		<section
+			class="flex flex-col border-border-subtle max-lg:border-b lg:h-screen lg:w-lg lg:shrink-0 lg:border-e xl:w-xl"
+		>
+			<PageHeader :title="activeTab.label" :description="activeTab.description">
+				<Button size="sm" @click="onReset">
+					<RotateCcw class="size-3.5" aria-hidden="true" />
+					{{ t(m.reset.id) }}
+				</Button>
+			</PageHeader>
+			<div class="p-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+				<EmbedSettings v-if="tab === 'configuration'" />
+				<CustomizationSettings v-else />
+			</div>
+		</section>
 
-				<div class="flex flex-col gap-4">
-					<PreviewPanel
-						:loading="preview.loading.value"
-						:generation-time="preview.generationTime.value"
-						:api-slow="preview.apiSlow.value"
-						:api-error="preview.apiError.value"
-						:preview-src="preview.previewSrc.value"
-						:target-url="targetUrl"
-						:platform-name="builder.platformConfig.value.name"
-					/>
+		<main class="min-w-0 flex-1 lg:overflow-y-auto">
+			<PageHeader :title="t(m.preview.id)" :description="t(m.previewDescription.id)" />
 
+			<div class="flex max-w-3xl flex-col gap-6 p-4">
+				<PreviewPanel
+					:loading="preview.loading.value"
+					:api-slow="preview.apiSlow.value"
+					:api-error="preview.apiError.value"
+					:preview-src="preview.previewSrc.value"
+					:target-url="targetUrl"
+					:platform-name="builder.platformConfig.value.name"
+				/>
+
+				<section class="flex flex-col gap-2">
+					<h2 class="m-0 px-1 text-sm font-semibold">{{ t(m.embedCode.id) }}</h2>
 					<OutputBlock
 						:label="t(m.markdown.id)"
 						:text="markdownText"
@@ -31,29 +46,24 @@
 						:placeholder="t(m.htmlPlaceholder.id)"
 					/>
 					<OutputBlock :label="t(m.url.id)" :text="urlText" :placeholder="t(m.urlPlaceholder.id)" />
-
-					<div class="flex justify-end">
-						<OutputActions @reset="onReset" />
-					</div>
-				</div>
+				</section>
 			</div>
-		</div>
-
-		<AppFooter />
+		</main>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { Palette, RotateCcw, SlidersHorizontal } from '@lucide/vue'
 import { computed, nextTick, onMounted, provide, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import ConfigurationPanel from './components/builder/ConfigurationPanel.vue'
-import CustomizationPanel from './components/builder/CustomizationPanel.vue'
-import AppFooter from './components/layout/AppFooter.vue'
-import AppHeader from './components/layout/AppHeader.vue'
-import OutputActions from './components/preview/OutputActions.vue'
+import CustomizationSettings from './components/builder/CustomizationSettings.vue'
+import EmbedSettings from './components/builder/EmbedSettings.vue'
+import AppSidebar from './components/layout/AppSidebar.vue'
+import PageHeader from './components/layout/PageHeader.vue'
 import OutputBlock from './components/preview/OutputBlock.vue'
 import PreviewPanel from './components/preview/PreviewPanel.vue'
+import Button from './components/ui/Button.vue'
 import { EmbedBuilderKey, useEmbedBuilder } from './composables/useEmbedBuilder'
 import { useEmbedPreview } from './composables/useEmbedPreview'
 import { defineMessages } from './helpers/i18n'
@@ -65,9 +75,25 @@ const builder = useEmbedBuilder()
 const preview = useEmbedPreview()
 provide(EmbedBuilderKey, builder)
 
-const customizationExpanded = ref(false)
-
 const m = defineMessages({
+	configuration: { id: 'section.configuration', defaultMessage: 'Configuration' },
+	configurationDescription: {
+		id: 'app.subtitle',
+		defaultMessage:
+			'Generate fast, beautiful and consistent embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content.',
+	},
+	customization: { id: 'section.customization', defaultMessage: 'Customization' },
+	customizationDescription: {
+		id: 'hint.customization',
+		defaultMessage: 'Adjust how your embed looks',
+	},
+	reset: { id: 'action.reset', defaultMessage: 'Reset' },
+	preview: { id: 'section.preview', defaultMessage: 'Preview' },
+	previewDescription: {
+		id: 'preview.description',
+		defaultMessage: 'Updates live as you change the settings',
+	},
+	embedCode: { id: 'section.embedCode', defaultMessage: 'Embed code' },
 	markdown: { id: 'section.markdown', defaultMessage: 'Markdown' },
 	html: { id: 'section.html', defaultMessage: 'HTML' },
 	url: { id: 'section.url', defaultMessage: 'URL' },
@@ -81,6 +107,27 @@ const m = defineMessages({
 	},
 	urlPlaceholder: { id: 'output.urlPlaceholder', defaultMessage: 'Your URL will appear here' },
 })
+
+type Tab = 'configuration' | 'customization'
+
+const tab = ref<Tab>('configuration')
+
+const tabs = computed(() => [
+	{
+		id: 'configuration' as const,
+		label: t(m.configuration.id),
+		description: t(m.configurationDescription.id),
+		icon: SlidersHorizontal,
+	},
+	{
+		id: 'customization' as const,
+		label: t(m.customization.id),
+		description: t(m.customizationDescription.id),
+		icon: Palette,
+	},
+])
+
+const activeTab = computed(() => tabs.value.find((item) => item.id === tab.value)!)
 
 const targetUrl = computed(() => preview.metaUrl.value || builder.targetUrlFallback.value)
 
@@ -129,20 +176,9 @@ function onReset() {
 
 onMounted(async () => {
 	skipNextSync = true
-	customizationExpanded.value = builder.loadFromUrl()
+	builder.loadFromUrl()
 	syncNow()
 	await nextTick()
 	skipNextSync = false
 })
 </script>
-
-<style scoped>
-.app-grid-bg {
-	background-color: var(--color-surface-1);
-	background-image:
-		linear-gradient(var(--color-grid-minor) 1px, transparent 1px),
-		linear-gradient(90deg, var(--color-grid-minor) 1px, transparent 1px);
-	background-size: 16px 16px;
-	background-position: center;
-}
-</style>

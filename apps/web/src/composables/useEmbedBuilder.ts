@@ -244,10 +244,6 @@ export function useEmbedBuilder() {
 		}
 	}
 
-	function onUrlPaste() {
-		setTimeout(() => onUrlInput(), 10)
-	}
-
 	function updateBrowserUrl() {
 		const params = new URLSearchParams()
 		const config = platformConfig.value
@@ -290,15 +286,15 @@ export function useEmbedBuilder() {
 		window.history.replaceState(null, '', newUrl)
 	}
 
-	/** Restores state from the shareable browser URL. Returns true if any non-default option was set. */
-	function loadFromUrl(): boolean {
+	/** Restores state from the shareable browser URL. */
+	function loadFromUrl() {
 		const rawParams = new URLSearchParams(window.location.search)
 
 		const urlParam = rawParams.get('url')
 		if (urlParam) {
 			urlInput.value = urlParam
 			void onUrlInput()
-			return false
+			return
 		}
 
 		const platformParam = rawParams.get('platform') || 'modrinth'
@@ -329,22 +325,6 @@ export function useEmbedBuilder() {
 		animations.value = rawParams.get('animations') !== 'false'
 		selectedColor.value = rawParams.get('color') || config.defaultColor
 		selectedBgColor.value = rawParams.get('backgroundColor') || null
-
-		return (
-			selectedColor.value !== config.defaultColor ||
-			selectedBgColor.value !== null ||
-			!showProjects.value ||
-			maxProjects.value !== CARD_LIMITS.DEFAULT_COUNT ||
-			!showVersions.value ||
-			maxVersions.value !== CARD_LIMITS.DEFAULT_COUNT ||
-			!relativeTime.value ||
-			showSummary.value ||
-			!showSparklines.value ||
-			!showDownloadBars.value ||
-			!showIcon.value ||
-			!showBorder.value ||
-			!animations.value
-		)
 	}
 
 	return {
@@ -388,7 +368,6 @@ export function useEmbedBuilder() {
 		resetToDefaults,
 		onTargetTypeChange,
 		onUrlInput,
-		onUrlPaste,
 		updateBrowserUrl,
 		loadFromUrl,
 	}

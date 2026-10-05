@@ -5,7 +5,6 @@ import type { PlatformId, TargetType } from '../platforms'
 
 export function useEmbedPreview() {
 	const loading = ref(false)
-	const generationTime = ref<number | null>(null)
 	const apiSlow = ref(false)
 	const apiError = ref(false)
 	const previewSrc = ref<string | null>(null)
@@ -14,7 +13,6 @@ export function useEmbedPreview() {
 
 	function reset() {
 		previewSrc.value = null
-		generationTime.value = null
 		apiSlow.value = false
 		apiError.value = false
 		metaName.value = ''
@@ -49,9 +47,7 @@ export function useEmbedPreview() {
 			return
 		}
 
-		const startTime = performance.now()
 		loading.value = true
-		generationTime.value = null
 		apiSlow.value = false
 		apiError.value = false
 
@@ -63,7 +59,6 @@ export function useEmbedPreview() {
 		img.src = `${embedUrl}${embedUrl.includes('?') ? '&' : '?'}t=${Date.now()}`
 
 		img.onload = () => {
-			generationTime.value = Math.round(performance.now() - startTime)
 			loading.value = false
 			previewSrc.value = img.src
 			void inspectHeaders(embedUrl)
@@ -71,7 +66,6 @@ export function useEmbedPreview() {
 
 		img.onerror = () => {
 			loading.value = false
-			generationTime.value = null
 			previewSrc.value = null
 			void inspectHeaders(embedUrl)
 		}
@@ -79,7 +73,6 @@ export function useEmbedPreview() {
 
 	return {
 		loading,
-		generationTime,
 		apiSlow,
 		apiError,
 		previewSrc,

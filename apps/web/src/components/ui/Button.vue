@@ -1,59 +1,32 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+
+const props = withDefaults(
+	defineProps<{
+		size?: 'sm' | 'md' | 'icon'
+		type?: 'button' | 'submit' | 'reset'
+		disabled?: boolean
+		active?: boolean
+	}>(),
+	{
+		size: 'md',
+		type: 'button',
+		disabled: false,
+		active: false,
+	},
+)
+
+const classes = computed(() => [
+	'inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+	props.size === 'icon' ? 'size-9 p-0' : props.size === 'sm' ? 'h-8 px-3' : 'h-9 px-3',
+	props.active
+		? 'border-accent bg-accent/10 text-primary'
+		: 'border-border bg-surface-control text-primary enabled:hover:bg-surface-hover',
+])
+</script>
+
 <template>
-	<button type="button" class="btn" :class="`btn-${variant}`" :disabled="disabled">
+	<button :type="type" :disabled="disabled" :class="classes">
 		<slot />
 	</button>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-	defineProps<{
-		variant?: 'primary' | 'secondary'
-		disabled?: boolean
-	}>(),
-	{
-		variant: 'primary',
-	},
-)
-</script>
-
-<style scoped>
-.btn {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.625rem 1rem;
-	border-radius: 0.25rem;
-	border: 1px solid transparent;
-	font-family: var(--font-mono);
-	font-size: 0.8125rem;
-	font-weight: 600;
-	letter-spacing: 0.02em;
-	cursor: pointer;
-	transition:
-		filter 0.15s ease,
-		opacity 0.15s ease;
-}
-
-.btn:hover:not(:disabled) {
-	filter: brightness(1.12);
-}
-
-.btn-primary {
-	background-color: var(--platform-color);
-	color: var(--platform-color-contrast);
-}
-
-.btn-secondary {
-	background-color: var(--color-surface-4);
-	color: var(--color-text-bright);
-	border-color: var(--color-border);
-}
-
-.btn:disabled {
-	background-color: var(--color-surface-4);
-	color: var(--color-text-muted);
-	opacity: 0.5;
-	cursor: not-allowed;
-	filter: none;
-}
-</style>

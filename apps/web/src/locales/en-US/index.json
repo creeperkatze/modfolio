@@ -1,9 +1,24 @@
 {
+  "action.copy": {
+    "message": "Copy {label}"
+  },
   "action.reset": {
     "message": "Reset"
   },
   "app.subtitle": {
     "message": "Generate fast, beautiful and consistent embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content."
+  },
+  "colorScheme.auto": {
+    "message": "System"
+  },
+  "colorScheme.dark": {
+    "message": "Dark"
+  },
+  "colorScheme.label": {
+    "message": "Color scheme"
+  },
+  "colorScheme.light": {
+    "message": "Light"
   },
   "error.apiDown": {
     "message": "The {platform} API is currently down."
@@ -29,20 +44,80 @@
   "footer.credits": {
     "message": "Made with ♥ by"
   },
-  "footer.donate": {
-    "message": "Donate"
+  "footer.crowdin.description": {
+    "message": "Translate Modfolio on Crowdin"
   },
-  "footer.github": {
-    "message": "On GitHub"
+  "footer.crowdin.title": {
+    "message": "Help translate"
+  },
+  "footer.github.description": {
+    "message": "Browse the source code"
+  },
+  "footer.github.title": {
+    "message": "Star on GitHub"
+  },
+  "footer.kofi.description": {
+    "message": "Buy me a coffee on Ko-fi"
+  },
+  "footer.kofi.title": {
+    "message": "Support me"
   },
   "footer.notAffiliated": {
     "message": "Not affiliated with Modrinth, CurseForge, Hangar or Spigot"
   },
-  "footer.source": {
-    "message": "Source"
+  "hint.accentColor": {
+    "message": "Used for highlights and graphs"
+  },
+  "hint.animations": {
+    "message": "Animate the embed as it loads"
+  },
+  "hint.badgeMetric": {
+    "message": "The stat shown on the badge"
+  },
+  "hint.customization": {
+    "message": "Adjust how your embed looks"
+  },
+  "hint.downloadBars": {
+    "message": "Compare project downloads with bars"
+  },
+  "hint.projectType": {
+    "message": "Only include projects of this type"
+  },
+  "hint.relativeTime": {
+    "message": "Show dates relative to today"
+  },
+  "hint.showBorder": {
+    "message": "Draw a border around the embed"
+  },
+  "hint.showFiles": {
+    "message": "List the latest files"
+  },
+  "hint.showIcon": {
+    "message": "Show the platform logo on the badge"
+  },
+  "hint.showProjects": {
+    "message": "List projects on the card"
+  },
+  "hint.showSummary": {
+    "message": "Show the description text"
+  },
+  "hint.showVersions": {
+    "message": "List the latest versions"
+  },
+  "hint.sparklines": {
+    "message": "Graph release activity over time"
+  },
+  "hint.target": {
+    "message": "What the embed is about"
   },
   "hint.transparentBg": {
     "message": "Transparent works best in most situations, as it blends in with the background without changing its style."
+  },
+  "hint.type": {
+    "message": "A detailed card or a compact badge"
+  },
+  "hint.url": {
+    "message": "Paste a link to fill in everything below"
   },
   "metric.downloads": {
     "message": "Downloads"
@@ -85,6 +160,9 @@
   },
   "option.bgColor": {
     "message": "Background Color"
+  },
+  "option.customColor": {
+    "message": "Custom color"
   },
   "option.downloadBars": {
     "message": "Download Bars"
@@ -131,6 +209,9 @@
   "output.urlPlaceholder": {
     "message": "Your URL will appear here"
   },
+  "preview.description": {
+    "message": "Updates live as you change the settings"
+  },
   "preview.imageAlt": {
     "message": "Preview"
   },
@@ -170,6 +251,9 @@
   "section.customization": {
     "message": "Customization"
   },
+  "section.embedCode": {
+    "message": "Embed code"
+  },
   "section.html": {
     "message": "HTML"
   },
@@ -181,6 +265,12 @@
   },
   "section.url": {
     "message": "URL"
+  },
+  "sidebar.close": {
+    "message": "Close menu"
+  },
+  "sidebar.open": {
+    "message": "Open menu"
   },
   "target.author": {
     "message": "Author"

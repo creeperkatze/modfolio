@@ -1,32 +1,53 @@
 <template>
-	<CollapsiblePanel v-model:expanded="expanded" :title="t(m.title.id)">
-		<TextField
-			v-model="builder.urlInput.value"
-			:label="t(m.url.id)"
-			:placeholder="urlPlaceholder"
-			@input="builder.onUrlInput"
-			@paste="builder.onUrlPaste"
+	<div class="flex flex-col gap-2">
+		<OptionRow :icon="Link" :label="t(m.url.id)" :description="t(m.urlHint.id)" label-for="url">
+			<template #below>
+				<Input
+					id="url"
+					type="url"
+					autocomplete="off"
+					spellcheck="false"
+					class="w-full"
+					:model-value="builder.urlInput.value"
+					:placeholder="urlPlaceholder"
+					@update:model-value="onUrlInput"
+				/>
+			</template>
+		</OptionRow>
+
+		<OptionRow :icon="Blocks" :label="t(m.platform.id)">
+			<template #below>
+				<PlatformPicker
+					:label="t(m.platform.id)"
+					:selected="builder.selectedPlatform.value"
+					@select="builder.setPlatform"
+				/>
+			</template>
+		</OptionRow>
+
+		<OptionSelect
+			v-model="builder.embedType.value"
+			:icon="LayoutTemplate"
+			:label="t(m.type.id)"
+			:description="t(m.typeHint.id)"
+			:options="typeOptions"
 		/>
 
-		<hr class="border-border border-t" />
-
-		<PlatformPicker :selected="builder.selectedPlatform.value" @select="builder.setPlatform" />
-
-		<hr class="border-border border-t" />
-
-		<SelectField v-model="builder.embedType.value" :label="t(m.type.id)" :options="typeOptions" />
-
-		<SelectField
+		<OptionSelect
 			v-model="builder.targetType.value"
+			:icon="Crosshair"
 			:label="t(m.target.id)"
+			:description="t(m.targetHint.id)"
 			:options="targetOptions"
 			@change="builder.onTargetTypeChange"
 		/>
 
-		<SelectField
+		<OptionSelect
 			v-if="builder.embedType.value === 'badge'"
 			v-model="builder.badgeMetric.value"
+			:icon="Hash"
 			:label="t(m.badgeMetric.id)"
+			:description="t(m.badgeMetricHint.id)"
 			:options="metricOptions"
 		/>
 
@@ -36,43 +57,53 @@
 			:target="builder.targetType.value"
 		/>
 
-		<SelectField
+		<OptionSelect
 			v-if="
 				builder.embedType.value === 'card' &&
 				builder.isUserLike.value &&
 				projectTypeOptions.length > 0
 			"
 			v-model="builder.projectTypeFilter.value"
+			:icon="Funnel"
 			:label="t(m.projectType.id)"
+			:description="t(m.projectTypeHint.id)"
 			:options="projectTypeOptions"
 		/>
-	</CollapsiblePanel>
+	</div>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue'
+import { Blocks, Crosshair, Funnel, Hash, LayoutTemplate, Link } from '@lucide/vue'
+import { computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { EmbedBuilderKey } from '../../composables/useEmbedBuilder'
 import { defineMessages } from '../../helpers/i18n'
-import CollapsiblePanel from '../ui/CollapsiblePanel.vue'
-import SelectField from '../ui/SelectField.vue'
-import TextField from '../ui/TextField.vue'
+import OptionRow from '../options/OptionRow.vue'
+import OptionSelect from '../options/OptionSelect.vue'
+import Input from '../ui/Input.vue'
 import IdentifierField from './IdentifierField.vue'
 import PlatformPicker from './PlatformPicker.vue'
 
 const builder = inject(EmbedBuilderKey)!
 
 const { t } = useI18n()
-const expanded = ref(true)
 
 const m = defineMessages({
-	title: { id: 'section.configuration', defaultMessage: 'Configuration' },
 	url: { id: 'field.url', defaultMessage: 'URL' },
+	urlHint: { id: 'hint.url', defaultMessage: 'Paste a link to fill in everything below' },
+	platform: { id: 'field.platform', defaultMessage: 'Platform' },
 	type: { id: 'field.type', defaultMessage: 'Type' },
+	typeHint: { id: 'hint.type', defaultMessage: 'A detailed card or a compact badge' },
 	target: { id: 'field.target', defaultMessage: 'Target' },
+	targetHint: { id: 'hint.target', defaultMessage: 'What the embed is about' },
 	badgeMetric: { id: 'field.badgeMetric', defaultMessage: 'Badge Metric' },
+	badgeMetricHint: { id: 'hint.badgeMetric', defaultMessage: 'The stat shown on the badge' },
 	projectType: { id: 'field.projectType', defaultMessage: 'Project Type' },
+	projectTypeHint: {
+		id: 'hint.projectType',
+		defaultMessage: 'Only include projects of this type',
+	},
 
 	typeCard: { id: 'type.card', defaultMessage: 'Card' },
 	typeBadge: { id: 'type.badge', defaultMessage: 'Badge' },
@@ -106,6 +137,11 @@ const m = defineMessages({
 	projectTypeTexturePack: { id: 'projectType.texturePack', defaultMessage: 'Texture Packs' },
 	projectTypeBukkitPlugin: { id: 'projectType.bukkitPlugin', defaultMessage: 'Bukkit Plugins' },
 })
+
+function onUrlInput(value: string) {
+	builder.urlInput.value = value
+	void builder.onUrlInput()
+}
 
 const urlPlaceholder = computed(
 	() =>
