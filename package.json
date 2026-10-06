@@ -3,7 +3,7 @@
     "version": "2.1.1",
     "private": true,
     "type": "module",
-    "packageManager": "pnpm@11.3.0+sha512.2c403d6594527287672b1f7056343a1f7c3634036a67ffabfcc2b3d7595d843768f8787148d1b57cf7956c90606bbd192857c363af19e96d2d0ec9ec5741d215",
+    "packageManager": "pnpm@12.9.1+sha512.06b055fff5cd20dc12781de173ced3310ce0951bf2ec620211a16045d5444d5c93a663210764ef29a653a610459ba0368f0e74f84d80c54723cf95aae7bc0d6d",
     "author": "Creeperkatze",
     "license": "AGPL-3.0-only",
     "scripts": {
@@ -26,6 +26,6 @@
         "release:major": "pnpm version major && git push && git push --tags"
     },
     "devDependencies": {
-        "turbo": "^2.10.2"
+        "turbo": "^2.11.7"
     }
 }
