@@ -198,7 +198,14 @@ async fn handle(
             }
             Err(err) => {
                 record(&state, entity, output, "error");
-                return output.error(&state, platform, &err).await;
+                let style = BadgeStyle {
+                    value_color: Some("#f38ba8"),
+                    show_icon: query.show_icon,
+                    show_border: query.show_border,
+                    ..Default::default()
+                };
+                let svg = generate_badge(label, err.badge_text(), platform, &style);
+                return output.error(&state, svg, &err).await;
             }
         },
     };

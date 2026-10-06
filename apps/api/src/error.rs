@@ -32,6 +32,13 @@ impl AppError {
         }
     }
 
+    pub fn badge_text(&self) -> &'static str {
+        match self {
+            AppError::Upstream { .. } => "Unavailable",
+            AppError::Internal(_) => "Error",
+        }
+    }
+
     pub fn detail(&self) -> &str {
         match self {
             AppError::Upstream { message, .. } => message,

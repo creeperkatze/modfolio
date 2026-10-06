@@ -7,8 +7,6 @@ use axum::response::{IntoResponse, Response};
 use serde::Deserialize;
 
 use crate::error::AppError;
-use crate::generators::card::generate_error_card;
-use crate::platform::Platform;
 use crate::state::AppState;
 
 // These crawlers need PNG images.
@@ -126,9 +124,8 @@ impl Output {
         self.failure(state, svg, StatusCode::NOT_FOUND).await
     }
 
-    pub async fn error(self, state: &AppState, platform: Platform, err: &AppError) -> Response {
-        tracing::warn!(platform = platform.id(), error = %err, "failed to build embed");
-        let svg = generate_error_card(err.title(), err.detail(), platform);
+    pub async fn error(self, state: &AppState, svg: String, err: &AppError) -> Response {
+        tracing::warn!(error = %err, "failed to build embed");
         self.failure(state, svg, err.status()).await
     }
 

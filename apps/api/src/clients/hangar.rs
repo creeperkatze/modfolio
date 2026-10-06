@@ -68,6 +68,7 @@ pub struct VersionStats {
 #[serde(rename_all = "camelCase")]
 pub struct User {
     pub name: Option<String>,
+    pub tagline: Option<String>,
     pub avatar_url: Option<String>,
     pub project_count: Option<f64>,
 }

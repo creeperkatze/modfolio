@@ -165,7 +165,8 @@ async fn handle(state: SharedState, client: Client, query: CardQuery, card: Card
             }
             Err(err) => {
                 record(&state, card, output, "error");
-                return output.error(&state, platform, &err).await;
+                let svg = generate_error_card(err.title(), err.detail(), platform);
+                return output.error(&state, svg, &err).await;
             }
         },
     };

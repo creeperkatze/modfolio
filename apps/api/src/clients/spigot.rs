@@ -1,5 +1,6 @@
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
+use serde::de::IgnoredAny;
 
 use super::nullable;
 use crate::error::AppError;
@@ -33,6 +34,8 @@ pub struct Resource {
     pub rating: Option<Rating>,
     pub icon: Option<Icon>,
     pub release_date: Option<i64>,
+    #[serde(default, deserialize_with = "nullable")]
+    pub versions: Vec<IgnoredAny>,
 }
 
 impl Resource {

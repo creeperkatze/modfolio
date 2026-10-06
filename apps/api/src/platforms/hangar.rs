@@ -65,6 +65,7 @@ pub async fn project_card(state: &AppState, slug: &str) -> Result<Option<CardDat
 
     Ok(Some(CardData {
         name: non_empty(project.name.as_deref()),
+        summary: project.description.clone(),
         image,
         versions,
         stats,
@@ -140,6 +141,7 @@ pub async fn user_card(state: &AppState, username: &str) -> Result<Option<CardDa
 
     Ok(Some(CardData {
         name: non_empty(user.name.as_deref()),
+        summary: user.tagline.clone(),
         image: image.or_else(|| non_empty(user.avatar_url.as_deref())),
         all_version_dates: all_version_dates(&projects),
         projects,
