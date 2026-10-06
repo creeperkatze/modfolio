@@ -71,9 +71,6 @@
   "hint.badgeMetric": {
     "message": "The stat shown on the badge"
   },
-  "hint.customization": {
-    "message": "Adjust how your embed looks"
-  },
   "hint.downloadBars": {
     "message": "Compare project downloads with bars"
   },
@@ -206,9 +203,6 @@
   "output.urlPlaceholder": {
     "message": "Your URL will appear here"
   },
-  "preview.description": {
-    "message": "Updates live as you change the settings"
-  },
   "preview.imageAlt": {
     "message": "Preview"
   },
@@ -262,12 +256,6 @@
   },
   "section.url": {
     "message": "URL"
-  },
-  "sidebar.close": {
-    "message": "Close menu"
-  },
-  "sidebar.open": {
-    "message": "Open menu"
   },
   "target.author": {
     "message": "Author"

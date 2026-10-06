@@ -1,73 +1,80 @@
 <template>
 	<div
-		class="flex min-h-screen flex-col bg-surface-1 lg:h-screen lg:flex-row lg:overflow-hidden"
+		class="flex min-h-screen justify-center bg-surface-2 px-4 py-6 sm:px-6 lg:py-10"
 		:style="{ '--color-accent': '#' + builder.platformConfig.value.defaultColor }"
 	>
-		<AppSidebar v-model:tab="tab" :tabs="tabs" />
+		<div class="flex w-full max-w-300 flex-col gap-6">
+			<AppHeader />
 
-		<section
-			class="flex flex-col border-border-subtle max-lg:border-b lg:h-screen lg:w-lg lg:shrink-0 lg:border-e xl:w-xl"
-		>
-			<PageHeader :title="activeTab.label" :description="activeTab.description">
-				<Button size="sm" @click="onReset">
-					<RotateCcw class="size-3.5" aria-hidden="true" />
-					{{ t(m.reset.id) }}
-				</Button>
-			</PageHeader>
-			<div class="p-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
-				<EmbedSettings v-if="tab === 'configuration'" />
-				<CustomizationSettings v-else />
+			<div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+				<main class="flex flex-col gap-8 rounded-xl border border-border bg-surface-1 p-4 lg:p-6">
+					<CardSection :title="t(m.configuration.id)">
+						<template #action>
+							<Button size="sm" @click="onReset">
+								<RotateCcw class="size-3.5" aria-hidden="true" />
+								{{ t(m.reset.id) }}
+							</Button>
+						</template>
+						<EmbedSettings />
+					</CardSection>
+					<CardSection :title="t(m.customization.id)">
+						<CustomizationSettings />
+					</CardSection>
+				</main>
+
+				<aside
+					class="flex flex-col gap-8 rounded-xl border border-border bg-surface-1 p-4 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:p-6"
+				>
+					<CardSection :title="t(m.preview.id)">
+						<PreviewPanel
+							:loading="preview.loading.value"
+							:api-slow="preview.apiSlow.value"
+							:api-error="preview.apiError.value"
+							:preview-src="preview.previewSrc.value"
+							:target-url="targetUrl"
+							:platform-name="builder.platformConfig.value.name"
+						/>
+					</CardSection>
+					<CardSection :title="t(m.embedCode.id)">
+						<div class="flex flex-col gap-2">
+							<OutputBlock
+								:icon="FileCode"
+								:label="t(m.markdown.id)"
+								:text="markdownText"
+								:placeholder="t(m.markdownPlaceholder.id)"
+							/>
+							<OutputBlock
+								:icon="Code"
+								:label="t(m.html.id)"
+								:text="htmlText"
+								:placeholder="t(m.htmlPlaceholder.id)"
+							/>
+							<OutputBlock
+								:icon="Link"
+								:label="t(m.url.id)"
+								:text="urlText"
+								:placeholder="t(m.urlPlaceholder.id)"
+							/>
+						</div>
+					</CardSection>
+				</aside>
 			</div>
-		</section>
 
-		<main class="min-w-0 flex-1 lg:overflow-y-auto">
-			<PageHeader :title="t(m.preview.id)" :description="t(m.previewDescription.id)" />
-
-			<div class="flex max-w-3xl flex-col gap-6 p-4">
-				<PreviewPanel
-					:loading="preview.loading.value"
-					:api-slow="preview.apiSlow.value"
-					:api-error="preview.apiError.value"
-					:preview-src="preview.previewSrc.value"
-					:target-url="targetUrl"
-					:platform-name="builder.platformConfig.value.name"
-				/>
-
-				<section class="flex flex-col gap-2">
-					<h2 class="m-0 px-1 text-sm font-semibold">{{ t(m.embedCode.id) }}</h2>
-					<OutputBlock
-						:icon="FileCode"
-						:label="t(m.markdown.id)"
-						:text="markdownText"
-						:placeholder="t(m.markdownPlaceholder.id)"
-					/>
-					<OutputBlock
-						:icon="Code"
-						:label="t(m.html.id)"
-						:text="htmlText"
-						:placeholder="t(m.htmlPlaceholder.id)"
-					/>
-					<OutputBlock
-						:icon="Link"
-						:label="t(m.url.id)"
-						:text="urlText"
-						:placeholder="t(m.urlPlaceholder.id)"
-					/>
-				</section>
-			</div>
-		</main>
+			<AppFooter />
+		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Code, FileCode, Link, Palette, RotateCcw, SlidersHorizontal } from '@lucide/vue'
-import { computed, nextTick, onMounted, provide, ref, watch } from 'vue'
+import { Code, FileCode, Link, RotateCcw } from '@lucide/vue'
+import { computed, nextTick, onMounted, provide, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import CustomizationSettings from './components/builder/CustomizationSettings.vue'
 import EmbedSettings from './components/builder/EmbedSettings.vue'
-import AppSidebar from './components/layout/AppSidebar.vue'
-import PageHeader from './components/layout/PageHeader.vue'
+import AppFooter from './components/layout/AppFooter.vue'
+import AppHeader from './components/layout/AppHeader.vue'
+import CardSection from './components/layout/CardSection.vue'
 import OutputBlock from './components/preview/OutputBlock.vue'
 import PreviewPanel from './components/preview/PreviewPanel.vue'
 import Button from './components/ui/Button.vue'
@@ -84,22 +91,9 @@ provide(EmbedBuilderKey, builder)
 
 const m = defineMessages({
 	configuration: { id: 'section.configuration', defaultMessage: 'Configuration' },
-	configurationDescription: {
-		id: 'app.subtitle',
-		defaultMessage:
-			'Generate fast, beautiful and consistent embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content.',
-	},
 	customization: { id: 'section.customization', defaultMessage: 'Customization' },
-	customizationDescription: {
-		id: 'hint.customization',
-		defaultMessage: 'Adjust how your embed looks',
-	},
 	reset: { id: 'action.reset', defaultMessage: 'Reset' },
 	preview: { id: 'section.preview', defaultMessage: 'Preview' },
-	previewDescription: {
-		id: 'preview.description',
-		defaultMessage: 'Updates live as you change the settings',
-	},
 	embedCode: { id: 'section.embedCode', defaultMessage: 'Embed code' },
 	markdown: { id: 'section.markdown', defaultMessage: 'Markdown' },
 	html: { id: 'section.html', defaultMessage: 'HTML' },
@@ -114,27 +108,6 @@ const m = defineMessages({
 	},
 	urlPlaceholder: { id: 'output.urlPlaceholder', defaultMessage: 'Your URL will appear here' },
 })
-
-type Tab = 'configuration' | 'customization'
-
-const tab = ref<Tab>('configuration')
-
-const tabs = computed(() => [
-	{
-		id: 'configuration' as const,
-		label: t(m.configuration.id),
-		description: t(m.configurationDescription.id),
-		icon: SlidersHorizontal,
-	},
-	{
-		id: 'customization' as const,
-		label: t(m.customization.id),
-		description: t(m.customizationDescription.id),
-		icon: Palette,
-	},
-])
-
-const activeTab = computed(() => tabs.value.find((item) => item.id === tab.value)!)
 
 const targetUrl = computed(() => preview.metaUrl.value || builder.targetUrlFallback.value)
 
