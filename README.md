@@ -154,6 +154,7 @@ Compact badges showing a single metric.
 
 - Node.js
 - pnpm
+- Rust
 
 ### Installation
 
@@ -171,7 +172,7 @@ pnpm dev
 
 ### Environment Variables
 
-Copy `apps/backend/.env.example` and rename it to `apps/backend/.env`.
+Copy `apps/api/.env.example` and rename it to `apps/api/.env`.
 
 ## 🌐 Translating
 

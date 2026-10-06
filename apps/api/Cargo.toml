@@ -1,0 +1,34 @@
+[package]
+name = "modfolio-api"
+# The release version lives in the root package.json and is injected by build.rs.
+version = "0.0.0"
+edition = "2024"
+license = "AGPL-3.0-only"
+publish = false
+
+[dependencies]
+axum = "0.8"
+base64 = "0.23"
+chrono = "0.4"
+dotenvy = "0.15"
+futures = "0.3"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "ico", "tiff"] }
+prometheus = { version = "0.14", features = ["process"] }
+reqwest = { version = "0.13", features = ["json", "query"] }
+resvg = "0.48"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+subtle = "2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal", "sync"] }
+tower-http = { version = "0.7", features = ["fs", "trace"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+url = "2"
+
+[dev-dependencies]
+http-body-util = "0.1"
+tower = { version = "0.5", features = ["util"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

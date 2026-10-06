@@ -29,6 +29,15 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: apps/api
+
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm lint
@@ -42,16 +51,21 @@ jobs:
           ref: ${{ inputs.ref || github.ref }}
           submodules: recursive
 
-      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
-
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # stable
         with:
-          node-version: 22
-          cache: pnpm
+          toolchain: stable
+          components: llvm-tools-preview
 
-      - run: pnpm install --frozen-lockfile
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: apps/api
 
-      - run: pnpm --filter modfolio-api test:coverage
+      - uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
+        with:
+          tool: cargo-llvm-cov
+
+      - run: cargo llvm-cov --locked --lcov --output-path coverage/lcov.info
+        working-directory: apps/api
         env:
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
 

@@ -1,8 +1,10 @@
 **/node_modules
 **/dist
+**/target
+**/coverage
 Dockerfile
 .gitignore
 .git
-.env
+**/.env
 .vscode
 logs
