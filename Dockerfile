@@ -1,4 +1,4 @@
-FROM node:22-slim
+FROM node:22.23.4-slim
 
 LABEL org.opencontainers.image.source=https://github.com/creeperkatze/modfolio
 
