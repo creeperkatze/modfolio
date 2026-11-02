@@ -23,9 +23,6 @@
   "field.url": {
     "message": "URL"
   },
-  "footer.notAffiliated": {
-    "message": "Не пов'язано з Modrinth, CurseForge, Hangar або Spigot"
-  },
   "hint.transparentBg": {
     "message": "Прозорий фон найкраще підходить у більшості випадків, оскільки він зливається з фоном без зміни його стилю."
   },

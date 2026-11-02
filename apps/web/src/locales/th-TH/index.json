@@ -17,18 +17,6 @@
   "footer.credits": {
     "message": "ทำด้วย ♥ โดย"
   },
-  "footer.donate": {
-    "message": "สนับสนุน"
-  },
-  "footer.github": {
-    "message": "บน GitHub"
-  },
-  "footer.notAffiliated": {
-    "message": "ไม่มีความเกี่ยวข้องกับ Modrinth, CurseForge, Hangar หรือ Spigot"
-  },
-  "footer.source": {
-    "message": "ที่มา"
-  },
   "metric.downloads": {
     "message": "ดาวน์โหลด"
   },

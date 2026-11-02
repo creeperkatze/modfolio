@@ -26,12 +26,6 @@
   "footer.credits": {
     "message": "Сделано с ♥ ими"
   },
-  "footer.notAffiliated": {
-    "message": "Не связаны с Modrinth, CurseForge, Hangar или Spigot"
-  },
-  "footer.source": {
-    "message": "Источник"
-  },
   "hint.transparentBg": {
     "message": "Прозрачный фон подходит лучше в большинстве случаев, потому что он сливается с фоном, не меняя стиль."
   },

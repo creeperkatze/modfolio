@@ -23,9 +23,6 @@
   "field.url": {
     "message": "URL"
   },
-  "footer.notAffiliated": {
-    "message": "Non affiliato con Modrinth, CurseForge, Hangar o Spigot"
-  },
   "hint.transparentBg": {
     "message": "L'opzione \"Trasparente\" funziona meglio nella maggior parte dei casi, poiché si fonde con lo sfondo senza modificarne lo stile."
   },

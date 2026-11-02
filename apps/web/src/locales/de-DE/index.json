@@ -26,15 +26,6 @@
   "footer.credits": {
     "message": "Mit ♥ erstellt von"
   },
-  "footer.donate": {
-    "message": "Spenden"
-  },
-  "footer.notAffiliated": {
-    "message": "Nicht assoziiert mit Modrinth, CurseForge, Hangar oder Spigot"
-  },
-  "footer.source": {
-    "message": "Quelle"
-  },
   "hint.transparentBg": {
     "message": "Transparent funktioniert in den meisten Situationen am besten, da es sich in den Hintergrund anpasst, ohne seinen Stil zu verändern."
   },
