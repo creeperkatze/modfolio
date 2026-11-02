@@ -142,3 +142,4 @@ vite.config.ts.timestamp-*
 
 .claude
 .turbo
+target/

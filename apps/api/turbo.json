@@ -1,0 +1,20 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"extends": ["//"],
+	"tasks": {
+		"build": {
+			"cache": false
+		},
+		"test": {
+			"dependsOn": [],
+			"cache": false
+		},
+		"test:coverage": {
+			"dependsOn": [],
+			"cache": false
+		},
+		"lint": {
+			"cache": false
+		}
+	}
+}
