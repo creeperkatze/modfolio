@@ -28,6 +28,9 @@ const LEGACY_HOSTNAME: &str = "modfolio.creeperkatze.de";
 
 const CACHE_MAX_AGE_SECONDS: u32 = 3600;
 
+/// The real status of an error embed, which itself is sent with 200.
+pub const ERROR_STATUS_HEADER: &str = "x-error-status";
+
 #[derive(Deserialize, Clone, Copy, Default, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum Format {
@@ -86,14 +89,12 @@ pub fn hex_color(value: Option<String>) -> Option<String> {
 #[derive(Clone, Copy)]
 pub struct Output {
     pub png: bool,
-    image_crawler: bool,
 }
 
 impl Output {
     pub fn new(client: &Client, format: Format) -> Self {
         Output {
             png: client.image_crawler || format == Format::Png,
-            image_crawler: client.image_crawler,
         }
     }
 
@@ -133,12 +134,11 @@ impl Output {
         let mut headers = HeaderMap::new();
         headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
         headers.insert(
-            HeaderName::from_static("x-error-status"),
+            HeaderName::from_static(ERROR_STATUS_HEADER),
             HeaderValue::from(status.as_u16()),
         );
-        // Crawlers won't show images with an error status.
-        let status = if self.image_crawler { StatusCode::OK } else { status };
-        self.respond(state, svg, status, headers).await
+        // Image proxies like GitHub's and crawlers hide images with an error status, so the error embed is sent as a success.
+        self.respond(state, svg, StatusCode::OK, headers).await
     }
 
     async fn respond(self, state: &AppState, svg: String, status: StatusCode, mut headers: HeaderMap) -> Response {

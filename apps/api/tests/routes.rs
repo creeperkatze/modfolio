@@ -121,9 +121,9 @@ mod modrinth {
     }
 
     #[tokio::test]
-    async fn returns_a_404_card_for_a_nonexistent_user() {
+    async fn returns_a_not_found_card_for_a_nonexistent_user() {
         let res = get("/modrinth/user/this-user-should-not-exist-xyz123").await;
-        assert_eq!(res.status, StatusCode::NOT_FOUND);
+        assert_eq!(res.status, StatusCode::OK);
         assert_eq!(res.header("x-error-status"), "404");
         assert!(res.header("content-type").contains("image/svg+xml"));
     }
@@ -202,9 +202,9 @@ mod curseforge {
     }
 
     #[tokio::test]
-    async fn returns_a_404_card_for_a_nonexistent_project() {
+    async fn returns_a_not_found_card_for_a_nonexistent_project() {
         let res = get("/curseforge/project/999999999").await;
-        assert_eq!(res.status, StatusCode::NOT_FOUND);
+        assert_eq!(res.status, StatusCode::OK);
         assert_eq!(res.header("x-error-status"), "404");
     }
 
@@ -240,9 +240,9 @@ mod hangar {
     }
 
     #[tokio::test]
-    async fn returns_a_404_card_for_a_nonexistent_project() {
+    async fn returns_a_not_found_card_for_a_nonexistent_project() {
         let res = get("/hangar/project/this-project-should-not-exist-xyz123").await;
-        assert_eq!(res.status, StatusCode::NOT_FOUND);
+        assert_eq!(res.status, StatusCode::OK);
         assert_eq!(res.header("x-error-status"), "404");
     }
 }
@@ -288,9 +288,9 @@ mod spigot {
     }
 
     #[tokio::test]
-    async fn returns_a_404_card_for_a_nonexistent_resource() {
+    async fn returns_a_not_found_card_for_a_nonexistent_resource() {
         let res = get("/spigot/resource/999999999").await;
-        assert_eq!(res.status, StatusCode::NOT_FOUND);
+        assert_eq!(res.status, StatusCode::OK);
         assert_eq!(res.header("x-error-status"), "404");
     }
 }

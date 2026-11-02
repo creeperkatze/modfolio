@@ -39,7 +39,12 @@ async fn track_metrics(State(state): State<SharedState>, request: Request, next:
     let response = next.run(request).await;
 
     let metrics = &state.metrics;
-    let status = response.status().as_u16().to_string();
+    // Error embeds are sent with 200 but count with their real status.
+    let status = response
+        .headers()
+        .get(embed::ERROR_STATUS_HEADER)
+        .and_then(|v| v.to_str().ok())
+        .map_or_else(|| response.status().as_u16().to_string(), str::to_string);
     metrics
         .http_requests_total
         .with_label_values(&[&method, &route, &status])
