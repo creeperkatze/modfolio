@@ -6,8 +6,10 @@
 		"dev": "cargo run",
 		"start": "cargo run --release --locked",
 		"test": "cargo test --locked",
-		"test:coverage": "cargo llvm-cov --locked --lcov --output-path coverage/lcov.info",
-		"lint": "cargo fmt --check && cargo clippy --all-targets --locked -- -D warnings",
-		"lint:fix": "cargo fmt && cargo clippy --all-targets --fix --allow-dirty -- -D warnings"
+		"test:coverage": "cargo llvm-cov --locked --lcov --output-path lcov.info",
+		"lint": "cargo clippy --all-targets --locked -- -D warnings",
+		"lint:fix": "cargo clippy --all-targets --locked --fix --allow-dirty -- -D warnings",
+		"fmt": "cargo fmt",
+		"fmt:check": "cargo fmt --check"
 	}
 }

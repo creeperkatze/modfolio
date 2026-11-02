@@ -1,0 +1,8 @@
+languageIds:
+  - vue
+  - typescript
+
+usageMatchRegex:
+  - id:\s*['"]({key})['"]
+
+monopoly: true

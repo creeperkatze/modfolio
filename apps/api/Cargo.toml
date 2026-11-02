@@ -2,8 +2,12 @@
 name = "modfolio-api"
 # The release version lives in the root package.json and is injected by build.rs.
 version = "0.0.0"
-edition = "2024"
+description = "Embeddable cards and badges for Modrinth, CurseForge, Hangar and Spigot content."
+authors = ["Creeperkatze"]
 license = "AGPL-3.0-only"
+homepage = "https://modfolio.creeperkatze.dev"
+repository = "https://github.com/creeperkatze/modfolio"
+edition = "2024"
 publish = false
 
 [dependencies]
@@ -12,10 +16,18 @@ base64 = "0.23"
 chrono = "0.4"
 dotenvy = "0.15"
 futures = "0.3"
-image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "ico", "tiff"] }
+image = { version = "0.25", default-features = false, features = [
+	"png",
+	"jpeg",
+	"gif",
+	"webp",
+	"bmp",
+	"ico",
+	"tiff",
+] }
 prometheus = { version = "0.14", features = ["process"] }
 reqwest = { version = "0.13", features = ["json", "query"] }
-resvg = "0.48"
+resvg = "0.49"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 subtle = "2"
@@ -28,6 +40,23 @@ url = "2"
 [dev-dependencies]
 http-body-util = "0.1"
 tower = { version = "0.5", features = ["util"] }
+
+[lints.clippy]
+bool_to_int_with_if = "warn"
+cloned_instead_of_copied = "warn"
+dbg_macro = "warn"
+explicit_iter_loop = "warn"
+filter_map_next = "warn"
+flat_map_option = "warn"
+manual_assert = "warn"
+manual_let_else = "warn"
+match_bool = "warn"
+needless_collect = "warn"
+redundant_clone = "warn"
+redundant_type_annotations = "warn"
+todo = "warn"
+uninlined_format_args = "warn"
+unnested_or_patterns = "warn"
 
 [profile.release]
 lto = "thin"

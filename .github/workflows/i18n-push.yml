@@ -2,18 +2,18 @@ name: Crowdin (push)
 
 on:
   push:
-    branches: ['main']
+    branches: [main]
     paths:
       - '.github/workflows/i18n-push.yml'
       - 'apps/web/src/locales/en-US/**'
-      - 'apps/web/crowdin.yml'
+      - 'crowdin.yml'
   workflow_dispatch:
 
 concurrency:
   group: i18n-management
 
 jobs:
-  push_translations:
+  push:
     name: Push sources to Crowdin
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -22,7 +22,7 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref }}
 
@@ -36,10 +36,9 @@ jobs:
           echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
           echo "safe_branch_name=$SAFE_BRANCH_NAME" >> "$GITHUB_OUTPUT"
 
-      - name: Upload translations to Crowdin
-        uses: crowdin/github-action@8868a33591d21088edfc398968173a3b98d51706 # v2.16.2
+      - name: Upload source strings to Crowdin
+        uses: crowdin/github-action@9c23991700c0ec5256fd41089b9d9d7d540e424e # v3.3.0
         with:
-          config: apps/web/crowdin.yml
           upload_sources: true
           upload_translations: false
           download_translations: false

@@ -6,20 +6,29 @@
 			"outputs": ["dist/**"]
 		},
 		"dev": {
-			"cache": false
+			"cache": false,
+			"persistent": true
 		},
 		"lint": {
 			"outputs": []
 		},
 		"lint:fix": {
-			"cache": false,
+			"cache": false
+		},
+		"fmt": {
+			"cache": false
+		},
+		"fmt:check": {
+			"outputs": []
+		},
+		"typecheck": {
 			"outputs": []
 		},
 		"test": {
 			"dependsOn": ["build"],
 			"outputs": []
 		},
-        "test:coverage": {
+		"test:coverage": {
 			"dependsOn": ["build"],
 			"outputs": []
 		}

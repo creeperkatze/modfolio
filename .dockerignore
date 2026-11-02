@@ -1,7 +1,7 @@
 **/node_modules
 **/dist
 **/target
-**/coverage
+**/lcov.info
 Dockerfile
 .gitignore
 .git

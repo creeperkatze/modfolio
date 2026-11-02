@@ -15,6 +15,9 @@
 		},
 		"lint": {
 			"cache": false
+		},
+		"fmt:check": {
+			"cache": false
 		}
 	}
 }

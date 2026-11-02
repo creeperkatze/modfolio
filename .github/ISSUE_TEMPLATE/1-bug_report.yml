@@ -1,0 +1,46 @@
+name: 🐛 Bug report
+description: Report a bug to help improve modfolio
+labels: ['bug']
+body:
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Where are you seeing the problem?
+      multiple: true
+      options:
+        - Modrinth
+        - CurseForge
+        - Hangar
+        - Spigot
+        - Website
+  - type: input
+    id: url
+    attributes:
+      label: Embed URL
+      description: The full URL of the card or badge with the problem, if applicable.
+      placeholder: e.g. https://modfolio.creeperkatze.dev/modrinth/project/modmenu
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is. Include screenshots if applicable.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: false

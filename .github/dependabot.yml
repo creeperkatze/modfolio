@@ -1,0 +1,44 @@
+version: 2
+
+multi-ecosystem-groups:
+  app:
+    schedule:
+      interval: 'weekly'
+    commit-message:
+      prefix: 'deps'
+
+updates:
+  - package-ecosystem: 'cargo'
+    directory: '/apps/api'
+    multi-ecosystem-group: 'app'
+    patterns: ['*']
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: 'npm'
+    directory: '/'
+    multi-ecosystem-group: 'app'
+    patterns: ['*']
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    commit-message:
+      prefix: 'deps(docker)'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    groups:
+      actions-minor-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+    commit-message:
+      prefix: 'deps(actions)'

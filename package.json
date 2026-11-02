@@ -1,31 +1,37 @@
 {
-    "name": "modfolio",
-    "version": "2.1.3",
-    "private": true,
-    "type": "module",
-    "packageManager": "pnpm@12.9.1+sha512.06b055fff5cd20dc12781de173ced3310ce0951bf2ec620211a16045d5444d5c93a663210764ef29a653a610459ba0368f0e74f84d80c54723cf95aae7bc0d6d",
-    "author": "Creeperkatze",
-    "license": "AGPL-3.0-only",
-    "scripts": {
-        "dev": "turbo run dev",
-        "build": "turbo run build",
-        "web:dev": "turbo run dev --filter=modfolio-web",
-        "web:build": "turbo run build --filter=modfolio-web",
-        "web:intl:extract": "pnpm --filter modfolio-web intl:extract",
-        "api:dev": "turbo run dev --filter=modfolio-api",
-        "api:build": "turbo run build --filter=modfolio-api",
-        "api:start": "pnpm --filter modfolio-api start",
-        "api:test": "turbo run test --filter=modfolio-api",
-        "api:test:coverage": "pnpm --filter modfolio-api test:coverage",
-        "test": "turbo run test",
-        "test:coverage": "turbo run test:coverage",
-        "lint": "turbo run lint",
-        "lint:fix": "turbo run lint:fix",
-        "release:patch": "pnpm version patch && git push && git push --tags",
-        "release:minor": "pnpm version minor && git push && git push --tags",
-        "release:major": "pnpm version major && git push && git push --tags"
-    },
-    "devDependencies": {
-        "turbo": "^2.11.7"
-    }
+	"name": "modfolio",
+	"version": "2.1.3",
+	"private": true,
+	"license": "AGPL-3.0-only",
+	"author": "Creeperkatze",
+	"type": "module",
+	"scripts": {
+		"dev": "turbo run dev",
+		"build": "turbo run build",
+		"web:dev": "turbo run dev --filter=modfolio-web",
+		"web:build": "turbo run build --filter=modfolio-web",
+		"web:intl:extract": "pnpm --filter modfolio-web intl:extract",
+		"web:intl:prune": "pnpm --filter modfolio-web intl:prune",
+		"api:dev": "turbo run dev --filter=modfolio-api",
+		"api:build": "turbo run build --filter=modfolio-api",
+		"api:start": "pnpm --filter modfolio-api start",
+		"api:test": "turbo run test --filter=modfolio-api",
+		"api:test:coverage": "turbo run test:coverage --filter=modfolio-api",
+		"test": "turbo run test",
+		"test:coverage": "turbo run test:coverage",
+		"lint": "oxlint && turbo run lint",
+		"lint:fix": "oxlint --fix && turbo run lint:fix",
+		"fmt": "oxfmt && turbo run fmt",
+		"fmt:check": "oxfmt --check && turbo run fmt:check",
+		"typecheck": "turbo run typecheck",
+		"release:patch": "pnpm version patch && git push && git push --tags",
+		"release:minor": "pnpm version minor && git push && git push --tags",
+		"release:major": "pnpm version major && git push && git push --tags"
+	},
+	"devDependencies": {
+		"oxfmt": "^0.75.0",
+		"oxlint": "^1.90.0",
+		"turbo": "^2.11.10"
+	},
+	"packageManager": "pnpm@12.9.1+sha512.06b055fff5cd20dc12781de173ced3310ce0951bf2ec620211a16045d5444d5c93a663210764ef29a653a610459ba0368f0e74f84d80c54723cf95aae7bc0d6d"
 }

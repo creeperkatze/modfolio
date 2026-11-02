@@ -1,11 +1,2 @@
 packages:
   - 'apps/*'
-
-allowBuilds:
-  '@scarf/scarf': false
-  esbuild: true
-
-onlyBuiltDependencies:
-  - '@scarf/scarf'
-  - esbuild
-  - protobufjs

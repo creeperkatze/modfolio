@@ -2,15 +2,15 @@ name: Crowdin (pull)
 
 on:
   schedule:
-    - cron: '0 7 * * MON' # every monday at 7 am
+    - cron: '0 7 * * MON'
   workflow_dispatch:
 
 concurrency:
   group: i18n-management
 
 jobs:
-  pull_translations:
-    name: 'Pull translations from Crowdin'
+  pull:
+    name: Pull translations from Crowdin
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     concurrency:
@@ -21,14 +21,13 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref }}
 
       - name: Download translations from Crowdin
-        uses: crowdin/github-action@8868a33591d21088edfc398968173a3b98d51706 # v2.16.2
+        uses: crowdin/github-action@9c23991700c0ec5256fd41089b9d9d7d540e424e # v3.3.0
         with:
-          config: apps/web/crowdin.yml
           upload_sources: false
           upload_translations: false
           download_translations: true
@@ -43,12 +42,20 @@ jobs:
         shell: bash
         run: sudo chown -R $USER:$USER .
 
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Remove untranslated strings
+        run: node apps/web/scripts/prune-locales.js
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
-          title: 'New translations from Crowdin'
-          commit-message: 'New translations from Crowdin'
-          branch: crowdin/new-translations
+          title: 'chore: sync translations from Crowdin'
+          commit-message: 'chore: sync translations from Crowdin'
+          branch: sync/translations
           body: |
             Automated by [`i18n-pull.yml`](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n-pull.yml).
 

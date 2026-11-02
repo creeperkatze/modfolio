@@ -50,9 +50,6 @@
   "metric.views": {
     "message": "จำนวนการดู"
   },
-  "option.accentColor": {
-    "message": ""
-  },
   "option.maxFiles": {
     "message": "จํานวนไฟล์สูงสุด"
   },
