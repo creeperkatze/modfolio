@@ -64,7 +64,7 @@ jobs:
         with:
           tool: cargo-llvm-cov
 
-      - run: cargo llvm-cov --locked --lcov --output-path coverage/lcov.info
+      - run: mkdir -p coverage && cargo llvm-cov --locked --lcov --output-path coverage/lcov.info
         working-directory: apps/api
         env:
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
