@@ -3,13 +3,9 @@ fn main() {
     println!("cargo:rerun-if-changed={path}");
 
     let manifest = std::fs::read_to_string(path).expect("root package.json should be readable");
-    let version = manifest
-        .lines()
-        .find_map(|line| {
-            let rest = line.trim().strip_prefix("\"version\"")?;
-            let value = rest.trim_start().strip_prefix(':')?.trim();
-            Some(value.trim_end_matches(',').trim_matches('"').to_string())
-        })
+    let manifest: serde_json::Value = serde_json::from_str(&manifest).expect("root package.json should be valid JSON");
+    let version = manifest["version"]
+        .as_str()
         .expect("root package.json should have a version field");
 
     println!("cargo:rustc-env=MODFOLIO_VERSION={version}");

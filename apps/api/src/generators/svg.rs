@@ -1,6 +1,7 @@
+use chrono::{DateTime, Utc};
+
 use crate::format::{
-    escape_xml, format_distance_to_now, format_number, format_short_date, generate_sparkline, js_num, now_ms,
-    parse_date_ms, truncate_text, wrap_text,
+    escape_xml, format_number, format_short_date, generate_sparkline, relative_time, truncate_text, wrap_text,
 };
 use crate::icons::icon;
 use crate::model::{ProjectItem, VersionItem};
@@ -13,7 +14,7 @@ pub struct Colors {
     pub border_color: &'static str,
 }
 
-fn is_hex_color(value: &str) -> bool {
+pub fn is_hex_color(value: &str) -> bool {
     value.len() == 7 && value.starts_with('#') && value[1..].chars().all(|c| c.is_ascii_hexdigit())
 }
 
@@ -31,8 +32,7 @@ pub fn theme_colors(accent_color: &str, background_color: Option<&str>) -> Color
 }
 
 pub fn calculate_bottom_delay(item_count: usize) -> f64 {
-    let first_item_delay = 0.1 + 0.1;
-    first_item_delay + item_count as f64 * 0.08 + 0.1
+    0.3 + item_count as f64 * 0.08
 }
 
 const LEGACY_DOMAIN_WARNING_HEIGHT: i64 = 24;
@@ -51,10 +51,10 @@ fn legacy_domain_warning(width: i64, height: i64, animations: bool) -> String {
     </text>
   </g>"##,
         class = if animations { r#" class="fade-in-delayed""# } else { "" },
-        icon_y = js_num((height - 14) as f64 / 2.0),
-        scale = js_num(14.0 / 24.0),
+        icon_y = (height - 14) as f64 / 2.0,
+        scale = 14.0 / 24.0,
         icon = icon("triangle-alert", "#fff").unwrap_or_default(),
-        text_y = js_num(height as f64 / 2.0 + 4.0),
+        text_y = height as f64 / 2.0 + 4.0,
     )
 }
 
@@ -204,7 +204,7 @@ fn sparkline_paths(path: &str, fill_path: &str, accent: &str) -> String {
     )
 }
 
-pub fn activity_sparkline(version_dates: &[String], colors: &Colors, animations: bool) -> String {
+pub fn activity_sparkline(version_dates: &[DateTime<Utc>], colors: &Colors, animations: bool) -> String {
     let sparkline = generate_sparkline(version_dates, 420.0, 56.25);
     let paths = sparkline_paths(&sparkline.path, &sparkline.fill_path, &colors.accent_color);
 
@@ -312,18 +312,12 @@ pub fn stats_grid(stats: &[StatCell], colors: &Colors, animations: bool) -> Stri
         .iter()
         .enumerate()
         .map(|(index, cell)| {
-            let value_delay = 0.0 + index as f64 * 0.1;
+            let value_delay = index as f64 * 0.1;
             let label_delay = 0.1 + index as f64 * 0.1;
             let (value_anim, label_anim) = if animations {
                 (
-                    format!(
-                        r#" class="stat-value" style="animation-delay: {}s""#,
-                        js_num(value_delay)
-                    ),
-                    format!(
-                        r#" class="stat-label" style="animation-delay: {}s""#,
-                        js_num(label_delay)
-                    ),
+                    format!(r#" class="stat-value" style="animation-delay: {value_delay}s""#),
+                    format!(r#" class="stat-label" style="animation-delay: {label_delay}s""#),
                 )
             } else {
                 (String::new(), String::new())
@@ -392,8 +386,7 @@ fn project_list_item(
 
     let type_icon = icon(project_type_icon(Some(&project.project_type)), colors.text_color).unwrap_or_default();
     let loader_icons_html = loader_icons(&project.loaders, 54, y);
-    let animation_delay = base_delay + index as f64 * 0.08;
-    let delay = js_num(animation_delay);
+    let delay = base_delay + index as f64 * 0.08;
     let accent = &colors.accent_color;
     let border = colors.border_color;
     let text = colors.text_color;
@@ -433,8 +426,8 @@ fn project_list_item(
         opacity="0.1"
       />
     </g>"#,
-            sw = js_num(sparkline_width),
-            sx = js_num(sparkline_x_offset),
+            sw = sparkline_width,
+            sx = sparkline_x_offset,
             sy = y - 88,
             path = sparkline.path,
             fill_path = sparkline.fill_path,
@@ -446,9 +439,8 @@ fn project_list_item(
     let bar_html = if opts.show_download_bars {
         let bar_anim = if opts.animations {
             format!(
-                r#" class="download-bar" style="--target-width: {}px; animation-delay: {}s""#,
-                js_num(bar_width),
-                js_num(animation_delay + 0.1)
+                r#" class="download-bar" style="--target-width: {bar_width}px; animation-delay: {}s""#,
+                delay + 0.1
             )
         } else {
             String::new()
@@ -456,8 +448,8 @@ fn project_list_item(
         format!(
             r#"    <!-- Relative downloads bar -->
     <rect x="15.5" y="{}" width="{}" height="3" fill="{accent}" clip-path="url(#project-clip-{index})"{bar_anim}/>"#,
-            js_num(y as f64 - 18.5),
-            js_num(bar_width - 0.5),
+            y as f64 - 18.5,
+            bar_width - 0.5,
         )
     } else {
         String::new()
@@ -560,7 +552,7 @@ pub fn summary(text: Option<&str>, colors: &Colors, animations: bool) -> Summary
         };
     };
 
-    let lines = wrap_text(&escape_xml(&truncate_text(text, 220)), 60);
+    let lines = wrap_text(&truncate_text(text, 220), 60);
     let line_height = 16;
     let top_padding = 8;
     let bottom_padding = 10;
@@ -572,8 +564,9 @@ pub fn summary(text: Option<&str>, colors: &Colors, animations: bool) -> Summary
         .map(|(i, line)| {
             let y = 110 + top_padding + (i as i64 + 1) * line_height;
             format!(
-                r#"    <text x="15" y="{y}" font-family="Inter, sans-serif" font-size="12" fill="{}" opacity="0.8">{line}</text>"#,
-                colors.text_color
+                r#"    <text x="15" y="{y}" font-family="Inter, sans-serif" font-size="12" fill="{}" opacity="0.8">{}</text>"#,
+                colors.text_color,
+                escape_xml(line)
             )
         })
         .collect::<Vec<_>>()
@@ -629,10 +622,7 @@ pub fn project_list(
         .collect();
 
     let header_anim = if animations {
-        format!(
-            r#" class="section-header" style="animation-delay: {}s""#,
-            js_num(section_delay)
-        )
+        format!(r#" class="section-header" style="animation-delay: {section_delay}s""#)
     } else {
         String::new()
     };
@@ -654,17 +644,17 @@ fn version_list_item(
     version: &VersionItem,
     index: usize,
     colors: &Colors,
-    relative_time: bool,
+    relative: bool,
     animations: bool,
     y_offset: i64,
 ) -> String {
     let y = 160 + index as i64 * 50 + y_offset;
     let version_number = escape_xml(&truncate_text(&version.version_number, 18));
 
-    let now = now_ms();
-    let published = version.date.as_deref().and_then(parse_date_ms).unwrap_or(now);
-    let date_str = if relative_time {
-        format_distance_to_now(published, now)
+    let now = Utc::now();
+    let published = version.date.unwrap_or(now);
+    let date_str = if relative {
+        relative_time(published, now)
     } else {
         format_short_date(published)
     };
@@ -672,7 +662,7 @@ fn version_list_item(
     let loader_icons_html = loader_icons(&version.loaders, 20, y);
 
     let game_versions = &version.game_versions;
-    let mut game_versions_text = game_versions.iter().take(3).cloned().collect::<Vec<_>>().join(", ");
+    let mut game_versions_text = game_versions[..game_versions.len().min(3)].join(", ");
     if game_versions.len() > 3 {
         game_versions_text.push_str("...");
     }
@@ -683,10 +673,7 @@ fn version_list_item(
     let border = colors.border_color;
 
     let group_attrs = if animations {
-        format!(
-            r#" class="list-item" style="animation-delay: {}s""#,
-            js_num(animation_delay)
-        )
+        format!(r#" class="list-item" style="animation-delay: {animation_delay}s""#)
     } else {
         String::new()
     };
@@ -736,7 +723,7 @@ fn version_list_item(
         gv_y = y + 15,
         game_versions_text = escape_xml(&game_versions_text),
         cal_y = y - 12,
-        scale = js_num(14.0 / 24.0),
+        scale = 14.0 / 24.0,
         calendar_icon = icon("calendar", text).unwrap_or_default(),
         dl_y = y + 18,
         dl_icon_y = y + 6,
@@ -784,10 +771,7 @@ pub fn version_list(
 
 fn delayed_fade(animations: bool, delay: f64) -> String {
     if animations {
-        format!(
-            r#" class="fade-in-delayed" style="animation-delay: {}s""#,
-            js_num(delay)
-        )
+        format!(r#" class="fade-in-delayed" style="animation-delay: {delay}s""#)
     } else {
         String::new()
     }

@@ -1,6 +1,7 @@
+use std::cmp::Reverse;
 use std::time::Instant;
 
-use super::{all_version_dates, attach_version_dates, date_ms, elapsed_ms, sort_by_date_desc, sort_by_downloads_desc};
+use super::{all_version_dates, attach_version_dates, sort_by_downloads_desc};
 use crate::clients::modrinth::{ModrinthApi, ProjectV2, ProjectV3};
 use crate::error::AppError;
 use crate::image::{enrich_image, fetch_project_icons};
@@ -59,10 +60,7 @@ async fn enrich_top_projects(api: &ModrinthApi<'_>, top: &mut [ProjectItem]) {
     fetch_project_icons(api.upstream, top).await;
     attach_version_dates(top, |id| async move {
         match api.project_versions(&id).await {
-            Ok(Some(versions)) => versions
-                .into_iter()
-                .map(|v| v.date_published.unwrap_or_default())
-                .collect(),
+            Ok(Some(versions)) => versions.into_iter().filter_map(|v| v.date_published).collect(),
             _ => Vec::new(),
         }
     })
@@ -81,7 +79,7 @@ pub async fn user_card(
     let (user, projects) = tokio::join!(api.user(username), api.user_projects(username));
     let Some(user) = user? else { return Ok(None) };
     let projects = projects?.unwrap_or_default();
-    let api_ms = elapsed_ms(start);
+    let api_time = start.elapsed();
 
     let items = filter_type(projects.iter().map(item_from_v2).collect(), project_type);
     let (stats, mut top) = aggregate(items);
@@ -98,7 +96,7 @@ pub async fn user_card(
         all_version_dates: all_version_dates(&top),
         projects: top,
         stats,
-        api_ms,
+        api_time,
         ..Default::default()
     }))
 }
@@ -112,7 +110,7 @@ pub async fn project_card(state: &AppState, slug: &str) -> Result<Option<CardDat
     let Some(project) = project? else { return Ok(None) };
     let mut versions = versions?.unwrap_or_default();
     let is_server = project.project_types.iter().any(|t| is_server_project_type(t));
-    let api_ms = elapsed_ms(start);
+    let api_time = start.elapsed();
 
     let image = enrich_image(&state.upstream, project.icon_url.as_deref()).await;
 
@@ -137,7 +135,7 @@ pub async fn project_card(state: &AppState, slug: &str) -> Result<Option<CardDat
     let latest = if is_server {
         Vec::new()
     } else {
-        sort_by_date_desc(&mut versions, |v| date_ms(v.date_published.as_deref()));
+        versions.sort_by_key(|v| Reverse(v.date_published));
         versions
             .into_iter()
             .take(MAX_COUNT)
@@ -161,7 +159,7 @@ pub async fn project_card(state: &AppState, slug: &str) -> Result<Option<CardDat
         versions: latest,
         stats,
         entity_type: is_server.then_some("server"),
-        api_ms,
+        api_time,
         ..Default::default()
     }))
 }
@@ -180,7 +178,7 @@ pub async fn organization_card(
         return Ok(None);
     };
     let projects = projects?.unwrap_or_default();
-    let api_ms = elapsed_ms(start);
+    let api_time = start.elapsed();
 
     let items = filter_type(projects.iter().map(item_from_v3).collect(), project_type);
     let (stats, mut top) = aggregate(items);
@@ -197,7 +195,7 @@ pub async fn organization_card(
         all_version_dates: all_version_dates(&top),
         projects: top,
         stats,
-        api_ms,
+        api_time,
         ..Default::default()
     }))
 }
@@ -215,7 +213,7 @@ pub async fn collection_card(state: &AppState, id: &str) -> Result<Option<CardDa
     } else {
         api.projects(&collection.projects).await?.unwrap_or_default()
     };
-    let api_ms = elapsed_ms(start);
+    let api_time = start.elapsed();
 
     let (stats, mut top) = aggregate(projects.iter().map(item_from_v2).collect());
 
@@ -231,7 +229,7 @@ pub async fn collection_card(state: &AppState, id: &str) -> Result<Option<CardDa
         all_version_dates: all_version_dates(&top),
         projects: top,
         stats,
-        api_ms,
+        api_time,
         ..Default::default()
     }))
 }
@@ -260,7 +258,7 @@ pub async fn user_badge(state: &AppState, username: &str) -> Result<Option<Badge
     );
     Ok(Some(BadgeData {
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
     }))
 }
 
@@ -282,7 +280,7 @@ pub async fn project_badge(state: &AppState, slug: &str) -> Result<Option<BadgeD
         .with("versionCount", version_count);
     Ok(Some(BadgeData {
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
     }))
 }
 
@@ -303,7 +301,7 @@ pub async fn organization_badge(state: &AppState, id: &str) -> Result<Option<Bad
     );
     Ok(Some(BadgeData {
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
     }))
 }
 
@@ -327,6 +325,6 @@ pub async fn collection_badge(state: &AppState, id: &str) -> Result<Option<Badge
     );
     Ok(Some(BadgeData {
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
     }))
 }

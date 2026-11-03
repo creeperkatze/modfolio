@@ -1,3 +1,7 @@
+use std::time::Duration;
+
+use chrono::{DateTime, Utc};
+
 use crate::format::format_number;
 
 #[derive(Clone, Debug)]
@@ -47,7 +51,7 @@ impl Stats {
 #[derive(Clone, Debug, Default)]
 pub struct VersionItem {
     pub version_number: String,
-    pub date: Option<String>,
+    pub date: Option<DateTime<Utc>>,
     pub loaders: Vec<String>,
     pub game_versions: Vec<String>,
     pub downloads: f64,
@@ -64,7 +68,7 @@ pub struct ProjectItem {
     pub icon_url: Option<String>,
     pub project_type: String,
     pub loaders: Vec<String>,
-    pub version_dates: Vec<String>,
+    pub version_dates: Vec<DateTime<Utc>>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -77,19 +81,19 @@ pub struct CardData {
     pub versions: Vec<VersionItem>,
     pub projects: Vec<ProjectItem>,
     pub stats: Stats,
-    pub all_version_dates: Vec<String>,
+    pub all_version_dates: Vec<DateTime<Utc>>,
     /// Set for Modrinth servers.
     pub entity_type: Option<&'static str>,
-    pub api_ms: f64,
+    pub api_time: Duration,
 }
 
 #[derive(Clone, Debug, Default)]
 pub struct BadgeData {
     pub stats: Stats,
-    pub api_ms: f64,
+    pub api_time: Duration,
 }
 
-/// Treats empty strings as missing, like JS `||`.
+/// Treats empty strings as missing.
 pub fn non_empty(value: Option<&str>) -> Option<String> {
     value.filter(|s| !s.is_empty()).map(str::to_string)
 }

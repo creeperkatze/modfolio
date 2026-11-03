@@ -1,21 +1,16 @@
+use std::cmp::Reverse;
 use std::time::Instant;
 
 use futures::future::join_all;
 
-use super::{elapsed_ms, sort_by_downloads_desc};
+use super::sort_by_downloads_desc;
 use crate::clients::numeric_id;
 use crate::clients::spigot::{SpigotApi, author_avatar_url, resource_icon_fallback_url};
 use crate::error::AppError;
-use crate::format::{iso_from_ms, to_fixed};
 use crate::image::enrich_image_from_base64;
 use crate::model::{BadgeData, CardData, ProjectItem, Stats, VersionItem, non_empty};
 use crate::platform::MAX_COUNT;
 use crate::state::AppState;
-
-// Spigot dates are unix seconds.
-fn seconds_to_iso(seconds: Option<i64>) -> Option<String> {
-    seconds.filter(|s| *s != 0).and_then(|s| iso_from_ms(s * 1000))
-}
 
 fn average_rating(ratings: impl Iterator<Item = f64>) -> Option<f64> {
     let rated: Vec<f64> = ratings.filter(|r| *r > 0.0).collect();
@@ -24,7 +19,7 @@ fn average_rating(ratings: impl Iterator<Item = f64>) -> Option<f64> {
 
 fn with_rating(stats: Stats, field: &'static str, rating: Option<f64>) -> Stats {
     match rating {
-        Some(rating) => stats.with_text(field, to_fixed(rating, 1)),
+        Some(rating) => stats.with_text(field, format!("{rating:.1}")),
         None => stats,
     }
 }
@@ -46,12 +41,12 @@ pub async fn resource_card(state: &AppState, resource_id: &str) -> Result<Option
 
     let versions = match api.get_resource_versions(&id, MAX_COUNT).await {
         Ok(Some(mut versions)) => {
-            versions.sort_by_key(|v| std::cmp::Reverse(v.release_date.unwrap_or(0)));
+            versions.sort_by_key(|v| Reverse(v.release_date));
             versions
                 .into_iter()
                 .map(|version| VersionItem {
                     version_number: non_empty(version.name.as_deref()).unwrap_or_else(|| "Unknown".into()),
-                    date: iso_from_ms(version.release_date.unwrap_or(0) * 1000),
+                    date: version.release_date,
                     loaders: Vec::new(),
                     game_versions: Vec::new(),
                     downloads: version.downloads,
@@ -73,7 +68,7 @@ pub async fn resource_card(state: &AppState, resource_id: &str) -> Result<Option
         image,
         versions,
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
         ..Default::default()
     }))
 }
@@ -100,7 +95,7 @@ pub async fn author_card(state: &AppState, author_id: &str) -> Result<Option<Car
         .flatten()
         .unwrap_or_default();
     let total_downloads: f64 = all.iter().map(|r| r.downloads).sum();
-    let all_version_dates: Vec<String> = all.iter().filter_map(|r| seconds_to_iso(r.release_date)).collect();
+    let all_version_dates = all.iter().filter_map(|r| r.release_date).collect();
     let average = average_rating(all.iter().map(|r| r.rating_average()));
     let resource_count = all.len();
 
@@ -133,7 +128,7 @@ pub async fn author_card(state: &AppState, author_id: &str) -> Result<Option<Car
         projects: resources,
         stats,
         all_version_dates,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
         ..Default::default()
     }))
 }
@@ -157,7 +152,7 @@ pub async fn resource_badge(state: &AppState, resource_id: &str) -> Result<Optio
         .with("versionCount", resource.versions.len() as f64);
     Ok(Some(BadgeData {
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
     }))
 }
 
@@ -190,6 +185,6 @@ pub async fn author_badge(state: &AppState, author_id: &str) -> Result<Option<Ba
         .with("avgRating", avg_rating.unwrap_or(0.0));
     Ok(Some(BadgeData {
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
     }))
 }

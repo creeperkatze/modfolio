@@ -174,7 +174,7 @@ async fn handle(state: SharedState, client: Client, query: CardQuery, card: Card
     options.from_cache = from_cache;
     let svg = generate_card(&data, platform, data.entity_type.unwrap_or(card.entity()), &options);
     record(&state, card, output, "success");
-    output.success(&state, svg, from_cache, data.api_ms).await
+    output.success(&state, svg, from_cache, data.api_time).await
 }
 
 fn route(card: CardType) -> MethodRouter<SharedState> {

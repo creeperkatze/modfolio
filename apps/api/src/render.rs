@@ -59,7 +59,6 @@ impl Renderer {
 fn render(svg: &str, options: &usvg::Options) -> Result<Vec<u8>, AppError> {
     let tree = usvg::Tree::from_str(svg, options).map_err(|err| AppError::Internal(err.to_string()))?;
     let size = tree.size();
-    // Rounded to match the old resvg-js output size.
     let width = OUTPUT_WIDTH;
     let height = (OUTPUT_WIDTH as f32 * size.height() / size.width()).round() as u32;
     let mut pixmap =

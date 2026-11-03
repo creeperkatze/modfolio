@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
 
@@ -77,7 +78,7 @@ pub struct Author {
 pub struct File {
     pub display_name: Option<String>,
     pub file_name: Option<String>,
-    pub file_date: Option<String>,
+    pub file_date: Option<DateTime<Utc>>,
     #[serde(default, deserialize_with = "nullable")]
     pub download_count: f64,
     #[serde(default, deserialize_with = "nullable")]
@@ -155,22 +156,9 @@ pub fn extract_game_versions(file: &File) -> Vec<String> {
         .collect()
 }
 
-pub fn file_date_ms(file: &File) -> f64 {
-    file.file_date
-        .as_deref()
-        .and_then(crate::format::parse_date_ms)
-        .map_or(f64::NAN, |ms| ms as f64)
-}
-
 /// latestFiles is not sorted by date.
 pub fn latest_file(files: &[File]) -> Option<&File> {
-    let mut latest = files.first()?;
-    for file in &files[1..] {
-        if file_date_ms(file) > file_date_ms(latest) {
-            latest = file;
-        }
-    }
-    Some(latest)
+    files.iter().max_by_key(|file| file.file_date)
 }
 
 #[derive(Default)]

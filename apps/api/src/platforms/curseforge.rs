@@ -1,11 +1,11 @@
+use std::cmp::Reverse;
 use std::time::Instant;
 
 use futures::future::join_all;
 
-use super::{all_version_dates, attach_version_dates, elapsed_ms, sort_by_date_desc};
+use super::{all_version_dates, attach_version_dates};
 use crate::clients::curseforge::{
-    CurseforgeApi, SORT_TOTAL_DOWNLOADS, SearchOptions, extract_game_versions, extract_loaders, file_date_ms,
-    latest_file,
+    CurseforgeApi, SORT_TOTAL_DOWNLOADS, SearchOptions, extract_game_versions, extract_loaders, latest_file,
 };
 use crate::clients::numeric_id;
 use crate::error::AppError;
@@ -38,7 +38,7 @@ pub async fn mod_card(state: &AppState, mod_id: &str) -> Result<Option<CardData>
         Ok(Some(response)) => {
             let total = response.total_count().unwrap_or(response.data.len() as f64);
             let mut files = response.data;
-            sort_by_date_desc(&mut files, file_date_ms);
+            files.sort_by_key(|file| Reverse(file.file_date));
             let versions = files
                 .iter()
                 .take(MAX_COUNT)
@@ -46,7 +46,7 @@ pub async fn mod_card(state: &AppState, mod_id: &str) -> Result<Option<CardData>
                     version_number: non_empty(file.display_name.as_deref())
                         .or_else(|| non_empty(file.file_name.as_deref()))
                         .unwrap_or_else(|| "Unknown".into()),
-                    date: file.file_date.clone(),
+                    date: file.file_date,
                     loaders: extract_loaders(file),
                     game_versions: extract_game_versions(file),
                     downloads: file.download_count,
@@ -70,7 +70,7 @@ pub async fn mod_card(state: &AppState, mod_id: &str) -> Result<Option<CardData>
         class_id: m.class_id,
         versions,
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
         ..Default::default()
     }))
 }
@@ -132,11 +132,7 @@ pub async fn user_card(state: &AppState, user_id: &str, class_id: Option<&str>) 
         let api = &api;
         async move {
             match api.get_mod_files(&id, 50).await {
-                Ok(Some(files)) => files
-                    .data
-                    .into_iter()
-                    .map(|f| f.file_date.unwrap_or_default())
-                    .collect(),
+                Ok(Some(files)) => files.data.into_iter().filter_map(|f| f.file_date).collect(),
                 _ => Vec::new(),
             }
         }
@@ -164,7 +160,7 @@ pub async fn user_card(state: &AppState, user_id: &str, class_id: Option<&str>) 
         all_version_dates: all_version_dates(&projects),
         projects,
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
         ..Default::default()
     }))
 }
@@ -193,7 +189,7 @@ pub async fn mod_badge(state: &AppState, mod_id: &str) -> Result<Option<BadgeDat
         .with("rank", m.game_popularity_rank.filter(|r| *r != 0.0));
     Ok(Some(BadgeData {
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
     }))
 }
 
@@ -226,6 +222,6 @@ pub async fn user_badge(state: &AppState, user_id: &str) -> Result<Option<BadgeD
         .with("totalFollowers", user.follower_count.unwrap_or(0.0));
     Ok(Some(BadgeData {
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
     }))
 }

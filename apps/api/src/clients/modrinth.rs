@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
 
@@ -70,7 +71,7 @@ pub struct PingData {
 pub struct VersionV3 {
     pub name: Option<String>,
     pub version_number: Option<String>,
-    pub date_published: Option<String>,
+    pub date_published: Option<DateTime<Utc>>,
     #[serde(default, deserialize_with = "nullable")]
     pub loaders: Vec<String>,
     #[serde(default, deserialize_with = "nullable")]

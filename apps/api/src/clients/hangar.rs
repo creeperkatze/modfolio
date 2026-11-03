@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Mutex;
 
+use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
 use serde_json::{Map, Value};
@@ -20,7 +21,7 @@ pub struct Project {
     pub stats: Option<ProjectStats>,
     pub avatar_url: Option<String>,
     pub description: Option<String>,
-    pub created_at: Option<String>,
+    pub created_at: Option<DateTime<Utc>>,
 }
 
 impl Project {
@@ -49,7 +50,7 @@ pub struct ProjectStats {
 #[serde(rename_all = "camelCase")]
 pub struct Version {
     pub name: Option<String>,
-    pub created_at: Option<String>,
+    pub created_at: Option<DateTime<Utc>>,
     pub stats: Option<VersionStats>,
     #[serde(default, deserialize_with = "nullable")]
     pub downloads: Map<String, Value>,

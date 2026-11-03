@@ -10,7 +10,7 @@ use super::SharedState;
 use super::embed::{Client, Format, Output, hex_color};
 use crate::cache::{self, CachedValue};
 use crate::error::AppError;
-use crate::format::{format_number, js_num, to_fixed};
+use crate::format::format_number;
 use crate::generators::badge::{BadgeStyle, generate_badge};
 use crate::model::{BadgeData, Stats};
 use crate::platform::Platform;
@@ -109,13 +109,13 @@ impl Entity {
         match metric {
             Metric::Downloads if is_profile => format_number(num("totalDownloads")),
             Metric::Downloads => format_number(num("downloads")),
-            Metric::Projects => js_num(num("projectCount")),
+            Metric::Projects => num("projectCount").to_string(),
             Metric::Followers if is_profile => format_number(num("totalFollowers")),
             Metric::Followers => format_number(num("followers")),
-            Metric::Versions if matches!(self, Entity::CurseforgeProject) => js_num(num("fileCount")),
-            Metric::Versions => js_num(num("versionCount")),
+            Metric::Versions if matches!(self, Entity::CurseforgeProject) => num("fileCount").to_string(),
+            Metric::Versions => num("versionCount").to_string(),
             Metric::Rank => match stats.num("rank").filter(|r| *r != 0.0) {
-                Some(rank) => format!("#{}", js_num(rank)),
+                Some(rank) => format!("#{rank}"),
                 None => "N/A".into(),
             },
             Metric::Views => format_number(num("views")),
@@ -124,11 +124,11 @@ impl Entity {
             Metric::Rating => {
                 let field = if is_profile { "avgRating" } else { "rating" };
                 match stats.num(field).filter(|r| *r != 0.0) {
-                    Some(rating) => to_fixed(rating, 1),
+                    Some(rating) => format!("{rating:.1}"),
                     None => "N/A".into(),
                 }
             }
-            Metric::Resources => js_num(num("resourceCount")),
+            Metric::Resources => num("resourceCount").to_string(),
         }
     }
 }
@@ -221,7 +221,7 @@ async fn handle(
     };
     let svg = generate_badge(label, &entity.value(metric, &data.stats), platform, &style);
     record(&state, entity, output, "success");
-    output.success(&state, svg, from_cache, data.api_ms).await
+    output.success(&state, svg, from_cache, data.api_time).await
 }
 
 fn route(entity: Entity, metric: Metric) -> MethodRouter<SharedState> {

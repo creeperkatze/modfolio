@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::Duration;
 
-use crate::format::now_ms;
 use crate::metrics::Metrics;
 use crate::model::{BadgeData, CardData};
 
@@ -13,53 +11,34 @@ pub enum CachedValue {
     Json(serde_json::Value),
 }
 
-struct Entry {
-    value: CachedValue,
-    expiry: i64,
-}
-
 pub struct Cache {
-    entries: Mutex<HashMap<String, Entry>>,
-    ttl_ms: i64,
+    entries: moka::sync::Cache<String, CachedValue>,
     metrics: Arc<Metrics>,
 }
 
 impl Cache {
     pub fn new(ttl: Duration, metrics: Arc<Metrics>) -> Self {
         Cache {
-            entries: Mutex::new(HashMap::new()),
-            ttl_ms: ttl.as_millis() as i64,
+            entries: moka::sync::Cache::builder().time_to_live(ttl).build(),
             metrics,
         }
     }
 
     pub fn get(&self, key: &str) -> Option<CachedValue> {
-        let mut entries = self.entries.lock().unwrap_or_else(|e| e.into_inner());
-        let result = match entries.get(key) {
-            Some(entry) if now_ms() > entry.expiry => {
-                entries.remove(key);
-                self.metrics.cache_size.set(entries.len() as i64);
-                None
-            }
-            Some(entry) => Some(entry.value.clone()),
-            None => None,
-        };
+        let result = self.entries.get(key);
         let label = if result.is_some() { "hit" } else { "miss" };
         self.metrics.cache_operations_total.with_label_values(&[label]).inc();
+        self.update_size();
         result
     }
 
     pub fn set(&self, key: impl Into<String>, value: CachedValue) {
-        let now = now_ms();
-        let mut entries = self.entries.lock().unwrap_or_else(|e| e.into_inner());
-        entries.insert(
-            key.into(),
-            Entry {
-                value,
-                expiry: now + self.ttl_ms,
-            },
-        );
-        self.metrics.cache_size.set(entries.len() as i64);
+        self.entries.insert(key.into(), value);
+        self.update_size();
+    }
+
+    fn update_size(&self) {
+        self.metrics.cache_size.set(self.entries.entry_count() as i64);
     }
 }
 

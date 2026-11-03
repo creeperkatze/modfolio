@@ -1,8 +1,9 @@
+use std::cmp::Reverse;
 use std::time::Instant;
 
 use serde_json::Value;
 
-use super::{all_version_dates, attach_version_dates, date_ms, elapsed_ms, sort_by_date_desc, sort_by_downloads_desc};
+use super::{all_version_dates, attach_version_dates, sort_by_downloads_desc};
 use crate::clients::hangar::HangarApi;
 use crate::error::AppError;
 use crate::image::{enrich_image, fetch_project_icons};
@@ -31,7 +32,7 @@ pub async fn project_card(state: &AppState, slug: &str) -> Result<Option<CardDat
         Ok(Some(response)) => {
             let total = response.count().unwrap_or(response.result.len() as f64);
             let mut versions = response.result;
-            sort_by_date_desc(&mut versions, |v| date_ms(v.created_at.as_deref()));
+            versions.sort_by_key(|v| Reverse(v.created_at));
             let versions = versions
                 .into_iter()
                 .map(|version| {
@@ -69,7 +70,7 @@ pub async fn project_card(state: &AppState, slug: &str) -> Result<Option<CardDat
         image,
         versions,
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
         ..Default::default()
     }))
 }
@@ -114,11 +115,7 @@ pub async fn user_card(state: &AppState, username: &str) -> Result<Option<CardDa
                 let api = &api;
                 async move {
                     match api.get_project_versions(&slug, 10).await {
-                        Ok(Some(versions)) => versions
-                            .result
-                            .into_iter()
-                            .map(|v| v.created_at.unwrap_or_default())
-                            .collect(),
+                        Ok(Some(versions)) => versions.result.into_iter().filter_map(|v| v.created_at).collect(),
                         _ => Vec::new(),
                     }
                 }
@@ -146,7 +143,7 @@ pub async fn user_card(state: &AppState, username: &str) -> Result<Option<CardDa
         all_version_dates: all_version_dates(&projects),
         projects,
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
         ..Default::default()
     }))
 }
@@ -170,7 +167,7 @@ pub async fn project_badge(state: &AppState, slug: &str) -> Result<Option<BadgeD
         .with("versionCount", version_count);
     Ok(Some(BadgeData {
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
     }))
 }
 
@@ -197,6 +194,6 @@ pub async fn user_badge(state: &AppState, username: &str) -> Result<Option<Badge
         .with("totalStars", total_stars);
     Ok(Some(BadgeData {
         stats,
-        api_ms: elapsed_ms(start),
+        api_time: start.elapsed(),
     }))
 }

@@ -1,4 +1,5 @@
 use std::convert::Infallible;
+use std::time::Duration;
 
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
@@ -102,7 +103,7 @@ impl Output {
         if self.png { "png" } else { "svg" }
     }
 
-    pub async fn success(self, state: &AppState, svg: String, from_cache: bool, api_ms: f64) -> Response {
+    pub async fn success(self, state: &AppState, svg: String, from_cache: bool, api_time: Duration) -> Response {
         let mut headers = HeaderMap::new();
         headers.insert(
             header::CACHE_CONTROL,
@@ -115,7 +116,7 @@ impl Output {
         if !from_cache {
             headers.insert(
                 HeaderName::from_static("x-api-time"),
-                HeaderValue::from_str(&format!("{}ms", api_ms.round())).expect("valid header"),
+                HeaderValue::from_str(&format!("{}ms", api_time.as_millis())).expect("valid header"),
             );
         }
         self.respond(state, svg, StatusCode::OK, headers).await

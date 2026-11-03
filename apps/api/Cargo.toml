@@ -13,7 +13,7 @@ publish = false
 [dependencies]
 axum = "0.8"
 base64 = "0.23"
-chrono = "0.4"
+chrono = { version = "0.4", features = ["serde"] }
 dotenvy = "0.15"
 futures = "0.3"
 image = { version = "0.25", default-features = false, features = [
@@ -25,17 +25,24 @@ image = { version = "0.25", default-features = false, features = [
 	"ico",
 	"tiff",
 ] }
+moka = { version = "0.12", features = ["sync"] }
 prometheus = { version = "0.14", features = ["process"] }
+quick-xml = { version = "0.42", default-features = false }
 reqwest = { version = "0.13", features = ["json", "query"] }
 resvg = "0.49"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 subtle = "2"
+textwrap = { version = "0.16", default-features = false, features = ["std"] }
+timeago = { version = "0.6", default-features = false, features = ["chrono"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal", "sync"] }
 tower-http = { version = "0.7", features = ["fs", "trace"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 url = "2"
+
+[build-dependencies]
+serde_json = "1"
 
 [dev-dependencies]
 http-body-util = "0.1"

@@ -1,3 +1,5 @@
+use chrono::serde::ts_seconds_option;
+use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
 use serde::de::IgnoredAny;
@@ -33,7 +35,8 @@ pub struct Resource {
     pub likes: f64,
     pub rating: Option<Rating>,
     pub icon: Option<Icon>,
-    pub release_date: Option<i64>,
+    #[serde(default, with = "ts_seconds_option")]
+    pub release_date: Option<DateTime<Utc>>,
     #[serde(default, deserialize_with = "nullable")]
     pub versions: Vec<IgnoredAny>,
 }
@@ -61,7 +64,8 @@ pub struct Icon {
 #[serde(rename_all = "camelCase")]
 pub struct Version {
     pub name: Option<String>,
-    pub release_date: Option<i64>,
+    #[serde(default, with = "ts_seconds_option")]
+    pub release_date: Option<DateTime<Utc>>,
     #[serde(default, deserialize_with = "nullable")]
     pub downloads: f64,
 }

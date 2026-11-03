@@ -65,11 +65,7 @@ fn project_card(data: &CardData, platform: Platform, entity_type: &str, options:
     };
     let height = card_height(latest_versions.len(), summary_offset);
 
-    let version_dates: Vec<String> = data
-        .versions
-        .iter()
-        .map(|v| v.date.clone().unwrap_or_default())
-        .collect();
+    let version_dates: Vec<_> = data.versions.iter().filter_map(|v| v.date).collect();
 
     let stats: Vec<StatCell> = platform
         .stat_configs(entity_type)
