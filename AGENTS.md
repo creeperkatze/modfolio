@@ -14,7 +14,7 @@ This project is a pnpm workspace run with Turborepo:
 - `pnpm lint` runs oxlint and clippy. `pnpm lint:fix` applies their fixes.
 - `pnpm fmt` formats with oxfmt and `cargo fmt`. `pnpm fmt:check` only checks.
 - `pnpm typecheck` checks the website.
-- Never run the `release:*` scripts or push tags. Releases are done by the maintainer.
+- Never run the `release` script (`pnpm release patch|minor|major`) or push tags. Releases are done by the maintainer.
 
 ## Rules
 
