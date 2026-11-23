@@ -1,0 +1,338 @@
+{
+  "action.copy": {
+    "message": "{label}'i Kopyala"
+  },
+  "action.reset": {
+    "message": "Sıfırla"
+  },
+  "app.subtitle": {
+    "message": "Modrinth, CurseForge, Hangar ve Spigot içerikleri için hızlıca güzel, tutarlı gömülebilir kartlar ve rozetler oluşturun."
+  },
+  "colorScheme.auto": {
+    "message": "Sistem"
+  },
+  "colorScheme.dark": {
+    "message": "Koyu"
+  },
+  "colorScheme.label": {
+    "message": "Renk şeması"
+  },
+  "colorScheme.light": {
+    "message": "Aydınlık"
+  },
+  "error.apiDown": {
+    "message": "{platform} API'si şu anda yanıt vermiyor."
+  },
+  "field.badgeMetric": {
+    "message": "Rozet İstatistiği"
+  },
+  "field.platform": {
+    "message": "Platform"
+  },
+  "field.projectType": {
+    "message": "Proje Türü"
+  },
+  "field.target": {
+    "message": "Hedef"
+  },
+  "field.type": {
+    "message": "Tür"
+  },
+  "field.url": {
+    "message": "URL"
+  },
+  "footer.credits": {
+    "message": "♥ ile hazırlayan"
+  },
+  "footer.crowdin.description": {
+    "message": "Modfolio'yu Crowdin'de çevir"
+  },
+  "footer.crowdin.title": {
+    "message": "Çevirmemize yardım et"
+  },
+  "footer.github.description": {
+    "message": "Kaynak kodunu incele"
+  },
+  "footer.github.title": {
+    "message": "GitHub'da yıldızla"
+  },
+  "footer.kofi.description": {
+    "message": "Ko-fi'de bana bir kahve al"
+  },
+  "footer.kofi.title": {
+    "message": "Destek ol"
+  },
+  "hint.accentColor": {
+    "message": "Grafikler ve vurgular için kullanılır"
+  },
+  "hint.animations": {
+    "message": "Gömülü içeriği yüklendiği anda animasyon ile canlandır"
+  },
+  "hint.badgeMetric": {
+    "message": "Rozette gösterilen istatistik"
+  },
+  "hint.downloadBars": {
+    "message": "Proje indirmelerini çubuklar ile karşılaştır"
+  },
+  "hint.projectType": {
+    "message": "Sadece bu tür projeleri dahil et"
+  },
+  "hint.relativeTime": {
+    "message": "Bugünün tarihine göre göster"
+  },
+  "hint.showBorder": {
+    "message": "Gömülü içeriğin etrafına kenarlık ekle"
+  },
+  "hint.showFiles": {
+    "message": "En yeni dosyaları listele"
+  },
+  "hint.showIcon": {
+    "message": "Rozette platform logosunu göster"
+  },
+  "hint.showProjects": {
+    "message": "Karttaki projeleri listele"
+  },
+  "hint.showSummary": {
+    "message": "Açıklama metnini göster"
+  },
+  "hint.showVersions": {
+    "message": "En yeni versiyonları listele"
+  },
+  "hint.sparklines": {
+    "message": "Zaman içindeki sürüm etkinliklerini grafikte göster"
+  },
+  "hint.target": {
+    "message": "Gömülü içeriğin konusu"
+  },
+  "hint.transparentBg": {
+    "message": "Çoğu durumda şeffaf mod en iyi tercihtir, stili bozmadan arka plan ile uyuşur."
+  },
+  "hint.type": {
+    "message": "Detaylı kart ya da küçük rozet"
+  },
+  "hint.url": {
+    "message": "Alttaki her şeyi doldurmak için bir link yapıştır"
+  },
+  "metric.downloads": {
+    "message": "İndirilenler"
+  },
+  "metric.followers": {
+    "message": "Takipçiler"
+  },
+  "metric.likes": {
+    "message": "Beğeniler"
+  },
+  "metric.players": {
+    "message": "Çevrim içi Oyuncular"
+  },
+  "metric.projects": {
+    "message": "Projeler"
+  },
+  "metric.rank": {
+    "message": "Rütbe"
+  },
+  "metric.rating": {
+    "message": "Değerlendirme"
+  },
+  "metric.resources": {
+    "message": "Kaynaklar"
+  },
+  "metric.stars": {
+    "message": "Yıldızlar"
+  },
+  "metric.versions": {
+    "message": "Versiyonlar"
+  },
+  "metric.views": {
+    "message": "Görüntülemeler"
+  },
+  "option.accentColor": {
+    "message": "Vurgu Rengi"
+  },
+  "option.animations": {
+    "message": "Animasyonlar"
+  },
+  "option.bgColor": {
+    "message": "Arka plan Rengi"
+  },
+  "option.customColor": {
+    "message": "Özel renk"
+  },
+  "option.downloadBars": {
+    "message": "İndirme Çubukları"
+  },
+  "option.maxFiles": {
+    "message": "Maksimum Dosya Sayısı"
+  },
+  "option.maxProjects": {
+    "message": "Maksimum Proje Sayısı"
+  },
+  "option.maxVersions": {
+    "message": "Maksimum Versiyon sayısı"
+  },
+  "option.relativeTime": {
+    "message": "Göreli Zaman"
+  },
+  "option.showBorder": {
+    "message": "Kenarlığı Göster"
+  },
+  "option.showFiles": {
+    "message": "Dosyaları Göster"
+  },
+  "option.showIcon": {
+    "message": "Platform Simgesini Göster"
+  },
+  "option.showProjects": {
+    "message": "Projeleri Göster"
+  },
+  "option.showSummary": {
+    "message": "Özeti Göster"
+  },
+  "option.showVersions": {
+    "message": "Versiyonları Göster"
+  },
+  "option.sparklines": {
+    "message": "Mini Grafikler"
+  },
+  "output.htmlPlaceholder": {
+    "message": "HTML kodunuz burada görünecektir"
+  },
+  "output.markdownPlaceholder": {
+    "message": "Markdown kodunuz burada görünecektir"
+  },
+  "output.urlPlaceholder": {
+    "message": "URL'niz burada görünecektir"
+  },
+  "preview.imageAlt": {
+    "message": "Önizleme"
+  },
+  "preview.placeholder": {
+    "message": "Gömülü içeriğiniz burada görünecektir"
+  },
+  "projectType.all": {
+    "message": "Tüm Türler"
+  },
+  "projectType.bukkitPlugin": {
+    "message": "Bukkit Eklentileri"
+  },
+  "projectType.datapack": {
+    "message": "Veri Paketleri"
+  },
+  "projectType.mod": {
+    "message": "Modlar"
+  },
+  "projectType.modpack": {
+    "message": "Mod Paketleri"
+  },
+  "projectType.plugin": {
+    "message": "Eklentiler"
+  },
+  "projectType.resourcepack": {
+    "message": "Kaynak Paketleri"
+  },
+  "projectType.shader": {
+    "message": "Shaderlar"
+  },
+  "projectType.texturePack": {
+    "message": "Doku Paketleri"
+  },
+  "section.configuration": {
+    "message": "Konfigürasyon"
+  },
+  "section.customization": {
+    "message": "Özelleştirme"
+  },
+  "section.embedCode": {
+    "message": "Gömülü kod"
+  },
+  "section.html": {
+    "message": "HTML"
+  },
+  "section.markdown": {
+    "message": "Markdown"
+  },
+  "section.preview": {
+    "message": "Önizleme"
+  },
+  "section.url": {
+    "message": "URL"
+  },
+  "target.author": {
+    "message": "Yapımcı"
+  },
+  "target.collection": {
+    "message": "Koleksiyon"
+  },
+  "target.organization": {
+    "message": "Organizasyon"
+  },
+  "target.project": {
+    "message": "Proje"
+  },
+  "target.resource": {
+    "message": "Kaynak"
+  },
+  "target.user": {
+    "message": "Kullanıcı"
+  },
+  "type.badge": {
+    "message": "Rozet"
+  },
+  "type.card": {
+    "message": "Kart"
+  },
+  "value.label.author": {
+    "message": "Yapımcı ID'si"
+  },
+  "value.label.collection": {
+    "message": "Koleksiyon ID'si"
+  },
+  "value.label.default": {
+    "message": "Değer"
+  },
+  "value.label.organization": {
+    "message": "Organizasyon Kısa Adı"
+  },
+  "value.label.project.default": {
+    "message": "Proje Kısa Adı"
+  },
+  "value.label.project.numeric": {
+    "message": "Proje ID'si"
+  },
+  "value.label.resource": {
+    "message": "Kaynak ID'si"
+  },
+  "value.label.user.curseforge": {
+    "message": "Kullanıcı ID'si"
+  },
+  "value.label.user.default": {
+    "message": "Kullanıcı Adı"
+  },
+  "value.placeholder.author": {
+    "message": "Kullanıcı ID'sini gir"
+  },
+  "value.placeholder.collection": {
+    "message": "Koleksiyon ID'sini gir"
+  },
+  "value.placeholder.organization": {
+    "message": "Organizasyon kısa adını ya da ID'sini gir"
+  },
+  "value.placeholder.project.default": {
+    "message": "Proje kısa adını ya da ID'sini gir"
+  },
+  "value.placeholder.project.numeric": {
+    "message": "Proje ID'sini gir"
+  },
+  "value.placeholder.resource": {
+    "message": "Kaynak ID'sini gir"
+  },
+  "value.placeholder.user.curseforge": {
+    "message": "Kullanıcı ID'sini gir"
+  },
+  "value.placeholder.user.default": {
+    "message": "Kullanıcı adını ya da ID'sini gir"
+  },
+  "warning.apiSlow": {
+    "message": "{platform} API'si yavaş yanıt veriyor. Gömülü içeriklerin yüklenmesi daha uzun sürebilir."
+  }
+}
