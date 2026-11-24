@@ -312,15 +312,6 @@ pub fn template(name: &str) -> Option<&'static str> {
         <path d="M-21.195 10.385s1.378.38 1.947 1.615" fill="none" stroke="{{COLOR}}" stroke-width="1.81" stroke-linecap="round" stroke-linejoin="round" transform="matrix(1.04036 0 0 1.1631 41.36 -1.513)"/>
     "###
         }
-        "database-zap" => {
-            r###"
-        <ellipse cx="12" cy="5" rx="9" ry="3" stroke="{{COLOR}}" stroke-width="2" fill="none"/>
-        <path d="M3 5v14a9 3 0 0 0 12 1.84" stroke="{{COLOR}}" stroke-width="2" stroke-linecap="round" fill="none"/>
-        <path d="M21 5v3" stroke="{{COLOR}}" stroke-width="2" stroke-linecap="round" fill="none"/>
-        <path d="M21 12l-3 5h4l-3 5" stroke="{{COLOR}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        <path d="M3 12a9 3 0 0 0 11.59 2.87" stroke="{{COLOR}}" stroke-width="2" stroke-linecap="round" fill="none"/>
-    "###
-        }
         "java-agent" => {
             r###"
         <path d="M18 2L22 6" stroke="{{COLOR}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>

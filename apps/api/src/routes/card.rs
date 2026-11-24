@@ -127,7 +127,7 @@ fn record(state: &AppState, card: CardType, output: Output, status: &str) {
 async fn handle(state: SharedState, client: Client, query: CardQuery, card: CardType, id: String) -> Response {
     let platform = card.platform();
     let output = Output::new(&client, query.format);
-    let mut options = CardOptions {
+    let options = CardOptions {
         show_projects: query.show_projects,
         show_versions: query.show_versions,
         max_projects: count(query.max_projects),
@@ -142,7 +142,6 @@ async fn handle(state: SharedState, client: Client, query: CardQuery, card: Card
         background_color: hex_color(query.background_color),
         project_type: query.project_type.filter(|t| !t.is_empty()),
         legacy_domain: client.legacy_domain || query.legacy_domain,
-        from_cache: false,
     };
 
     let mut cache_key = cache::key(platform.id(), card.entity(), &id);
@@ -171,7 +170,6 @@ async fn handle(state: SharedState, client: Client, query: CardQuery, card: Card
         },
     };
 
-    options.from_cache = from_cache;
     let svg = generate_card(&data, platform, data.entity_type.unwrap_or(card.entity()), &options);
     record(&state, card, output, "success");
     output.success(&state, svg, from_cache, data.api_time).await

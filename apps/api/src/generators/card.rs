@@ -1,6 +1,6 @@
 use super::svg::{
-    StatCell, activity_sparkline, attribution, calculate_bottom_delay, divider, header, info, profile_image,
-    project_list, rect_image, stats_grid, summary, svg_wrapper, theme_colors, version_list,
+    StatCell, activity_sparkline, divider, header, profile_image, project_list, rect_image, stats_grid, summary,
+    svg_wrapper, theme_colors, version_list,
 };
 use crate::format::{escape_xml, format_number, truncate_text};
 use crate::model::{CardData, Stat};
@@ -22,7 +22,6 @@ pub struct CardOptions {
     pub background_color: Option<String>,
     pub project_type: Option<String>,
     pub legacy_domain: bool,
-    pub from_cache: bool,
 }
 
 const STAT_X: [i64; 3] = [15, 155, 270];
@@ -93,7 +92,6 @@ fn project_card(data: &CardData, platform: Platform, entity_type: &str, options:
     };
 
     let title = data.name.as_deref().unwrap_or("Unknown");
-    let bottom_delay = calculate_bottom_delay(latest_versions.len());
 
     let parts = [
         if options.show_sparklines {
@@ -124,8 +122,6 @@ fn project_card(data: &CardData, platform: Platform, entity_type: &str, options:
             animations,
             summary_offset,
         ),
-        info(height, colors.text_color, options.from_cache, animations, bottom_delay),
-        attribution(height, colors.text_color, animations, bottom_delay),
     ];
     let content = format!("\n{}\n", parts.join("\n"));
 
@@ -184,7 +180,6 @@ fn profile_card(data: &CardData, platform: Platform, kind: ProfileKind, options:
         .collect();
 
     let title = data.name.as_deref().unwrap_or(fallback_title);
-    let bottom_delay = calculate_bottom_delay(top_projects.len());
 
     let parts = [
         if options.show_sparklines {
@@ -216,8 +211,6 @@ fn profile_card(data: &CardData, platform: Platform, kind: ProfileKind, options:
             animations,
             summary_offset,
         ),
-        info(height, colors.text_color, options.from_cache, animations, bottom_delay),
-        attribution(height, colors.text_color, animations, bottom_delay),
     ];
     let content = format!("\n{}\n", parts.join("\n"));
 
@@ -276,16 +269,11 @@ pub fn generate_error_card(message: &str, detail: &str, platform: Platform) -> S
       {message}
     </text>
     {detail_html}
-
-    {info}
-    {attribution}
   </g>
 </svg>"#,
         border = "#E4E2E2",
         text_y = if detail.is_empty() { "65" } else { "55" },
         message = escape_xml(message),
-        info = info(120, detail_text_color, false, true, 0.0),
-        attribution = attribution(120, detail_text_color, true, 0.0),
     )
     .trim()
     .to_string()

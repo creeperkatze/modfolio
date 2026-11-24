@@ -31,10 +31,6 @@ pub fn theme_colors(accent_color: &str, background_color: Option<&str>) -> Color
     }
 }
 
-pub fn calculate_bottom_delay(item_count: usize) -> f64 {
-    0.3 + item_count as f64 * 0.08
-}
-
 const LEGACY_DOMAIN_WARNING_HEIGHT: i64 = 24;
 
 fn legacy_domain_warning(width: i64, height: i64, animations: bool) -> String {
@@ -766,60 +762,5 @@ pub fn version_list(
         130 + y_offset,
         colors.text_color,
         escape_xml(header_text)
-    )
-}
-
-fn delayed_fade(animations: bool, delay: f64) -> String {
-    if animations {
-        format!(r#" class="fade-in-delayed" style="animation-delay: {delay}s""#)
-    } else {
-        String::new()
-    }
-}
-
-pub fn attribution(height: i64, text_color: &str, animations: bool, delay: f64) -> String {
-    format!(
-        r#"
-  <!-- Bottom right attribution -->
-  <text x="435" y="{}" font-family="Inter, sans-serif" font-size="10" fill="{text_color}" text-anchor="end"{}>
-    modfolio.creeperkatze.dev
-  </text>"#,
-        height - 5,
-        delayed_fade(animations, delay)
-    )
-}
-
-pub fn info(height: i64, text_color: &str, from_cache: bool, animations: bool, delay: f64) -> String {
-    let fade = delayed_fade(animations, delay);
-    let cache_html = if from_cache {
-        format!(
-            r#"
-  <!-- Cache icon -->
-  <g opacity="0.6"{fade}>
-    <svg x="15" y="{}" width="12" height="12" viewBox="0 0 24 24">
-      {}
-    </svg>
-  </g>"#,
-            height - 15,
-            icon("database-zap", text_color).unwrap_or_default()
-        )
-    } else {
-        String::new()
-    };
-
-    format!(
-        r#"
-  <!-- Bottom left version -->
-  <text x="{}" y="{}"
-        font-family="Inter, sans-serif"
-        font-size="10"
-        fill="{text_color}"
-        text-anchor="start"{fade}>
-    v{}
-  </text>
-{cache_html}"#,
-        if from_cache { 30 } else { 15 },
-        height - 5,
-        crate::VERSION
     )
 }
